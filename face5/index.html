@@ -69,6 +69,22 @@
       margin: 14px 0 18px;
       color: #004080;
       text-decoration: none;
+      padding: 10px;
+      border: 1px solid #e1ebf6;
+      border-radius: 6px;
+      background: #fbfdff;
+      box-shadow: 0 8px 18px rgba(0, 48, 96, 0.05);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+    .site-preview:hover {
+      transform: translateY(-4px);
+      border-color: #aac5df;
+      box-shadow: 0 14px 28px rgba(0, 48, 96, 0.1);
+    }
+    .preview-main {
+      display: block;
+      color: inherit;
+      text-decoration: none;
     }
     .preview-screen {
       position: relative;
@@ -117,6 +133,40 @@
       text-align: center;
       text-transform: uppercase;
       letter-spacing: 0;
+    }
+    .preview-copy {
+      margin: 8px 0 10px;
+      color: #405b75;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .preview-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .preview-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 8px 10px;
+      border: 1px solid #b8cde2;
+      border-radius: 5px;
+      background: #fff;
+      color: #004080;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .preview-button.primary {
+      border-color: #004080;
+      background: #004080;
+      color: #fff;
+    }
+    .preview-button:hover,
+    .preview-button:focus-visible {
+      filter: brightness(1.06);
     }
     .preview-gridline .preview-screen {
       background: linear-gradient(135deg, #ffffff, #e7e7e7);
@@ -326,16 +376,30 @@
     <div class="analysis-layout">
       <aside class="example-rail" aria-label="Esempi siti animati">
         <h2>Esempi siti</h2>
-        <a class="site-preview preview-gridline" href="/examples/esempio-1/" aria-label="Apri Esempio 1 GRIDLINE">
-          <div class="preview-screen"><span></span><span></span><span></span></div>
-          <strong>Esempio 1</strong>
-          <em>GRIDLINE</em>
-        </a>
-        <a class="site-preview preview-pixzen" href="/examples/esempio-2/" aria-label="Apri Esempio 2 PIXZEN">
-          <div class="preview-screen"><span></span><span></span><span></span></div>
-          <strong>Esempio 2</strong>
-          <em>PIXZEN</em>
-        </a>
+        <article class="site-preview preview-gridline">
+          <a class="preview-main" href="/examples/esempio-1/" aria-label="Apri Esempio 1 GRIDLINE">
+            <div class="preview-screen"><span></span><span></span><span></span></div>
+            <strong>Esempio 1</strong>
+            <em>GRIDLINE</em>
+          </a>
+          <p class="preview-copy">Studio luxury minimal con hero 3D, servizi, portfolio e footer elegante.</p>
+          <div class="preview-actions">
+            <a class="preview-button primary" href="/examples/esempio-1/">Apri demo</a>
+            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-1/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+          </div>
+        </article>
+        <article class="site-preview preview-pixzen">
+          <a class="preview-main" href="/examples/esempio-2/" aria-label="Apri Esempio 2 PIXZEN">
+            <div class="preview-screen"><span></span><span></span><span></span></div>
+            <strong>Esempio 2</strong>
+            <em>PIXZEN</em>
+          </a>
+          <p class="preview-copy">Agenzia AI con typing effect, marquee, card servizi, lavori e insight interattivi.</p>
+          <div class="preview-actions">
+            <a class="preview-button primary" href="/examples/esempio-2/">Apri demo</a>
+            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-2/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+          </div>
+        </article>
       </aside>
 
       <div class="content">
@@ -446,11 +510,18 @@
 
       <aside class="example-rail" aria-label="Esempio sito animato aggiuntivo">
         <h2>Portfolio dinamico</h2>
-        <a class="site-preview preview-zedian" href="/examples/esempio-3/" aria-label="Apri Esempio 3 ZEDIAN">
-          <div class="preview-screen"><span></span><span></span><span></span></div>
-          <strong>Esempio 3</strong>
-          <em>ZEDIAN</em>
-        </a>
+        <article class="site-preview preview-zedian">
+          <a class="preview-main" href="/examples/esempio-3/" aria-label="Apri Esempio 3 ZEDIAN">
+            <div class="preview-screen"><span></span><span></span><span></span></div>
+            <strong>Esempio 3</strong>
+            <em>ZEDIAN</em>
+          </a>
+          <p class="preview-copy">Portfolio dark cyber con card trascinabile, stack lavori 3D e servizi accordion.</p>
+          <div class="preview-actions">
+            <a class="preview-button primary" href="/examples/esempio-3/">Apri demo</a>
+            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-3/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+          </div>
+        </article>
         <p>Anteprime leggere in CSS: movimento continuo senza video aggiuntivi.</p>
       </aside>
     </div>

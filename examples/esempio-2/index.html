@@ -180,6 +180,31 @@
       letter-spacing: 0;
       text-transform: uppercase;
     }
+    .hero-copy {
+      width: min(720px, 100%);
+      margin: 28px auto 0;
+      color: #6f6f6f;
+      font-size: clamp(1rem, 2vw, 1.24rem);
+      line-height: 1.7;
+    }
+    .hero-cta {
+      display: inline-flex;
+      margin-top: 28px;
+      padding: 15px 24px;
+      border: 1px solid rgba(10,10,10,0.18);
+      border-radius: 999px;
+      color: #f5f3ef;
+      background: #0a0a0a;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .hero-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 46px rgba(10,10,10,0.16);
+    }
     .cursor { animation: blink 0.8s step-end infinite; }
     .scroll-down {
       position: absolute;
@@ -272,6 +297,44 @@
       color: #fff;
       font-size: 1.1rem;
       line-height: 1.5;
+    }
+    .agency-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      width: min(1180px, calc(100% - 42px));
+      margin: -52px auto 92px;
+    }
+    .agency-card {
+      min-height: 210px;
+      padding: 20px;
+      border: 1px solid rgba(10,10,10,0.12);
+      background: rgba(234,231,225,0.52);
+      transition: transform 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
+    }
+    .agency-card:hover {
+      transform: translateY(-7px);
+      background: #0a0a0a;
+      color: #f5f3ef;
+      box-shadow: 0 22px 55px rgba(10,10,10,0.14);
+    }
+    .agency-card span {
+      color: #8e8e8e;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .agency-card h3 {
+      margin: 42px 0 12px;
+      font-size: 1.38rem;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .agency-card p {
+      margin: 0;
+      color: #8e8e8e;
+      line-height: 1.55;
     }
     .work {
       width: min(1120px, calc(100% - 42px));
@@ -467,6 +530,7 @@
       .nav-center, .talk { display: none; }
       .hamburger { display: block; }
       .split { grid-template-columns: 1fr; padding: 76px 0; }
+      .agency-cards { grid-template-columns: 1fr; margin-top: -34px; }
       .media-panel { position: relative; top: 0; height: 340px; }
       .article-row { grid-template-columns: 1fr; cursor: pointer; }
       footer { grid-template-columns: 1fr; }
@@ -502,6 +566,8 @@
       <div class="hero-content">
         <p class="label">Futuristic AI agency</p>
         <h1><span id="typed">Building Tomorrow</span><span class="cursor">_</span></h1>
+        <p class="hero-copy">PIXZEN designs AI-driven acquisition systems: sharper positioning, paid media experiments, automated funnels and creative direction that makes growth feel cinematic.</p>
+        <a class="hero-cta" href="#contact">Start a Project</a>
       </div>
       <a class="scroll-down" href="#brands">Scroll down</a>
     </section>
@@ -520,15 +586,21 @@
           <h2 class="section-title">Systems that think, sell and scale.</h2>
           <div class="service-list">
             <button class="service active" data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1100&auto=format&fit=crop" data-copy="AI strategy, positioning and experience architecture for ambitious digital brands.">AI Strategy</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1100&auto=format&fit=crop" data-copy="Conversion systems, dashboards and full-funnel growth experiments.">Growth Systems</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1100&auto=format&fit=crop" data-copy="Editorial web interfaces with premium motion, content hierarchy and data storytelling.">Brand Interfaces</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1100&auto=format&fit=crop" data-copy="Automation layers for lead scoring, creative testing and retention.">Automation Labs</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1100&auto=format&fit=crop" data-copy="Paid advertising systems that connect intent, message, landing experience and measurable conversion events.">Paid Advertising</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1100&auto=format&fit=crop" data-copy="Automated funnels for lead scoring, remarketing, follow-up and retention across high-value journeys.">Funnel Automation</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1100&auto=format&fit=crop" data-copy="Cinematic creative direction for campaigns, social proof, landing pages and performance assets.">Creative Direction</button>
           </div>
         </div>
         <aside class="media-panel" aria-live="polite">
           <img id="service-img" src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1100&auto=format&fit=crop" alt="AI strategy visual">
           <div id="service-copy" class="media-caption">AI strategy, positioning and experience architecture for ambitious digital brands.</div>
         </aside>
+      </div>
+      <div class="agency-cards" aria-label="Core service cards">
+        <article class="agency-card"><span>01</span><h3>AI Strategy</h3><p>Roadmaps, AI use-cases, positioning and website intelligence shaped around business outcomes.</p></article>
+        <article class="agency-card"><span>02</span><h3>Paid Advertising</h3><p>Search, social and retargeting campaigns with landing pages and clean conversion tracking.</p></article>
+        <article class="agency-card"><span>03</span><h3>Funnel Automation</h3><p>Lead capture, qualification, CRM triggers and follow-up sequences built to reduce waste.</p></article>
+        <article class="agency-card"><span>04</span><h3>Creative Direction</h3><p>Campaign concepts, visual systems and motion assets that make performance feel premium.</p></article>
       </div>
     </section>
 
@@ -567,7 +639,7 @@
     <section id="contact" class="contact">
       <div>
         <h2>Let's Build<br>The Future.</h2>
-        <a class="magnetic" href="/face5">Torna al report</a>
+        <a class="magnetic" href="/face5">Start a Project</a>
       </div>
     </section>
   </main>

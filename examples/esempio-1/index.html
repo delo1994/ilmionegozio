@@ -198,15 +198,117 @@
       height: 34px;
       background: #e5e7eb;
     }
-    .below {
-      width: min(900px, calc(100% - 48px));
-      margin: 0 auto 90px;
-      padding: 34px;
-      border: 1px solid #e5e7eb;
-      background: rgba(255,255,255,0.74);
-      backdrop-filter: blur(14px);
+    .content-section {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 86px 0;
+      border-top: 1px solid #e5e7eb;
     }
-    .below h2 { margin-top: 0; font-weight: 500; }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+    .section-head h2 {
+      max-width: 620px;
+      margin: 0;
+      color: #111827;
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .section-head p {
+      max-width: 380px;
+      margin: 0;
+      color: #6b7280;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+    .service-grid,
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .service-card {
+      min-height: 220px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-color: #111827;
+      box-shadow: 0 24px 70px rgba(17,24,39,0.08);
+    }
+    .service-card span,
+    .portfolio-card span {
+      color: #9ca3af;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .service-card h3,
+    .portfolio-card h3 {
+      margin: 40px 0 12px;
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 1.08;
+    }
+    .service-card p,
+    .portfolio-card p {
+      margin: 0;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .portfolio-card {
+      position: relative;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      background: #f7f7f7;
+    }
+    .portfolio-card::before {
+      position: absolute;
+      inset: 22px 22px auto;
+      height: 120px;
+      content: "";
+      border: 1px solid rgba(17,24,39,0.15);
+      background:
+        linear-gradient(90deg, rgba(17,24,39,0.08), transparent 45%),
+        repeating-linear-gradient(0deg, transparent 0 24px, rgba(17,24,39,0.08) 24px 25px);
+      animation: portfolioDrift 6s ease-in-out infinite alternate;
+    }
+    .portfolio-card > * {
+      position: relative;
+      z-index: 2;
+    }
+    .demo-footer {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 42px 0 86px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: #6b7280;
+      font-size: 0.92rem;
+    }
+    @keyframes portfolioDrift {
+      from { transform: translateY(0); opacity: 0.66; }
+      to { transform: translateY(24px); opacity: 1; }
+    }
     .back {
       position: fixed;
       right: 18px;
@@ -239,6 +341,11 @@
       }
       .stat strong { font-size: 1.45rem; }
       .divider { height: 24px; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 16px; }
+      .service-grid,
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .demo-footer { display: block; padding-bottom: 120px; }
     }
   </style>
 </head>
@@ -278,11 +385,59 @@
       </div>
     </section>
 
-    <section id="about" class="below">
-      <h2>Minimal architecture, kinetic sculpture.</h2>
-      <p>Questa pagina traduce la specifica GRIDLINE dell'ODT in una demo statica: navbar glass, hero editoriale e scultura matematica 3D renderizzata con Three.js senza build React.</p>
+    <section id="about" class="content-section">
+      <div class="section-head">
+        <h2>Minimal architecture, kinetic sculpture.</h2>
+        <p>A luxury digital studio concept where motion stays quiet, typography leads and the 3D ribbon behaves like an architectural object.</p>
+      </div>
+      <div class="service-grid" id="services">
+        <article class="service-card">
+          <span>01 / Strategy</span>
+          <h3>Brand systems with restraint.</h3>
+          <p>Positioning, visual direction and interaction rules for premium service brands that need clarity before spectacle.</p>
+        </article>
+        <article class="service-card">
+          <span>02 / Interface</span>
+          <h3>Editorial web experiences.</h3>
+          <p>Responsive pages, conversion paths and elegant motion designed to feel calm, precise and expensive.</p>
+        </article>
+        <article class="service-card">
+          <span>03 / Spatial</span>
+          <h3>3D objects with purpose.</h3>
+          <p>Lightweight WebGL scenes that support the message without covering copy or slowing down mobile.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="portfolio" class="content-section">
+      <div class="section-head">
+        <h2>Selected work, presented like objects.</h2>
+        <p>Each project is framed as a clean visual system: fewer colors, stronger hierarchy, better decision paths.</p>
+      </div>
+      <div class="portfolio-grid">
+        <article class="portfolio-card">
+          <span>Hospitality</span>
+          <h3>Private Villa Launch</h3>
+          <p>Immersive booking experience with refined copy, quiet motion and high-trust contact flow.</p>
+        </article>
+        <article class="portfolio-card">
+          <span>Studio</span>
+          <h3>Design Archive</h3>
+          <p>Monochrome portfolio system for an architecture practice with project-led navigation.</p>
+        </article>
+        <article class="portfolio-card">
+          <span>Product</span>
+          <h3>Luxury Configurator</h3>
+          <p>Premium object presentation with lightweight 3D, material states and conversion-focused CTA.</p>
+        </article>
+      </div>
     </section>
   </main>
+  <footer id="contact" class="demo-footer">
+    <strong>GRIDLINE</strong>
+    <span>Minimal luxury 3D studio concept</span>
+    <a class="primary-btn" href="/face5">Torna al report</a>
+  </footer>
   <a class="back" href="/face5">Torna al report</a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
