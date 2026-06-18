@@ -122,7 +122,7 @@
   </button>
 
   <!-- Video di background, marcato come decorativo -->
-  <video id="bgVideo" autoplay loop muted aria-hidden="true">
+  <video id="bgVideo" autoplay loop muted preload="metadata" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
     <source src="/static/BackgroundRound1.mp4" type="video/mp4">
     Il tuo browser non supporta il tag video.
   </video>
@@ -135,11 +135,42 @@
     <canvas id="gameCanvas"></canvas>
   </main>
 
-  <audio id="bgMusic" src="/static/cartoon-game-theme-loop.wav" loop autoplay></audio>
+  <audio id="bgMusic" src="/static/cartoon-game-theme-loop.wav" loop autoplay preload="auto"></audio>
 
+  <script src="/static/media-optimizer.js"></script>
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+    const bgVideo = document.getElementById("bgVideo");
+    const bgMusic = document.getElementById("bgMusic");
+    const roundAudio = window.IlmioMedia ? window.IlmioMedia.createAudioPool([
+      { id: "hit", src: "/static/doh.wav" },
+      { id: "extra", src: "/static/Extra Life 8 Bit.wav" },
+      { id: "end", src: "/static/Welldone.wav" }
+    ], { htmlPreload: "auto" }) : null;
+
+    if (window.IlmioMedia) {
+      window.IlmioMedia.prepareVideo(bgVideo, {
+        preload: "metadata",
+        poster: "/static/background.webp"
+      });
+      window.IlmioMedia.whenIdle(function () {
+        roundAudio.preload(["hit", "extra"]);
+        window.IlmioMedia.warmVideo(bgVideo, { preload: "metadata", tryMutedPlay: true });
+      }, 800);
+      window.IlmioMedia.onFirstInteraction(function () {
+        roundAudio.unlock();
+        roundAudio.preload();
+        if (bgMusic) {
+          bgMusic.volume = 0.55;
+          bgMusic.play().catch(function () {});
+        }
+        if (bgVideo) {
+          bgVideo.play().catch(function () {});
+        }
+      });
+    }
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -236,14 +267,16 @@
 
     // Funzione per riprodurre il suono quando il giocatore viene colpito
     function playHitSound() {
-      let hitAudio = new Audio("/static/doh.wav");
-      hitAudio.play();
+      if (roundAudio) {
+        roundAudio.play("hit");
+      }
     }
 
     // Funzione per riprodurre il suono quando il giocatore prende una vita extra
     function playExtraLifeSound() {
-      let extraLifeAudio = new Audio("/static/Extra Life 8 Bit.wav");
-      extraLifeAudio.play();
+      if (roundAudio) {
+        roundAudio.play("extra");
+      }
     }
 
     // Funzioni di collisione (approssimando il giocatore come un quadrato)
@@ -493,11 +526,21 @@
 
       if(level > 6 && !gameEnded) {
         gameEnded = true;
-        let endAudio = new Audio("/static/Welldone.wav");
-        endAudio.play();
-        endAudio.addEventListener('ended', () => {
+        const redirectToEnd = () => {
           window.location.href = "https://nzp.gay/";
-        });
+        };
+        if (roundAudio) {
+          const endAudio = roundAudio.getAudioElement("end");
+          roundAudio.play("end");
+          if (endAudio) {
+            endAudio.addEventListener('ended', redirectToEnd, { once: true });
+            window.setTimeout(redirectToEnd, 3500);
+          } else {
+            window.setTimeout(redirectToEnd, 1800);
+          }
+        } else {
+          redirectToEnd();
+        }
       }
 
       requestAnimationFrame(update);

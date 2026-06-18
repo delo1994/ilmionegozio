@@ -133,7 +133,7 @@
 
   <div class="video-container" id="main-content">
     <!-- Il video è marcato come decorativo per le tecnologie assistive -->
-    <video id="experienceVideo" autoplay muted loop aria-hidden="true">
+    <video id="experienceVideo" autoplay muted loop preload="metadata" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
       <source src="/static/real_to_3d_experience.mp4" type="video/mp4">
       Il tuo browser non supporta il tag video.
     </video>
@@ -153,6 +153,31 @@
     <a href="/Accessibilita" target="_blank">Accessibilità</a> |  
     <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
   </footer>
+  <script src="/static/media-optimizer.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const experienceVideo = document.getElementById("experienceVideo");
+      if (!window.IlmioMedia || !experienceVideo) return;
+
+      window.IlmioMedia.prepareVideo(experienceVideo, {
+        preload: "metadata",
+        poster: "/static/background.webp"
+      });
+      window.IlmioMedia.whenIdle(function () {
+        window.IlmioMedia.warmVideo(experienceVideo, {
+          preload: "metadata",
+          tryMutedPlay: true
+        });
+      }, 900);
+      window.IlmioMedia.onFirstInteraction(function () {
+        window.IlmioMedia.warmVideo(experienceVideo, {
+          forceAuto: true,
+          tryMutedPlay: false
+        });
+        experienceVideo.play().catch(function () {});
+      });
+    });
+  </script>
 </body>
 </html>
 

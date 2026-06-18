@@ -284,7 +284,7 @@
             <div class="video-collection">
               <h2>Capcut</h2>
               <div class="videos-container">
-                <video controls>
+                <video controls preload="metadata" playsinline webkit-playsinline poster="/static/capcut.png">
                   <source src="/static/capcut1.mp4" type="video/mp4">
                   Il tuo browser non supporta il tag video.
                 </video>
@@ -312,7 +312,19 @@
   </footer>
 
   <!-- Il resto del codice (ad esempio eventuali effetti 3D, particelle ecc.) rimane invariato -->
+  <script src="/static/media-optimizer.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const capcutVideo = document.querySelector('video[src], video source[src="/static/capcut1.mp4"]')?.closest("video") || document.querySelector("video");
+      if (window.IlmioMedia && capcutVideo) {
+        window.IlmioMedia.prepareVideo(capcutVideo, {
+          preload: "metadata",
+          poster: "/static/capcut.png"
+        });
+      }
+    });
+  </script>
   <script>
     // Creazione del greenRenderer per le particelle
     const greenScene = new THREE.Scene();

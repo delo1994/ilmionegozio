@@ -114,6 +114,10 @@ Dimensione totale: 230.41 MB
 - Accessibilita.html: creato documento HTML completo da frammento originale
 - Face4Round1.html: aggiunto H1 sr-only senza impatto visivo
 - face2.html: corretto overflow orizzontale causato da tenda destra/footer mantenendo animazione originale
+- index.html: corretto aspect-ratio dello sfondo Three.js su mobile con texture cover, senza sostituire background.webp
+- static/media-optimizer.js: aggiunto helper conservativo per sbloccare AudioContext al primo tap, precaricare solo suoni essenziali e preparare video inline
+- index.html, face4.html, Face4Round1.html: ridotta latenza audio con preload leggero, Web Audio API e fallback HTMLAudio
+- face1.html, face2.html, face4.html, Face4Round1.html, face6.html: aggiunti poster/preload/playsinline e warm-up video senza cambiare gli asset originali
 - face3.html: corretto overflow orizzontale con box-sizing
 - face3.html: fallback WhatsApp se Twilio/env Vercel non sono configurati
 - face4.html: aggiunto H1 sr-only senza impatto visivo

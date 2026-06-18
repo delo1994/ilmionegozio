@@ -75,6 +75,7 @@
       z-index: 20;
       background: #000;
       display: none;
+      object-fit: cover;
     }
     canvas { 
       display: block; 
@@ -152,8 +153,9 @@
   </button>
   
   <!-- Video per il round, marcato come decorativo -->
-  <video id="roundVideo" src="/static/Round1.mp4" type="video/mp4" aria-hidden="true"></video>
+  <video id="roundVideo" src="/static/Round1.mp4" type="video/mp4" preload="metadata" playsinline webkit-playsinline poster="/static/backgroundFace4.webp" aria-hidden="true"></video>
   
+  <script src="/static/media-optimizer.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     /* === Setup Scena, Camera, Renderer e Sfondo === */
@@ -251,9 +253,45 @@
       slicingActive = false;
     });
 
-    /* === Audio: Suono di colpo e Audio Round === */
-    const hitSound = new Audio("/static/slice.wav");
-    const roundSound = new Audio("/static/Round1.wav");
+    /* === Audio e video: preload leggero, sblocco al primo gesto === */
+    const roundVideo = document.getElementById("roundVideo");
+    const gameAudio = window.IlmioMedia ? window.IlmioMedia.createAudioPool([
+      { id: "hit", src: "/static/slice.wav" },
+      { id: "round", src: "/static/Round1.wav" }
+    ], { htmlPreload: "auto" }) : null;
+    let roundVideoPrepared = false;
+
+    function prepareRoundMedia(forceAuto) {
+      if (gameAudio) {
+        gameAudio.unlock();
+        gameAudio.preload(forceAuto ? ["hit", "round"] : ["hit"]);
+      }
+      if (window.IlmioMedia && roundVideo) {
+        window.IlmioMedia.prepareVideo(roundVideo, {
+          preload: forceAuto ? "auto" : "metadata",
+          poster: "/static/backgroundFace4.webp"
+        });
+        if (forceAuto && !roundVideoPrepared) {
+          roundVideo.preload = "auto";
+          roundVideoPrepared = true;
+        }
+      }
+    }
+
+    function playGameSound(id) {
+      if (gameAudio) {
+        gameAudio.play(id);
+      }
+    }
+
+    if (window.IlmioMedia) {
+      window.IlmioMedia.whenIdle(function () {
+        prepareRoundMedia(false);
+      }, 900);
+      window.IlmioMedia.onFirstInteraction(function () {
+        prepareRoundMedia(true);
+      });
+    }
 
     /* === Gestione degli Oggetti 3D === */
     let objects = [];
@@ -364,9 +402,11 @@
             score++;
             scoreDiv.textContent = "Punteggio: " + score;
             console.log("Oggetto tagliato! Punteggio:", score);
-            hitSound.currentTime = 0;
-            hitSound.play();
+            playGameSound("hit");
             disintegrateObject(obj); // Avvia effetto di disintegrazione
+            if(score >= 12) {
+              prepareRoundMedia(true);
+            }
             if(score >= 20 && !gameEnded) {
               gameEnded = true;
               playVideoThenNewPage();
@@ -387,14 +427,19 @@
     }
 
     function playVideoThenNewPage() {
-      const video = document.getElementById("roundVideo");
+      const video = roundVideo;
+      prepareRoundMedia(true);
       video.style.display = "block";
-      video.play();
-      roundSound.currentTime = 0;
-      roundSound.play();
-      video.addEventListener("ended", function() {
+      try {
+        video.currentTime = 0;
+      } catch (error) {}
+      video.play().catch(function () {
         window.location.href = "/face4Round1";
       });
+      playGameSound("round");
+      video.addEventListener("ended", function() {
+        window.location.href = "/face4Round1";
+      }, { once: true });
     }
 
     let lastTime = performance.now();
