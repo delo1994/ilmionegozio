@@ -713,7 +713,7 @@
     }
 
     function launchCoffeeFromSpaceDrive() {
-      if (!spacedrive || coffeeProjectile || coffeeDiamond) return;
+      if (!spacedrive || coffeeProjectile || coffeeDiamond) return false;
       coffeeExploded = false;
       coffeeProjectile = createCoffeeObject();
       coffeeProjectile.position.copy(spacedrive.position).add(new THREE.Vector3(-2.8, 1.9, -0.2));
@@ -729,6 +729,7 @@
       }, isMobileViewport ? 520 : 620);
       document.documentElement.dataset.coffeeState = "launched";
       document.getElementById('message').textContent = "Un caffe' e' uscito dalla SpaceDrive!";
+      return true;
     }
 
     function getSpaceDriveBounds() {
@@ -859,14 +860,23 @@
 
     function changeSpaceDriveColorAndLaunchCoffee() {
       if (!spacedrive) return;
+      if (coffeeDiamond) {
+        document.getElementById('message').textContent = "Il diamante e' attivo: cliccalo per cambiare colore!";
+        return;
+      }
+      if (coffeeProjectile) {
+        document.getElementById('message').textContent = "Il caffe' e' gia' in viaggio verso l'esplosione!";
+        return;
+      }
       const randomColor = new THREE.Color(Math.random(), Math.random(), Math.random());
       spacedrive.traverse(obj => {
         if (obj.isMesh && obj.material) {
           obj.material.color.set(randomColor);
         }
       });
-      launchCoffeeFromSpaceDrive();
-      document.getElementById('message').textContent = "Spacedrive ha cambiato colore e ha lanciato un caffe'!";
+      if (launchCoffeeFromSpaceDrive()) {
+        document.getElementById('message').textContent = "Spacedrive ha cambiato colore e ha lanciato un caffe'!";
+      }
     }
 
     // === Movimento del Personaggio con Tasti Direzionali (solo su desktop) ===
@@ -904,7 +914,7 @@
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children, true);
       const clickedObject = intersects.length > 0 ? intersects[0].object : null;
-      if (coffeeDiamond && ((clickedObject && (clickedObject === coffeeDiamond || isDescendantOf(clickedObject, coffeeDiamond))) || isProjectedObjectNearPointer(coffeeDiamond, event, 84))) {
+      if (coffeeDiamond && ((clickedObject && (clickedObject === coffeeDiamond || isDescendantOf(clickedObject, coffeeDiamond))) || isProjectedObjectNearPointer(coffeeDiamond, event, isMobileViewport ? 168 : 136))) {
         changeDiamondColor();
         return;
       }
