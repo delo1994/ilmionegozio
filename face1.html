@@ -40,6 +40,34 @@
     #message {
       margin-top: 5px;
     }
+    #miniGameHud {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 120;
+      display: none;
+      width: min(520px, calc(100vw - 28px));
+      transform: translate(-50%, -50%);
+      padding: 18px 22px;
+      border: 2px solid rgba(255,170,0,0.9);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: clamp(1rem, 4vw, 1.35rem);
+      font-weight: bold;
+      text-shadow: 0 0 10px #ff9900;
+      box-shadow: 0 0 28px rgba(255,170,0,0.32), inset 0 0 24px rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+    #miniGameHud.active {
+      display: block;
+      animation: miniGameGlow 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes miniGameGlow {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.35); }
+    }
     #back-link {
       margin-top: 10px;
       display: inline-block;
@@ -109,6 +137,7 @@
     </p>
     <a id="back-link" href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
   </div>
+  <div id="miniGameHud" aria-live="polite"></div>
 
   <script src="/static/media-optimizer.js"></script>
   <script>
@@ -118,6 +147,26 @@
     let character = null;     // Personaggio controllabile (modello 3D)
     let octaClickCount = 0;   // Contatore click sull'ottaedro
     let mixer;                // AnimationMixer globale
+    let charizardColorStep = 0;
+    let octaMiniGameActive = false;
+    let octaMiniGameDestroyed = 0;
+    let octaMiniGameSpawnTimer = 0;
+    let octaMiniGameSlicing = false;
+    const octaMiniGameTargets = [];
+    const effectParticles = [];
+    let coffeeProjectile = null;
+    let coffeeDiamond = null;
+    const miniGameHud = document.getElementById("miniGameHud");
+    const face1Audio = window.IlmioMedia ? window.IlmioMedia.createAudioPool([
+      { id: "slice", src: "/static/slice.wav" },
+      { id: "hit", src: "/static/doh.wav" }
+    ], { htmlPreload: "auto" }) : null;
+    if (face1Audio && window.IlmioMedia) {
+      window.IlmioMedia.onFirstInteraction(function () {
+        face1Audio.unlock();
+        face1Audio.preload(["slice", "hit"]);
+      });
+    }
 
     // === Scena, Camera e Renderer ===
     const scene = new THREE.Scene();
@@ -366,6 +415,319 @@
       });
     }
 
+    function playFace1Sound(id) {
+      if (face1Audio) {
+        face1Audio.play(id);
+        return;
+      }
+      const src = id === "hit" ? "/static/doh.wav" : "/static/slice.wav";
+      const audio = new Audio(src);
+      audio.play().catch(function () {});
+    }
+
+    function findNamedParent(object, name) {
+      let target = object;
+      while (target) {
+        if (target.name === name) return target;
+        target = target.parent;
+      }
+      return null;
+    }
+
+    function isDescendantOf(object, root) {
+      let target = object;
+      while (target) {
+        if (target === root) return true;
+        target = target.parent;
+      }
+      return false;
+    }
+
+    function tintModel(root, color) {
+      root.traverse(child => {
+        if (child.isMesh && child.material) {
+          const material = Array.isArray(child.material) ? child.material[0] : child.material;
+          if (!child.userData.originalMaterial) {
+            child.userData.originalMaterial = material.clone();
+            child.material = material.clone();
+          }
+          child.material.color.copy(color);
+          if (child.material.emissive) {
+            child.material.emissive.copy(color).multiplyScalar(0.16);
+          }
+        }
+      });
+    }
+
+    function changeCharizardColor() {
+      if (!charizard) return;
+      charizardColorStep += 1;
+      const color = new THREE.Color().setHSL((charizardColorStep * 0.17) % 1, 0.92, 0.58);
+      tintModel(charizard, color);
+      charizard.scale.setScalar(2.14);
+      setTimeout(() => {
+        if (charizard) charizard.scale.set(2, 2, 2);
+      }, 180);
+      document.getElementById('message').textContent = "Charizard ha cambiato colore mentre vola!";
+    }
+
+    function createBurst(position, color, count = 14, speed = 8) {
+      for (let i = 0; i < count; i++) {
+        const shardGeo = i % 2 === 0 ? new THREE.TetrahedronGeometry(0.14 + Math.random() * 0.18) : new THREE.OctahedronGeometry(0.12 + Math.random() * 0.15, 0);
+        const shardMat = new THREE.MeshStandardMaterial({
+          color: color.clone().offsetHSL((Math.random() - 0.5) * 0.12, 0, 0.06),
+          emissive: color.clone().multiplyScalar(0.18),
+          transparent: true,
+          opacity: 1
+        });
+        const shard = new THREE.Mesh(shardGeo, shardMat);
+        shard.position.copy(position);
+        shard.userData.velocity = new THREE.Vector3(
+          (Math.random() - 0.5) * speed,
+          (Math.random() - 0.25) * speed,
+          (Math.random() - 0.5) * speed
+        );
+        shard.userData.life = 0.75 + Math.random() * 0.55;
+        shard.userData.maxLife = shard.userData.life;
+        effectParticles.push(shard);
+        scene.add(shard);
+      }
+    }
+
+    function setMiniGameHud(text, active = true) {
+      miniGameHud.textContent = text;
+      miniGameHud.classList.toggle("active", active);
+    }
+
+    function spawnMiniOctahedron() {
+      const size = 0.75 + Math.random() * 0.75;
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color().setHSL(0.08 + Math.random() * 0.09, 0.9, 0.55),
+        emissive: 0x331100,
+        roughness: 0.42,
+        metalness: 0.25
+      });
+      const mini = new THREE.Mesh(new THREE.OctahedronGeometry(size, 0), material);
+      mini.name = "miniOctaTarget";
+      mini.position.set(
+        THREE.MathUtils.randFloat(-12, 12),
+        THREE.MathUtils.randFloat(-5, 11),
+        THREE.MathUtils.randFloat(-5, 3)
+      );
+      mini.userData.velocity = new THREE.Vector3(
+        THREE.MathUtils.randFloat(-2.3, 2.3),
+        THREE.MathUtils.randFloat(-0.3, 2.6),
+        THREE.MathUtils.randFloat(-0.45, 0.45)
+      );
+      mini.userData.size = size;
+      octaMiniGameTargets.push(mini);
+      scene.add(mini);
+    }
+
+    function startOctaMiniGame() {
+      if (octaMiniGameActive) return;
+      octaMiniGameActive = true;
+      octaMiniGameDestroyed = 0;
+      octaMiniGameSpawnTimer = 0;
+      setMiniGameHud("MINIGIOCO OTTAEDRI: taglia 20 ottaedri");
+      document.getElementById('message').textContent = "Minigioco avviato: rompi 20 ottaedri!";
+      for (let i = 0; i < 12; i++) spawnMiniOctahedron();
+      if (face1Audio) face1Audio.preload(["slice", "hit"]);
+    }
+
+    function endOctaMiniGame() {
+      octaMiniGameActive = false;
+      octaMiniGameSlicing = false;
+      octaMiniGameTargets.splice(0).forEach(target => scene.remove(target));
+      setMiniGameHud("MINIGIOCO COMPLETATO: 20 OTTAEDRI DISTRUTTI", true);
+      document.getElementById('message').textContent = "Minigioco completato! Sei tornato all'esperienza principale.";
+      setTimeout(() => {
+        setMiniGameHud("", false);
+      }, 2200);
+    }
+
+    function breakMiniOctahedron(target) {
+      if (!target || target.userData.destroyed) return;
+      target.userData.destroyed = true;
+      octaMiniGameDestroyed++;
+      playFace1Sound("slice");
+      createBurst(target.position, target.material.color, 18, 10);
+      scene.remove(target);
+      const index = octaMiniGameTargets.indexOf(target);
+      if (index >= 0) octaMiniGameTargets.splice(index, 1);
+      setMiniGameHud("OTTAEDRI DISTRUTTI: " + octaMiniGameDestroyed + " / 20");
+      if (octaMiniGameDestroyed >= 20) {
+        endOctaMiniGame();
+      }
+    }
+
+    function getMiniOctahedronNearPointer(event) {
+      const pointer = new THREE.Vector2(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        - (event.clientY / window.innerHeight) * 2 + 1
+      );
+      const tolerance = window.matchMedia("(max-width: 600px)").matches ? 82 : 64;
+      let closest = null;
+      let closestDistance = Infinity;
+
+      octaMiniGameTargets.forEach(target => {
+        if (target.userData.destroyed) return;
+        const projected = target.position.clone().project(camera);
+        if (projected.z < -1 || projected.z > 1) return;
+        const screenX = (projected.x + 1) * 0.5 * window.innerWidth;
+        const screenY = (-projected.y + 1) * 0.5 * window.innerHeight;
+        const distance = Math.hypot(screenX - event.clientX, screenY - event.clientY);
+        const targetTolerance = tolerance + (target.userData.size || 1) * 18;
+        if (distance < targetTolerance && distance < closestDistance) {
+          closest = target;
+          closestDistance = distance;
+        }
+      });
+
+      return closest;
+    }
+
+    function handleMiniGamePointer(event) {
+      if (!octaMiniGameActive) return false;
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(octaMiniGameTargets, true);
+      if (hits.length) {
+        breakMiniOctahedron(hits[0].object);
+        return true;
+      }
+      const nearbyTarget = getMiniOctahedronNearPointer(event);
+      if (nearbyTarget) {
+        breakMiniOctahedron(nearbyTarget);
+        return true;
+      }
+      return false;
+    }
+
+    function isProjectedObjectNearPointer(object, event, tolerance) {
+      if (!object) return false;
+      const worldPosition = new THREE.Vector3();
+      object.updateWorldMatrix(true, false);
+      object.getWorldPosition(worldPosition);
+      const projected = worldPosition.project(camera);
+      if (projected.z < -1 || projected.z > 1) return false;
+      const screenX = (projected.x + 1) * 0.5 * window.innerWidth;
+      const screenY = (-projected.y + 1) * 0.5 * window.innerHeight;
+      return Math.hypot(screenX - event.clientX, screenY - event.clientY) <= tolerance;
+    }
+
+    function updateMiniGame(delta) {
+      if (octaMiniGameActive) {
+        octaMiniGameSpawnTimer += delta;
+        if (octaMiniGameSpawnTimer > 0.34 && octaMiniGameTargets.length < 22) {
+          spawnMiniOctahedron();
+          octaMiniGameSpawnTimer = 0;
+        }
+        for (let i = octaMiniGameTargets.length - 1; i >= 0; i--) {
+          const target = octaMiniGameTargets[i];
+          target.position.addScaledVector(target.userData.velocity, delta);
+          target.rotation.x += delta * 2.8;
+          target.rotation.y += delta * 3.2;
+          target.userData.velocity.y -= delta * 0.45;
+          if (target.position.y < -9 || Math.abs(target.position.x) > 17) {
+            scene.remove(target);
+            octaMiniGameTargets.splice(i, 1);
+          }
+        }
+      }
+      for (let i = effectParticles.length - 1; i >= 0; i--) {
+        const particle = effectParticles[i];
+        particle.userData.life -= delta;
+        particle.position.addScaledVector(particle.userData.velocity, delta);
+        particle.rotation.x += delta * 6;
+        particle.rotation.y += delta * 5;
+        if (particle.material) {
+          particle.material.opacity = Math.max(0, particle.userData.life / particle.userData.maxLife);
+        }
+        if (particle.userData.life <= 0) {
+          scene.remove(particle);
+          effectParticles.splice(i, 1);
+        }
+      }
+    }
+
+    function createCoffeeObject() {
+      const group = new THREE.Group();
+      group.name = "coffeeProjectile";
+      const cup = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.26, 0.34, 0.42, 18),
+        new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.35, metalness: 0.08 })
+      );
+      const liquid = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.24, 0.24, 0.04, 18),
+        new THREE.MeshStandardMaterial({ color: 0x4b240f, emissive: 0x120602, roughness: 0.55 })
+      );
+      liquid.position.y = 0.23;
+      group.add(cup, liquid);
+      return group;
+    }
+
+    function launchCoffeeFromSpaceDrive() {
+      if (!spacedrive || coffeeProjectile || coffeeDiamond) return;
+      coffeeProjectile = createCoffeeObject();
+      coffeeProjectile.position.copy(spacedrive.position).add(new THREE.Vector3(0, 2.2, 0));
+      coffeeProjectile.userData.velocity = new THREE.Vector3(2.2, 4.8, 0.6);
+      coffeeProjectile.userData.age = 0;
+      scene.add(coffeeProjectile);
+      document.getElementById('message').textContent = "Un caffe' e' uscito dalla SpaceDrive!";
+    }
+
+    function explodeCoffeeIntoDiamond() {
+      if (!coffeeProjectile) return;
+      const position = coffeeProjectile.position.clone();
+      scene.remove(coffeeProjectile);
+      coffeeProjectile = null;
+      createBurst(position, new THREE.Color(0xffcc66), 24, 12);
+      coffeeDiamond = new THREE.Mesh(
+        new THREE.OctahedronGeometry(1.15, 0),
+        new THREE.MeshStandardMaterial({
+          color: 0x66ffff,
+          emissive: 0x115577,
+          roughness: 0.18,
+          metalness: 0.75
+        })
+      );
+      coffeeDiamond.name = "coffeeDiamond";
+      coffeeDiamond.position.copy(position);
+      coffeeDiamond.userData.colorStep = 0;
+      scene.add(coffeeDiamond);
+      playFace1Sound("hit");
+      document.getElementById('message').textContent = "Il caffe' e' esploso ed e' diventato un diamante!";
+    }
+
+    function updateCoffeeAndDiamond(delta) {
+      if (coffeeProjectile) {
+        coffeeProjectile.userData.age += delta;
+        coffeeProjectile.position.addScaledVector(coffeeProjectile.userData.velocity, delta);
+        coffeeProjectile.userData.velocity.y -= delta * 3.2;
+        coffeeProjectile.rotation.x += delta * 5;
+        coffeeProjectile.rotation.z += delta * 4;
+        if (coffeeProjectile.userData.age > 1.05) {
+          explodeCoffeeIntoDiamond();
+        }
+      }
+      if (coffeeDiamond) {
+        coffeeDiamond.rotation.x += delta * 1.6;
+        coffeeDiamond.rotation.y += delta * 2.1;
+      }
+    }
+
+    function changeDiamondColor() {
+      if (!coffeeDiamond) return;
+      coffeeDiamond.userData.colorStep++;
+      const color = new THREE.Color().setHSL((coffeeDiamond.userData.colorStep * 0.21) % 1, 0.95, 0.58);
+      coffeeDiamond.material.color.copy(color);
+      coffeeDiamond.material.emissive.copy(color).multiplyScalar(0.28);
+      createBurst(coffeeDiamond.position, color, 10, 6);
+      document.getElementById('message').textContent = "Il diamante ha cambiato colore!";
+    }
+
     // === Movimento del Personaggio con Tasti Direzionali (solo su desktop) ===
     document.addEventListener('keydown', (event) => {
       if (window.innerWidth <= 600) return; // su mobile gestiamo il movimento tramite tocco
@@ -392,12 +754,32 @@
     const mouse = new THREE.Vector2();
     document.addEventListener('click', onDocumentClick, false);
     function onDocumentClick(event) {
+      if (octaMiniGameActive) {
+        handleMiniGamePointer(event);
+        return;
+      }
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children, true);
+      const clickedObject = intersects.length > 0 ? intersects[0].object : null;
+      if (coffeeDiamond && ((clickedObject && (clickedObject === coffeeDiamond || isDescendantOf(clickedObject, coffeeDiamond))) || isProjectedObjectNearPointer(coffeeDiamond, event, 84))) {
+        changeDiamondColor();
+        return;
+      }
+      if (charizard && ((clickedObject && isDescendantOf(clickedObject, charizard)) || isProjectedObjectNearPointer(charizard, event, 96))) {
+        changeCharizardColor();
+        return;
+      }
       if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
+        if (coffeeDiamond && (clickedObject === coffeeDiamond || isDescendantOf(clickedObject, coffeeDiamond))) {
+          changeDiamondColor();
+          return;
+        }
+        if (charizard && isDescendantOf(clickedObject, charizard)) {
+          changeCharizardColor();
+          return;
+        }
         // Se il terreno (ground) è cliccato: cambia colore e carica Charizard
         if (clickedObject.name === "ground") {
           clickedObject.material.color.setHex(Math.random() * 0xffffff);
@@ -423,7 +805,8 @@
                 obj.material.color.set(randomColor);
               }
             });
-            document.getElementById('message').textContent = "Spacedrive ha cambiato colore!";
+            launchCoffeeFromSpaceDrive();
+            document.getElementById('message').textContent = "Spacedrive ha cambiato colore e ha lanciato un caffe'!";
           }
           // Se il clic appartiene all'ottaedro
           else {
@@ -439,6 +822,9 @@
               if (octaClickCount >= 10 && !character) {
                 createCharacter();
               }
+              if (octaClickCount === 30) {
+                startOctaMiniGame();
+              }
             } else {
               if (clickedObject.material && clickedObject.material.color) {
                 clickedObject.material.color.setHex(Math.random() * 0xffffff);
@@ -452,6 +838,24 @@
         document.getElementById('message').textContent = "Charizard sta volando!";
       }
     }
+    renderer.domElement.addEventListener("pointerdown", function(event) {
+      if (!octaMiniGameActive) return;
+      octaMiniGameSlicing = true;
+      handleMiniGamePointer(event);
+    }, { passive: true });
+    renderer.domElement.addEventListener("pointermove", function(event) {
+      if (octaMiniGameActive && octaMiniGameSlicing) {
+        handleMiniGamePointer(event);
+      }
+    }, { passive: true });
+    window.addEventListener("pointerup", function() {
+      octaMiniGameSlicing = false;
+    });
+    renderer.domElement.addEventListener("touchmove", function(event) {
+      if (octaMiniGameActive && event.touches && event.touches[0]) {
+        handleMiniGamePointer(event.touches[0]);
+      }
+    }, { passive: true });
 
     // === Loop di Animazione ===
     const clock = new THREE.Clock();
@@ -462,6 +866,8 @@
       // Ruota l'ottaedro
       octahedron.rotation.x += 0.01;
       octahedron.rotation.y += 0.01;
+      updateMiniGame(delta);
+      updateCoffeeAndDiamond(delta);
       // Aggiorna l'animazione di Charizard se presente
       if (charizard && charizard.userData.mixer) {
         charizard.userData.mixer.update(delta);

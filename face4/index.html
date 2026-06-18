@@ -48,6 +48,23 @@
       color: white;
       font-size: 24px;
       z-index: 10;
+      text-shadow: 0 0 10px rgba(0,0,0,0.9);
+    }
+    #hazardFeedback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 11;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(255,0,0,0.24), rgba(0,0,0,0) 62%);
+      animation: hazardFlash 0.38s ease-out;
+    }
+    #hazardFeedback.active {
+      display: block;
+    }
+    @keyframes hazardFlash {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
     /* Pulsante di ritorno */
     #backBtn {
@@ -145,7 +162,8 @@
   </div>
   
   <!-- Visualizzazione dinamica del punteggio -->
-  <div id="score" role="status" aria-live="polite">Punteggio: 0</div>
+  <div id="score" role="status" aria-live="polite">Punteggio: 0 - Vite: 3</div>
+  <div id="hazardFeedback" aria-hidden="true"></div>
   
   <!-- Pulsante di ritorno con etichetta accessibile -->
   <button id="backBtn" onclick="window.location.href='/'" aria-label="Torna al Cubo Interattivo">
@@ -257,14 +275,15 @@
     const roundVideo = document.getElementById("roundVideo");
     const gameAudio = window.IlmioMedia ? window.IlmioMedia.createAudioPool([
       { id: "hit", src: "/static/slice.wav" },
-      { id: "round", src: "/static/Round1.wav" }
+      { id: "round", src: "/static/Round1.wav" },
+      { id: "bad", src: "/static/doh.wav" }
     ], { htmlPreload: "auto" }) : null;
     let roundVideoPrepared = false;
 
     function prepareRoundMedia(forceAuto) {
       if (gameAudio) {
         gameAudio.unlock();
-        gameAudio.preload(forceAuto ? ["hit", "round"] : ["hit"]);
+        gameAudio.preload(forceAuto ? ["hit", "round", "bad"] : ["hit", "bad"]);
       }
       if (window.IlmioMedia && roundVideo) {
         window.IlmioMedia.prepareVideo(roundVideo, {
@@ -296,14 +315,28 @@
     /* === Gestione degli Oggetti 3D === */
     let objects = [];
     let score = 0;
+    let lives = 3;
     const scoreDiv = document.getElementById('score');
+    const hazardFeedback = document.getElementById('hazardFeedback');
     let spawnInterval = 500;
     let spawnTimer = 0;
     let gameEnded = false;
 
+    function updateScoreDisplay(note) {
+      scoreDiv.textContent = "Punteggio: " + score + " - Vite: " + lives + (note ? " - " + note : "");
+    }
+
+    function flashHazardFeedback() {
+      hazardFeedback.classList.remove("active");
+      void hazardFeedback.offsetWidth;
+      hazardFeedback.classList.add("active");
+      setTimeout(() => hazardFeedback.classList.remove("active"), 380);
+    }
+
     function spawnObject() {
       const shapes = ["sphere", "cube", "cone", "cylinder", "torus"];
-      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const isHazard = Math.random() < 0.17;
+      const shape = isHazard ? "blackSolid" : shapes[Math.floor(Math.random() * shapes.length)];
       const size = 1 + Math.random() * 2;
       let geometry;
       switch(shape) {
@@ -322,12 +355,24 @@
         case "torus":
           geometry = new THREE.TorusGeometry(size, size / 3, 16, 100);
           break;
+        case "blackSolid":
+          geometry = Math.random() < 0.5
+            ? new THREE.IcosahedronGeometry(size * 0.92, 0)
+            : new THREE.OctahedronGeometry(size * 1.05, 0);
+          break;
       }
-      const material = new THREE.MeshStandardMaterial({ 
-        color: new THREE.Color(`hsl(${Math.random()*360},80%,60%)`), 
-        roughness: 0.5, 
-        metalness: 0.3 
-      });
+      const material = isHazard
+        ? new THREE.MeshStandardMaterial({
+            color: 0x020202,
+            emissive: 0x330000,
+            roughness: 0.78,
+            metalness: 0.65
+          })
+        : new THREE.MeshStandardMaterial({
+            color: new THREE.Color(`hsl(${Math.random()*360},80%,60%)`),
+            roughness: 0.5,
+            metalness: 0.3
+          });
       const mesh = new THREE.Mesh(geometry, material);
       const side = Math.floor(Math.random() * 4);
       let pos = new THREE.Vector3();
@@ -362,6 +407,7 @@
       mesh.userData.velocity = vel;
       mesh.userData.size = size;
       mesh.userData.sliced = false;
+      mesh.userData.isHazard = isHazard;
       objects.push(mesh);
       scene.add(mesh);
       console.log("Oggetto generato:", shape, pos);
@@ -399,10 +445,24 @@
           const dist = pointer.position.distanceTo(obj.position);
           if(dist < (pointerRadius + obj.userData.size)) {
             obj.userData.sliced = true;
-            score++;
-            scoreDiv.textContent = "Punteggio: " + score;
-            console.log("Oggetto tagliato! Punteggio:", score);
-            playGameSound("hit");
+            if (obj.userData.isHazard) {
+              lives = Math.max(0, lives - 1);
+              updateScoreDisplay("solido nero!");
+              console.log("Solido nero colpito! Vite:", lives);
+              playGameSound("bad");
+              flashHazardFeedback();
+              if (lives <= 0) {
+                setTimeout(() => {
+                  lives = 3;
+                  updateScoreDisplay("vite ripristinate");
+                }, 700);
+              }
+            } else {
+              score++;
+              updateScoreDisplay();
+              console.log("Oggetto tagliato! Punteggio:", score);
+              playGameSound("hit");
+            }
             disintegrateObject(obj); // Avvia effetto di disintegrazione
             if(score >= 12) {
               prepareRoundMedia(true);

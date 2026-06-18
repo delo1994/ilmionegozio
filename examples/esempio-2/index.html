@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esempio 2 - Vetrina Servizi</title>
+  <meta name="description" content="Esempio di sito vetrina per servizi con contenuti, prove e CTA.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #15283c; }
+    header { padding: 36px 20px; color: #fff; background: #004080; text-align: center; }
+    main { width: min(1060px, calc(100% - 32px)); margin: 28px auto; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { padding: 20px; background: #fff; border: 1px solid #d8e4f2; border-radius: 6px; box-shadow: 0 8px 18px rgba(0,64,128,0.08); }
+    .cta { display: inline-block; margin-top: 22px; padding: 12px 18px; background: #004080; color: #fff; border-radius: 5px; text-decoration: none; font-weight: 700; }
+    @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vetrina Servizi</h1>
+    <p>Architettura per spiegare valore, processo e risultati misurabili.</p>
+  </header>
+  <main>
+    <div class="cards">
+      <section class="card"><h2>Diagnosi</h2><p>Audit iniziale, bisogni, competitor e dati disponibili.</p></section>
+      <section class="card"><h2>Strategia</h2><p>Offerta, landing, messaggi e canali prioritari.</p></section>
+      <section class="card"><h2>Misura</h2><p>Pixel, eventi, dashboard e ottimizzazione periodica.</p></section>
+    </div>
+    <a class="cta" href="/face5">Torna al report</a>
+  </main>
+</body>
+</html>

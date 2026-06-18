@@ -296,6 +296,40 @@
     .footer a:focus-visible {
       color: #aaffff;
     }
+
+    #cube-topic-tooltip {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1200;
+      max-width: min(320px, calc(100vw - 28px));
+      padding: 10px 14px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.82);
+      border: 1px solid rgba(0, 255, 255, 0.72);
+      border-radius: 6px;
+      box-shadow: 0 0 18px rgba(0,255,255,0.32), inset 0 0 16px rgba(255,255,255,0.08);
+      font-family: "Courier New", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(16px, 16px, 0) scale(0.96);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      text-shadow: 0 0 8px rgba(0,255,255,0.65);
+    }
+    #cube-topic-tooltip.visible {
+      opacity: 1;
+      transform: translate3d(16px, 16px, 0) scale(1);
+    }
+
+    @media (max-width: 600px) {
+      #cube-topic-tooltip {
+        display: none;
+      }
+    }
   </style>
   
   <!-- Includi Three.js -->
@@ -319,6 +353,7 @@
       Puoi comunque usare il menu per entrare nelle sezioni del sito.
     </div>
   </div>
+  <div id="cube-topic-tooltip" aria-hidden="true"></div>
 
 
   <!-- Menu a tendina per la legenda (solo mobile) -->
@@ -461,13 +496,18 @@
       document.getElementById("cookie-banner").style.display = "none";
     }
     
+    function syncMobileLegend() {
+      const legend = document.getElementById("mobile-legend");
+      if (!legend) return;
+      legend.style.display = window.matchMedia("(max-width: 600px)").matches ? "block" : "none";
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       checkCookieConsent();
-      // Mostra il menu a tendina se su mobile
-      if(window.matchMedia("(max-width: 600px)").matches) {
-        document.getElementById("mobile-legend").style.display = "block";
-      }
+      syncMobileLegend();
     });
+    if (document.readyState !== "loading") syncMobileLegend();
+    window.addEventListener("resize", syncMobileLegend, { passive: true });
   </script>
 
   <!-- Scena Three.js, Camera e Renderer -->
@@ -549,6 +589,15 @@
     const innerCube = new THREE.Mesh(innerGeometry, innerMaterial);
     mainCube.add(innerCube);
     
+    const navTopics = [
+      { label: "AMBIENTI 3D", miniColor: 0xff0000, textColor: "#ffffff", page: '/face1' },
+      { label: "MONTAGGIO VIDEO", miniColor: 0x00ff00, textColor: "#00ff00", page: '/face2' },
+      { label: "GESTIONALE/APPUNTAMENTI", miniColor: 0x0000ff, textColor: "#ffffff", page: '/face3' },
+      { label: "APPS & GIOCHI", miniColor: 0xffff00, textColor: "#ffa500", page: '/face4' },
+      { label: "ANALISI DI MERCATO", miniColor: 0x00ffff, textColor: "#ffffff", page: '/face5' },
+      { label: "REAL TO 3D EXPERIENCE", miniColor: 0xff00ff, textColor: "#ff00ff", page: '/face6' }
+    ];
+
     // Leggenda HUD (desktop) o menu a tendina (mobile)
     const legendGroup = new THREE.Group();
     legendGroup.renderOrder = 999;
@@ -581,18 +630,9 @@
         return sprite;
       }
       
-      const legendEntries = [
-        { label: "AMBIENTI 3D", miniColor: 0xff0000, textColor: "#ffffff", page: '/face1' },
-        { label: "MONTAGGIO VIDEO", miniColor: 0x00ff00, textColor: "#00ff00", page: '/face2' },
-        { label: "GESTIONALE/APPUNTAMENTI", miniColor: 0x0000ff, textColor: "#ffffff", page: '/face3' },
-        { label: "APPS & GIOCHI", miniColor: 0xffff00, textColor: "#ffa500", page: '/face4' },
-        { label: "ANALISI DI MERCATO", miniColor: 0x00ffff, textColor: "#ffffff", page: '/face5' },
-        { label: "REAL TO 3D EXPERIENCE", miniColor: 0xff00ff, textColor: "#ff00ff", page: '/face6' }
-      ];
-      
       const miniCubeSize = 0.1;
       const spacing = 0.3;
-      legendEntries.forEach((entry, index) => {
+      navTopics.forEach((entry, index) => {
         const miniGeo = new THREE.BoxGeometry(miniCubeSize, miniCubeSize, miniCubeSize);
         const miniMat = new THREE.MeshBasicMaterial({
           color: entry.miniColor,
@@ -603,6 +643,7 @@
         const miniCube = new THREE.Mesh(miniGeo, miniMat);
         miniCube.isMiniCube = true;
         miniCube.userData.pageUrl = entry.page;
+        miniCube.userData.label = entry.label;
         miniCube.name = entry.label;
         miniCube.position.set(0, -index * spacing, 0);
         legendGroup.add(miniCube);
@@ -610,6 +651,7 @@
         const sprite = createTextSprite(entry.label, 16, entry.textColor);
         sprite.position.set(0.7, -index * spacing, 0);
         sprite.userData.pageUrl = entry.page;
+        sprite.userData.label = entry.label;
         sprite.material.depthTest = false;
         sprite.material.depthWrite = false;
         legendGroup.add(sprite);
@@ -643,12 +685,45 @@
     let targetURL = null;
     let animationStartTime = null;
     const animationDuration = 1000;
-    
-    function onClick(event) {
+    const topicTooltip = document.getElementById("cube-topic-tooltip");
+
+    function getTopicFromObject(object) {
+      let selectedObject = object;
+      while (selectedObject && !selectedObject.userData.pageUrl && selectedObject.parent) {
+        selectedObject = selectedObject.parent;
+      }
+      if (!selectedObject || !selectedObject.userData.pageUrl) return null;
+      return selectedObject.userData.label || selectedObject.name || "";
+    }
+
+    function showTopicTooltip(label, event) {
+      if (!topicTooltip || isMobileViewport || !label) return;
+      topicTooltip.textContent = label;
+      const x = Math.min(event.clientX + 16, window.innerWidth - topicTooltip.offsetWidth - 16);
+      const y = Math.min(event.clientY + 16, window.innerHeight - topicTooltip.offsetHeight - 16);
+      topicTooltip.style.left = Math.max(8, x) + "px";
+      topicTooltip.style.top = Math.max(8, y) + "px";
+      topicTooltip.classList.add("visible");
+    }
+
+    function hideTopicTooltip() {
+      if (topicTooltip) topicTooltip.classList.remove("visible");
+    }
+
+    function setPointerFromEvent(event) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-      
+    }
+
+    function playIndexAudioFromGesture(event) {
+      if (typeof window.startIndexAudio !== "function") return;
+      window.startIndexAudio(event);
+    }
+
+    function onClick(event) {
+      setPointerFromEvent(event);
+
       const intersectsCube = raycaster.intersectObject(mainCube);
       if (intersectsCube.length > 0 && !cubeClicked) {
         const faceIndex = intersectsCube[0].face.materialIndex;
@@ -675,20 +750,44 @@
             window.location.href = selectedObject.userData.pageUrl;
           }
         }
+      } else if (isMobileViewport) {
+        playIndexAudioFromGesture(event);
       }
     }
     renderer.domElement.addEventListener('click', onClick, false);
 
+    function onPointerAudioStart(event) {
+      setPointerFromEvent(event);
+      const intersectsCube = raycaster.intersectObject(mainCube);
+      if (isMobileViewport) {
+        if (intersectsCube.length === 0) {
+          playIndexAudioFromGesture(event);
+        }
+      } else {
+        playIndexAudioFromGesture(event);
+      }
+    }
+    renderer.domElement.addEventListener('pointerdown', onPointerAudioStart, { passive: true });
+
     function updateCursor(event) {
       if (isMobileViewport || cubeClicked) return;
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const overCube = raycaster.intersectObject(mainCube).length > 0;
-      const overLegend = raycaster.intersectObjects(legendGroup.children, true).length > 0;
+      setPointerFromEvent(event);
+      const cubeHit = raycaster.intersectObject(mainCube)[0];
+      const legendHit = raycaster.intersectObjects(legendGroup.children, true)[0];
+      const overCube = !!cubeHit;
+      const overLegend = !!legendHit;
       renderer.domElement.style.cursor = overCube || overLegend ? "pointer" : "grab";
+      if (cubeHit) {
+        const topic = navTopics[cubeHit.face.materialIndex];
+        showTopicTooltip(topic && topic.label, event);
+      } else if (legendHit) {
+        showTopicTooltip(getTopicFromObject(legendHit.object), event);
+      } else {
+        hideTopicTooltip();
+      }
     }
     renderer.domElement.addEventListener('pointermove', updateCursor, { passive: true });
+    renderer.domElement.addEventListener('pointerleave', hideTopicTooltip, { passive: true });
     
     let lastFrameTime = 0;
     function animate(timestamp) {
@@ -766,7 +865,7 @@
   </script>
   
   <script data-cookieconsent="ignore">
-    // Audio iniziale: usa file MP3 leggeri e Web Audio dopo il primo tap.
+    // Audio iniziale: usa file MP3 leggeri e Web Audio dopo il primo gesto valido.
     (function () {
       const audioFiles = [
         { id: "voce1", src: "/static/Voce1.mp3" },
@@ -774,21 +873,106 @@
         { id: "voce3", src: "/static/Voce3.mp3" },
         { id: "voce5", src: "/static/Voce5.mp3" }
       ];
+      const buffers = new Map();
+      const pending = new Map();
+      const fallbackAudio = new Map();
+      let ctx = null;
+      let audioStarted = false;
 
-      if (!window.IlmioMedia) return;
-
-      const voicePool = window.IlmioMedia.createAudioPool(audioFiles, { htmlPreload: "auto" });
-      window.IlmioMedia.whenIdle(function () {
-        voicePool.preload(["voce1", "voce2"]);
-      }, 700);
-
-      window.IlmioMedia.onFirstInteraction(function () {
-        voicePool.unlock();
-        voicePool.preload();
-        voicePool.playRandom().catch(function (error) {
-          console.error("Audio non riuscito:", error);
-        });
+      audioFiles.forEach(file => {
+        const audio = new Audio(file.src);
+        audio.preload = "auto";
+        audio.load();
+        fallbackAudio.set(file.id, audio);
       });
+
+      function getContext() {
+        if (ctx) return ctx;
+        const Ctor = window.AudioContext || window.webkitAudioContext;
+        if (!Ctor) return null;
+        ctx = new Ctor();
+        return ctx;
+      }
+
+      function unlock() {
+        const audioCtx = getContext();
+        if (!audioCtx) return Promise.resolve(false);
+        const resume = audioCtx.state === "suspended" ? audioCtx.resume().catch(function () {}) : Promise.resolve();
+        return resume.then(function () {
+          try {
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioCtx.createBuffer(1, 1, 22050);
+            source.connect(audioCtx.destination);
+            source.start(0);
+          } catch (error) {}
+          return true;
+        });
+      }
+
+      function preload(file) {
+        const audioCtx = getContext();
+        if (!audioCtx || buffers.has(file.id)) return Promise.resolve();
+        if (pending.has(file.id)) return pending.get(file.id);
+        const job = fetch(file.src, { cache: "force-cache" })
+          .then(response => response.arrayBuffer())
+          .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer.slice(0)))
+          .then(buffer => {
+            buffers.set(file.id, buffer);
+          })
+          .catch(function () {})
+          .finally(function () {
+            pending.delete(file.id);
+          });
+        pending.set(file.id, job);
+        return job;
+      }
+
+      function playFile(file) {
+        const audioCtx = getContext();
+        if (audioCtx && buffers.has(file.id)) {
+          const source = audioCtx.createBufferSource();
+          source.buffer = buffers.get(file.id);
+          source.connect(audioCtx.destination);
+          source.start(0);
+          return Promise.resolve(true);
+        }
+        preload(file);
+        const audio = fallbackAudio.get(file.id);
+        if (!audio) return Promise.resolve(false);
+        try { audio.currentTime = 0; } catch (error) {}
+        return audio.play().then(function () { return true; }).catch(function () { return false; });
+      }
+
+      function warmEssentialAudio() {
+        unlock().then(function () {
+          preload(audioFiles[0]);
+          preload(audioFiles[1]);
+        });
+      }
+
+      function startIndexAudio() {
+        if (audioStarted) return;
+        audioStarted = true;
+        document.documentElement.dataset.indexAudio = "started";
+        unlock().then(function () {
+          const readyFiles = audioFiles.filter(file => buffers.has(file.id));
+          const pool = readyFiles.length ? readyFiles : audioFiles;
+          const file = pool[Math.floor(Math.random() * pool.length)];
+          playFile(file);
+          audioFiles.forEach(preload);
+        });
+      }
+
+      window.startIndexAudio = startIndexAudio;
+      document.documentElement.dataset.indexAudio = "ready";
+
+      const idle = window.requestIdleCallback || function (callback) { return window.setTimeout(callback, 700); };
+      idle(warmEssentialAudio, { timeout: 1200 });
+
+      // Desktop conserva il vecchio comportamento: primo gesto = audio.
+      if (!window.matchMedia("(max-width: 600px)").matches) {
+        document.addEventListener("pointerdown", startIndexAudio, { once: true, passive: true });
+      }
     })();
   </script>
   

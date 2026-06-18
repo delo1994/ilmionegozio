@@ -118,6 +118,8 @@ Dimensione totale: 230.41 MB
 - static/media-optimizer.js: aggiunto helper conservativo per sbloccare AudioContext al primo tap, precaricare solo suoni essenziali e preparare video inline
 - index.html, face4.html, Face4Round1.html: ridotta latenza audio con preload leggero, Web Audio API e fallback HTMLAudio
 - face1.html, face2.html, face4.html, Face4Round1.html, face6.html: aggiunti poster/preload/playsinline e warm-up video senza cambiare gli asset originali
+- Face4Round1.html, index.html, face1.html, face4.html: aggiunte interazioni richieste (Space continuo, D+E+L+O, tooltip cubi, audio mobile fuori cubo, minigioco ottaedri, Charizard/diamante, solidi neri)
+- face5.html, examples/esempio-1..3: ampliato report marketing professionale e aggiunte anteprime/pagine dedicate
 - face3.html: corretto overflow orizzontale con box-sizing
 - face3.html: fallback WhatsApp se Twilio/env Vercel non sono configurati
 - face4.html: aggiunto H1 sr-only senza impatto visivo

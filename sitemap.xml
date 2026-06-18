@@ -33,6 +33,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://www.ilmionegozio.com/examples/esempio-1/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.ilmionegozio.com/examples/esempio-2/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.ilmionegozio.com/examples/esempio-3/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://www.ilmionegozio.com/privacy-policy</loc>
     <changefreq>monthly</changefreq>
   </url>

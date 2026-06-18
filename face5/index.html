@@ -24,9 +24,9 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #eef3f8;
       color: #333;
-      padding: 20px;
+      padding: 0;
     }
     header {
       background: #004080;
@@ -36,11 +36,146 @@
     }
     .content {
       max-width: 900px;
-      margin: 20px auto;
+      margin: 0 auto;
       background: #fff;
       padding: 20px 30px;
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .analysis-layout {
+      width: min(1380px, calc(100% - 32px));
+      margin: 24px auto;
+      display: grid;
+      grid-template-columns: minmax(170px, 220px) minmax(0, 920px) minmax(170px, 220px);
+      gap: 18px;
+      align-items: start;
+    }
+    .example-rail {
+      position: sticky;
+      top: 18px;
+      background: #fff;
+      border: 1px solid #dbe6f3;
+      border-radius: 5px;
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(0, 48, 96, 0.08);
+    }
+    .example-rail h2 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #004080;
+    }
+    .site-preview {
+      display: block;
+      margin: 14px 0 18px;
+      color: #004080;
+      text-decoration: none;
+    }
+    .preview-screen {
+      position: relative;
+      height: 118px;
+      overflow: hidden;
+      border: 2px solid #004080;
+      border-radius: 5px;
+      background: linear-gradient(180deg, #f9fbff, #dfeeff);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8);
+    }
+    .preview-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(0,64,128,0.08), transparent 40%),
+        repeating-linear-gradient(0deg, transparent 0 20px, rgba(0,64,128,0.08) 20px 21px);
+      transform: translateY(-30%);
+      animation: previewScroll 5.5s linear infinite;
+    }
+    .preview-screen span {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      height: 10px;
+      border-radius: 99px;
+      background: #004080;
+      opacity: 0.8;
+      animation: previewPulse 2.4s ease-in-out infinite alternate;
+    }
+    .preview-screen span:nth-child(1) { top: 20px; width: 70%; }
+    .preview-screen span:nth-child(2) { top: 48px; width: 48%; background: #36A2EB; animation-delay: 0.25s; }
+    .preview-screen span:nth-child(3) { top: 76px; width: 84%; background: #4BC0C0; animation-delay: 0.5s; }
+    .site-preview strong {
+      display: block;
+      margin-top: 8px;
+      color: #004080;
+      text-align: center;
+    }
+    @keyframes previewScroll {
+      to { transform: translateY(18%); }
+    }
+    @keyframes previewPulse {
+      from { transform: translateX(0); opacity: 0.55; }
+      to { transform: translateX(12px); opacity: 0.95; }
+    }
+    .report-kicker {
+      margin: 0 0 8px;
+      color: #53708e;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .executive-panel {
+      padding: 18px;
+      border-left: 5px solid #004080;
+      background: #f6faff;
+      margin-bottom: 18px;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .report-section {
+      padding: 16px;
+      border: 1px solid #d8e4f2;
+      border-radius: 5px;
+      background: #fff;
+    }
+    .report-section h3 {
+      margin: 0 0 8px;
+      color: #004080;
+      font-size: 1.05rem;
+    }
+    .icon-tools {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .insight-toggle {
+      border: 1px solid #c8d8ea;
+      background: #f7fbff;
+      color: #004080;
+      border-radius: 5px;
+      padding: 12px 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .insight-toggle span {
+      display: block;
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+    .insight-toggle[aria-expanded="true"] {
+      background: #004080;
+      color: #fff;
+    }
+    #insight-detail {
+      min-height: 44px;
+      padding: 12px 14px;
+      border: 1px solid #c8d8ea;
+      background: #f7fbff;
+      border-radius: 5px;
+      color: #24384d;
     }
     h2 {
       color: #004080;
@@ -100,6 +235,46 @@
     .footer a:hover {
       text-decoration: underline;
     }
+    @media (max-width: 1040px) {
+      .analysis-layout {
+        grid-template-columns: 1fr;
+      }
+      .example-rail {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(170px, 1fr));
+        gap: 12px;
+      }
+      .example-rail h2 {
+        grid-column: 1 / -1;
+      }
+      .site-preview {
+        margin: 0;
+      }
+    }
+    @media (max-width: 640px) {
+      body {
+        padding: 0;
+      }
+      header {
+        padding: 16px 12px;
+      }
+      .analysis-layout {
+        width: calc(100% - 18px);
+        margin: 12px auto;
+      }
+      .content {
+        padding: 16px;
+      }
+      .report-grid,
+      .icon-tools,
+      .example-rail {
+        grid-template-columns: 1fr;
+      }
+      .chart-container {
+        height: 260px;
+      }
+    }
   </style>
   <!-- Include Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -123,12 +298,88 @@
   </header>
 
   <main id="main-content" role="main">
-    <div class="content">
+    <div class="analysis-layout">
+      <aside class="example-rail" aria-label="Esempi siti animati">
+        <h2>Esempi siti</h2>
+        <a class="site-preview" href="/examples/esempio-1/" aria-label="Apri Esempio 1">
+          <div class="preview-screen"><span></span><span></span><span></span></div>
+          <strong>Esempio 1</strong>
+        </a>
+        <a class="site-preview" href="/examples/esempio-2/" aria-label="Apri Esempio 2">
+          <div class="preview-screen"><span></span><span></span><span></span></div>
+          <strong>Esempio 2</strong>
+        </a>
+      </aside>
+
+      <div class="content">
+      <p class="report-kicker">Report aziendale - marketing strategico, PPC e tracking</p>
+      <section class="executive-panel" aria-labelledby="executive-summary">
+        <h2 id="executive-summary">1. Executive summary</h2>
+        <p>
+          Il report trasforma i dati raccolti in una roadmap operativa: posizionamento, pubblico, campagne Google Ads e Meta Ads, tracciamento pixel, contenuti social e KPI. L'approccio combina esperienza commerciale, studio ecommerce/database e logica da agenzia pay per click.
+        </p>
+      </section>
+
       <section aria-labelledby="chi-siamo">
         <h2 id="chi-siamo">Chi Siamo</h2>
         <p>
           Siamo un team con esperienze diversificate. Ho maturato anni di esperienza nella vendita porta a porta e nel network marketing, frequentando corsi di ecommerce e programmazione database con specializzazione in sistemi di archiviazione e blockchain, oltre ad aver svolto uno stage presso un adblocker specializzato in Google Ads con partnership Google. L'altro membro del team ha completato un corso in marketing e comunicazione digitale. Queste esperienze ci consentono di analizzare il mercato e di utilizzare i dati per ottimizzare l'interazione utente all'interno dei siti web.
         </p>
+      </section>
+
+      <div class="icon-tools" aria-label="Ideogrammi interattivi del report">
+        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Il pixel registra eventi come visualizzazioni, click, lead e acquisti. Serve a misurare conversioni, creare pubblici personalizzati e alimentare campagne di remarketing."><span>◉</span>Pixel</button>
+        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Le campagne PPC vengono separate per intento: ricerca consapevole su Google, domanda latente su Meta, remarketing su utenti caldi."><span>▲</span>PPC</button>
+        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Il funnel ordina le azioni: awareness, traffico qualificato, lead, preventivo, vendita e fidelizzazione."><span>◆</span>Funnel</button>
+        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="I contenuti social traducono il valore in prove: casi studio, backstage, prima/dopo, domande frequenti e offerte chiare."><span>●</span>Social</button>
+      </div>
+      <div id="insight-detail" role="status" aria-live="polite">Seleziona un ideogramma per leggere il dettaglio operativo.</div>
+
+      <section class="report-grid" aria-label="Sezioni professionali del report">
+        <article class="report-section">
+          <h3>2. Obiettivi aziendali</h3>
+          <p>Definire richieste preventivo, prenotazioni consulenza, vendite ecommerce, traffico qualificato e crescita del database contatti.</p>
+        </article>
+        <article class="report-section">
+          <h3>3. Analisi pubblico</h3>
+          <p>Segmentare per area geografica, livello di consapevolezza, urgenza, capacità di spesa, device e interessi digitali.</p>
+        </article>
+        <article class="report-section">
+          <h3>4. Analisi competitor</h3>
+          <p>Studiare offerta, messaggi, pagine di atterraggio, promesse, prezzo percepito, recensioni e creatività pubblicitarie.</p>
+        </article>
+        <article class="report-section">
+          <h3>5. Strategia Google Ads</h3>
+          <p>Campagne Search per intento alto, estensioni, keyword negative, landing coerenti e ottimizzazione su conversioni reali.</p>
+        </article>
+        <article class="report-section">
+          <h3>6. Strategia Meta/Facebook Ads</h3>
+          <p>Creatività visuali, pubblici lookalike, retargeting video/engagement e test A/B su headline, offerta e formato.</p>
+        </article>
+        <article class="report-section">
+          <h3>7. Pixel, tracking e conversioni</h3>
+          <p>Eventi consigliati: PageView, ViewContent, Lead, Contact, Schedule, Purchase. Ogni evento deve avere origine, valore e consenso corretti.</p>
+        </article>
+        <article class="report-section">
+          <h3>8. Funnel marketing</h3>
+          <p>Contenuto utile per traffico freddo, prova sociale per traffico tiepido, CTA diretta per utenti caldi e follow-up per lead non chiusi.</p>
+        </article>
+        <article class="report-section">
+          <h3>9. Piano contenuti social</h3>
+          <p>Calendario con educational, dietro le quinte, portfolio, confronto problemi/soluzioni, recensioni e inviti a demo o consulenza.</p>
+        </article>
+        <article class="report-section">
+          <h3>10. KPI da monitorare</h3>
+          <p>CTR, CPC, CPM, CPA, tasso conversione landing, ROAS, frequenza, qualità lead, costo per appuntamento e tempo medio alla vendita.</p>
+        </article>
+        <article class="report-section">
+          <h3>11. Fonti e motivazioni</h3>
+          <p>Fonti operative da usare: documentazione Google Ads, Meta Business Help, Google Analytics, Search Console, ISTAT, Unioncamere, Osservatorio eCommerce B2C Politecnico di Milano, survey proprietarie e benchmark di settore.</p>
+        </article>
+        <article class="report-section">
+          <h3>12. Prossime azioni operative</h3>
+          <p>Audit tracking, revisione landing, mappa keyword, piano creatività, installazione eventi, dashboard KPI e ciclo test settimanale.</p>
+        </article>
       </section>
 
       <section aria-labelledby="le-nostre-analisi">
@@ -164,10 +415,28 @@
       <nav role="navigation" aria-label="Navigazione di ritorno">
         <a href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
       </nav>
+      </div>
+
+      <aside class="example-rail" aria-label="Esempio sito animato aggiuntivo">
+        <h2>Portfolio dinamico</h2>
+        <a class="site-preview" href="/examples/esempio-3/" aria-label="Apri Esempio 3">
+          <div class="preview-screen"><span></span><span></span><span></span></div>
+          <strong>Esempio 3</strong>
+        </a>
+        <p>Anteprime leggere in CSS: movimento continuo senza video aggiuntivi.</p>
+      </aside>
     </div>
   </main>
 
   <script>
+    document.querySelectorAll('.insight-toggle').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.insight-toggle').forEach(item => item.setAttribute('aria-expanded', 'false'));
+        button.setAttribute('aria-expanded', 'true');
+        document.getElementById('insight-detail').textContent = button.dataset.detail;
+      });
+    });
+
     // Grafico: Distribuzione Geografica (Pie Chart)
     const ctxGeo = document.getElementById('geoChart').getContext('2d');
     const geoChart = new Chart(ctxGeo, {

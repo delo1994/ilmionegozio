@@ -60,6 +60,39 @@
       z-index: 10;
       border-radius: 5px;
     }
+    #jailbreakOverlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 300;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at center, rgba(0,255,255,0.2), rgba(0,0,0,0.88) 58%),
+        repeating-linear-gradient(90deg, rgba(0,255,120,0.08) 0 2px, transparent 2px 8px);
+      color: #fff;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      letter-spacing: 0;
+      text-shadow: 0 0 12px #00ffff, 0 0 28px #00ff99;
+    }
+    #jailbreakOverlay.active {
+      display: grid;
+      animation: jailbreakPulse 0.9s ease-in-out infinite alternate;
+    }
+    #jailbreakOverlay span {
+      max-width: min(900px, 92vw);
+      padding: 22px 28px;
+      border: 2px solid rgba(0,255,255,0.85);
+      background: rgba(0,0,0,0.62);
+      box-shadow: 0 0 34px rgba(0,255,255,0.4), inset 0 0 30px rgba(0,255,120,0.16);
+      font-size: clamp(1.45rem, 6vw, 4.2rem);
+      font-weight: 900;
+    }
+    @keyframes jailbreakPulse {
+      from { filter: hue-rotate(0deg) saturate(1.1); transform: scale(1); }
+      to { filter: hue-rotate(65deg) saturate(1.8); transform: scale(1.018); }
+    }
     /* Footer visibile in fondo alla pagina con sfondo trasparente */
     .footer {
       position: fixed;
@@ -129,6 +162,7 @@
 
   <!-- Informazioni aggiornate dinamicamente, annunciate tramite screen reader -->
   <div id="info" role="status" aria-live="polite">Punteggio: 0 - Livello: 1 - Vite: 3</div>
+  <div id="jailbreakOverlay" aria-hidden="true"><span>YOU JAILBREAK THE CODE YOU WIN</span></div>
 
   <!-- Area di gioco interattiva -->
   <main id="main-content" role="application" aria-label="Area di gioco - Gara Triangolare Avanzata">
@@ -174,32 +208,90 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const END_URL = "https://nzp.gay/";
     let score = 0, level = 1, lives = 3;
     let gameEnded = false; // per controllare il termine del 6° round
     const player = { x: canvas.width / 2, y: canvas.height - 50, size: 20, speed: 5 };
     const bullets = [], enemies = [], enemyBullets = [], hearts = [], keys = {};
+    const pressedLetters = new Set();
+    let spaceFireInterval = null;
+    let jailbreakTriggered = false;
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     });
 
+    function isTypingField(target) {
+      if (!target) return false;
+      const tag = target.tagName ? target.tagName.toLowerCase() : "";
+      return tag === "input" || tag === "textarea" || tag === "select" || target.isContentEditable;
+    }
+
+    function firePlayerShot() {
+      bullets.push({ x: player.x, y: player.y, size: 5, vy: -8 });
+      if (level >= 3) {
+        bullets.push({ x: player.x, y: player.y, size: 5, vx: 8, vy: 0 });
+        bullets.push({ x: player.x, y: player.y, size: 5, vx: -8, vy: 0 });
+        bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: 8 });
+        bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: -8 });
+      }
+    }
+
+    function startSpaceFire() {
+      if (spaceFireInterval || gameEnded) return;
+      firePlayerShot();
+      spaceFireInterval = setInterval(firePlayerShot, 150);
+    }
+
+    function stopSpaceFire() {
+      clearInterval(spaceFireInterval);
+      spaceFireInterval = null;
+    }
+
+    function checkJailbreakCombo() {
+      if (jailbreakTriggered || gameEnded) return;
+      if (["d", "e", "l", "o"].every(letter => pressedLetters.has(letter))) {
+        jailbreakTriggered = true;
+        gameEnded = true;
+        stopSpaceFire();
+        const overlay = document.getElementById("jailbreakOverlay");
+        overlay.classList.add("active");
+        document.getElementById("info").innerText = "YOU JAILBREAK THE CODE YOU WIN";
+        setTimeout(() => {
+          window.location.href = END_URL;
+        }, 1800);
+      }
+    }
+
     // Eventi da tastiera per desktop
     document.addEventListener('keydown', e => {
+      if (isTypingField(e.target)) return;
       keys[e.key] = true;
       if (e.code === 'Space') {
-        // Colpo principale
-        bullets.push({ x: player.x, y: player.y, size: 5, vy: -8 });
-        if (level >= 3) {
-          bullets.push({ x: player.x, y: player.y, size: 5, vx: 8, vy: 0 });
-          bullets.push({ x: player.x, y: player.y, size: 5, vx: -8, vy: 0 });
-          bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: 8 });
-          bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: -8 });
-        }
+        e.preventDefault();
+        startSpaceFire();
+        return;
+      }
+      if (/^[a-zA-Z]$/.test(e.key)) {
+        pressedLetters.add(e.key.toLowerCase());
+        checkJailbreakCombo();
       }
     });
 
-    document.addEventListener('keyup', e => keys[e.key] = false);
+    document.addEventListener('keyup', e => {
+      keys[e.key] = false;
+      if (e.code === 'Space') {
+        stopSpaceFire();
+      }
+      if (/^[a-zA-Z]$/.test(e.key)) {
+        pressedLetters.delete(e.key.toLowerCase());
+      }
+    });
+    window.addEventListener("blur", () => {
+      stopSpaceFire();
+      pressedLetters.clear();
+    });
 
     // Eventi touch per dispositivi mobili: muovi il giocatore con il dito e spara automaticamente
     let autoFireInterval = null;
@@ -526,8 +618,9 @@
 
       if(level > 6 && !gameEnded) {
         gameEnded = true;
+        stopSpaceFire();
         const redirectToEnd = () => {
-          window.location.href = "https://nzp.gay/";
+          window.location.href = END_URL;
         };
         if (roundAudio) {
           const endAudio = roundAudio.getAudioElement("end");

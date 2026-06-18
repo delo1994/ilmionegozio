@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esempio 3 - Dashboard Marketing</title>
+  <meta name="description" content="Esempio di dashboard marketing per monitorare campagne, pixel e KPI.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #101820; color: #fff; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0; }
+    .dashboard { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+    .panel { min-height: 150px; padding: 18px; border: 1px solid rgba(0,255,255,0.35); border-radius: 6px; background: rgba(0,64,128,0.24); box-shadow: inset 0 0 24px rgba(0,255,255,0.06); }
+    .bar { height: 14px; margin: 14px 0; border-radius: 99px; background: linear-gradient(90deg, #00ffff, #36A2EB); animation: grow 2.4s ease-in-out infinite alternate; }
+    .bar:nth-child(3) { width: 68%; animation-delay: 0.2s; }
+    .bar:nth-child(4) { width: 84%; animation-delay: 0.4s; }
+    a { color: #9ff; font-weight: 700; }
+    @keyframes grow { from { width: 32%; } to { width: 96%; } }
+    @media (max-width: 760px) { .dashboard { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Dashboard Marketing</h1>
+    <p>Esempio orientato a KPI, campagne e conversioni tracciate.</p>
+    <div class="dashboard">
+      <section class="panel"><h2>Campagne</h2><div class="bar"></div><div class="bar"></div><div class="bar"></div></section>
+      <section class="panel"><h2>Pixel</h2><p>Eventi, conversioni e pubblici remarketing.</p></section>
+      <section class="panel"><h2>Funnel</h2><p>Da traffico freddo a richiesta preventivo.</p></section>
+      <section class="panel"><h2>KPI</h2><p>CTR, CPC, CPA, ROAS e qualita lead.</p></section>
+    </div>
+    <p><a href="/face5">Torna al report</a></p>
+  </main>
+</body>
+</html>
