@@ -108,6 +108,31 @@
       color: #004080;
       text-align: center;
     }
+    .site-preview em {
+      display: block;
+      margin-top: 2px;
+      color: #53708e;
+      font-size: 0.78rem;
+      font-style: normal;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    .preview-gridline .preview-screen {
+      background: linear-gradient(135deg, #ffffff, #e7e7e7);
+      border-color: #111827;
+    }
+    .preview-gridline .preview-screen span { background: #111827; }
+    .preview-pixzen .preview-screen {
+      background: linear-gradient(135deg, #f5f3ef, #d8d4cb);
+      border-color: #0a0a0a;
+    }
+    .preview-pixzen .preview-screen span { background: #0a0a0a; }
+    .preview-zedian .preview-screen {
+      background: linear-gradient(135deg, #0d1116, #14181f);
+      border-color: #00df8f;
+    }
+    .preview-zedian .preview-screen span { background: #00df8f; }
     @keyframes previewScroll {
       to { transform: translateY(18%); }
     }
@@ -301,13 +326,15 @@
     <div class="analysis-layout">
       <aside class="example-rail" aria-label="Esempi siti animati">
         <h2>Esempi siti</h2>
-        <a class="site-preview" href="/examples/esempio-1/" aria-label="Apri Esempio 1">
+        <a class="site-preview preview-gridline" href="/examples/esempio-1/" aria-label="Apri Esempio 1 GRIDLINE">
           <div class="preview-screen"><span></span><span></span><span></span></div>
           <strong>Esempio 1</strong>
+          <em>GRIDLINE</em>
         </a>
-        <a class="site-preview" href="/examples/esempio-2/" aria-label="Apri Esempio 2">
+        <a class="site-preview preview-pixzen" href="/examples/esempio-2/" aria-label="Apri Esempio 2 PIXZEN">
           <div class="preview-screen"><span></span><span></span><span></span></div>
           <strong>Esempio 2</strong>
+          <em>PIXZEN</em>
         </a>
       </aside>
 
@@ -419,9 +446,10 @@
 
       <aside class="example-rail" aria-label="Esempio sito animato aggiuntivo">
         <h2>Portfolio dinamico</h2>
-        <a class="site-preview" href="/examples/esempio-3/" aria-label="Apri Esempio 3">
+        <a class="site-preview preview-zedian" href="/examples/esempio-3/" aria-label="Apri Esempio 3 ZEDIAN">
           <div class="preview-screen"><span></span><span></span><span></span></div>
           <strong>Esempio 3</strong>
+          <em>ZEDIAN</em>
         </a>
         <p>Anteprime leggere in CSS: movimento continuo senza video aggiuntivi.</p>
       </aside>

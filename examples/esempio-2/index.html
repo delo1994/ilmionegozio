@@ -3,31 +3,691 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Esempio 2 - Vetrina Servizi</title>
-  <meta name="description" content="Esempio di sito vetrina per servizi con contenuti, prove e CTA.">
+  <title>PIXZEN - Futuristic AI Agency</title>
+  <meta name="description" content="Esempio PIXZEN: sito agenzia AI futuristica con estetica editoriale monocromatica, typing effect, marquee, hover media e modal case study.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #15283c; }
-    header { padding: 36px 20px; color: #fff; background: #004080; text-align: center; }
-    main { width: min(1060px, calc(100% - 32px)); margin: 28px auto; }
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .card { padding: 20px; background: #fff; border: 1px solid #d8e4f2; border-radius: 6px; box-shadow: 0 8px 18px rgba(0,64,128,0.08); }
-    .cta { display: inline-block; margin-top: 22px; padding: 12px 18px; background: #004080; color: #fff; border-radius: 5px; text-decoration: none; font-weight: 700; }
-    @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: #0a0a0a;
+      background: #f5f3ef;
+      font-family: "Satoshi", "Inter", Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    body.modal-open { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      opacity: 0.035;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+      padding: 26px 36px;
+      transition: background 0.25s ease, backdrop-filter 0.25s ease, border-color 0.25s ease;
+    }
+    .navbar.scrolled {
+      border-bottom: 1px solid rgba(10,10,10,0.08);
+      background: rgba(245,243,239,0.82);
+      backdrop-filter: blur(16px);
+    }
+    .logo {
+      font-weight: 900;
+      letter-spacing: 0.2em;
+    }
+    .nav-center {
+      display: flex;
+      gap: 28px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .nav-center a {
+      position: relative;
+      padding-bottom: 4px;
+    }
+    .nav-center a::after {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      content: "";
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-center a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    .nav-right {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .talk {
+      padding: 12px 18px;
+      border: 1px solid rgba(10,10,10,0.16);
+      border-radius: 999px;
+      background: transparent;
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      cursor: pointer;
+    }
+    .hamburger {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(10,10,10,0.14);
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+    }
+    .hamburger span,
+    .hamburger::before,
+    .hamburger::after {
+      display: block;
+      width: 18px;
+      height: 1px;
+      margin: 5px auto;
+      content: "";
+      background: #0a0a0a;
+    }
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      display: grid;
+      place-items: center;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(245,243,239,0.96);
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .mobile-menu.open { visibility: visible; opacity: 1; }
+    .mobile-menu a {
+      display: block;
+      margin: 18px;
+      font-size: clamp(2.4rem, 14vw, 5rem);
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    section {
+      border-top: 1px solid rgba(10,10,10,0.1);
+    }
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      overflow: hidden;
+      padding: 130px 28px 90px;
+      text-align: center;
+    }
+    .hero::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      opacity: 0.85;
+      background:
+        radial-gradient(circle at 50% 45%, transparent 0 11px, rgba(10,10,10,0.08) 12px 13px, transparent 14px),
+        radial-gradient(circle at 28% 25%, rgba(10,10,10,0.08), transparent 30%),
+        radial-gradient(circle at 78% 72%, rgba(10,10,10,0.07), transparent 28%);
+      background-size: 20px 20px, cover, cover;
+      mix-blend-mode: luminosity;
+      animation: inkShift 11s ease-in-out infinite alternate;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(1240px, 100%);
+    }
+    .label {
+      margin: 0 0 22px;
+      color: #8e8e8e;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(3.3rem, 11vw, 9.2rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .cursor { animation: blink 0.8s step-end infinite; }
+    .scroll-down {
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      z-index: 3;
+      transform: translateX(-50%);
+      color: #8e8e8e;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+    .marquee {
+      overflow: hidden;
+      padding: 28px 0;
+      background: #eae7e1;
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      gap: 42px;
+      animation: marquee 24s linear infinite;
+    }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.42;
+      filter: grayscale(1);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+    .brand:hover { opacity: 1; filter: grayscale(0); }
+    .split {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 48px;
+      width: min(1180px, calc(100% - 42px));
+      margin: 0 auto;
+      padding: 110px 0;
+    }
+    .section-title {
+      margin: 0 0 24px;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      line-height: 0.94;
+      text-transform: uppercase;
+    }
+    .service-list {
+      display: grid;
+      gap: 6px;
+    }
+    .service {
+      width: 100%;
+      border: 0;
+      border-top: 1px solid rgba(10,10,10,0.12);
+      background: transparent;
+      padding: 22px 0;
+      text-align: left;
+      font-size: clamp(1.4rem, 3vw, 2.4rem);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .service.active,
+    .service:hover { color: #5f5f5f; }
+    .media-panel {
+      position: sticky;
+      top: 120px;
+      height: 560px;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+    .media-panel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1);
+      transform: scale(1.04);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .media-caption {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      color: #fff;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    .work {
+      width: min(1120px, calc(100% - 42px));
+      margin: 0 auto;
+      padding: 110px 0;
+    }
+    .cards {
+      display: grid;
+      gap: 22px;
+      margin-top: 42px;
+    }
+    .case-card {
+      position: sticky;
+      top: 96px;
+      min-height: 420px;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      border: 1px solid rgba(10,10,10,0.12);
+      background: #0a0a0a;
+      cursor: pointer;
+    }
+    .case-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.1);
+      opacity: 0.68;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .case-card:hover img { transform: scale(1.05); }
+    .case-card div {
+      position: relative;
+      z-index: 2;
+      padding: 32px;
+      color: #fff;
+    }
+    .case-card h3 {
+      margin: 8px 0 0;
+      font-size: clamp(2rem, 6vw, 5rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+    .manifesto {
+      width: min(1120px, calc(100% - 42px));
+      margin: 0 auto;
+      padding: 120px 0 70px;
+    }
+    .manifesto p {
+      max-width: 1020px;
+      margin: 0;
+      color: #8e8e8e;
+      font-size: clamp(2rem, 6vw, 5.6rem);
+      font-weight: 900;
+      line-height: 1.02;
+      text-transform: uppercase;
+    }
+    .manifesto span { transition: color 0.25s ease; }
+    .manifesto span.active { color: #0a0a0a; }
+    .values {
+      overflow: hidden;
+      padding: 32px 0;
+      font-size: clamp(2.4rem, 10vw, 7rem);
+      font-weight: 900;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .values div { display: inline-block; animation: marquee 18s linear infinite; }
+    .insights {
+      width: min(1120px, calc(100% - 42px));
+      margin: 0 auto;
+      padding: 100px 0;
+    }
+    .article-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 120px 40px;
+      gap: 16px;
+      align-items: center;
+      border-top: 1px solid rgba(10,10,10,0.14);
+      padding: 26px 0;
+      cursor: none;
+    }
+    .article-row:last-child { border-bottom: 1px solid rgba(10,10,10,0.14); }
+    .article-row h3 { margin: 0; font-size: clamp(1.3rem, 3vw, 2.1rem); }
+    .muted { color: #8e8e8e; }
+    #cursor-image {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 70;
+      width: 230px;
+      height: 150px;
+      object-fit: cover;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.7);
+      filter: grayscale(1);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    #cursor-image.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .contact {
+      position: relative;
+      display: grid;
+      min-height: 80vh;
+      place-items: center;
+      overflow: hidden;
+      padding: 120px 24px;
+      text-align: center;
+    }
+    .contact::before,
+    .contact::after {
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      content: "";
+      background: rgba(10,10,10,0.08);
+      filter: blur(80px);
+      animation: pulse 6s ease-in-out infinite alternate;
+    }
+    .contact::before { left: 10%; top: 24%; }
+    .contact::after { right: 12%; bottom: 18%; animation-delay: 1.2s; }
+    .contact h2 {
+      position: relative;
+      z-index: 2;
+      margin: 0 0 28px;
+      font-size: clamp(3rem, 9vw, 8rem);
+      line-height: 0.95;
+    }
+    .magnetic {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      padding: 18px 28px;
+      border-radius: 999px;
+      color: #fff;
+      background: #0a0a0a;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      transition: transform 0.24s ease;
+    }
+    footer {
+      display: grid;
+      grid-template-columns: 1fr repeat(3, auto);
+      gap: 28px;
+      padding: 40px 36px;
+      border-top: 1px solid rgba(10,10,10,0.12);
+      color: #8e8e8e;
+      font-size: 0.82rem;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      align-items: end;
+      visibility: hidden;
+      background: rgba(10,10,10,0.34);
+      opacity: 0;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .modal.open { visibility: visible; opacity: 1; }
+    .modal-panel {
+      min-height: 58vh;
+      padding: 42px;
+      background: #f5f3ef;
+      transform: translateY(100%);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal.open .modal-panel { transform: translateY(0); }
+    .close {
+      float: right;
+      border: 1px solid rgba(10,10,10,0.18);
+      border-radius: 999px;
+      background: transparent;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes bounce { 50% { transform: translate(-50%, -9px); } }
+    @keyframes pulse { to { transform: scale(1.2); opacity: 0.55; } }
+    @keyframes inkShift { to { background-position: 40px 30px, center, center; } }
+    @media (max-width: 820px) {
+      .navbar { grid-template-columns: 1fr auto; padding: 18px; }
+      .nav-center, .talk { display: none; }
+      .hamburger { display: block; }
+      .split { grid-template-columns: 1fr; padding: 76px 0; }
+      .media-panel { position: relative; top: 0; height: 340px; }
+      .article-row { grid-template-columns: 1fr; cursor: pointer; }
+      footer { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Vetrina Servizi</h1>
-    <p>Architettura per spiegare valore, processo e risultati misurabili.</p>
-  </header>
-  <main>
-    <div class="cards">
-      <section class="card"><h2>Diagnosi</h2><p>Audit iniziale, bisogni, competitor e dati disponibili.</p></section>
-      <section class="card"><h2>Strategia</h2><p>Offerta, landing, messaggi e canali prioritari.</p></section>
-      <section class="card"><h2>Misura</h2><p>Pixel, eventi, dashboard e ottimizzazione periodica.</p></section>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="navbar" aria-label="Navigazione PIXZEN">
+    <a class="logo" href="#home">PIXZEN</a>
+    <div class="nav-center">
+      <a href="#services">Expertise</a>
+      <a href="#work">Work</a>
+      <a href="#insights">Insights</a>
+      <a href="#contact">Contact</a>
     </div>
-    <a class="cta" href="/face5">Torna al report</a>
+    <div class="nav-right">
+      <a class="talk" href="#contact">Let's talk</a>
+      <button class="hamburger" type="button" aria-label="Apri menu"><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-menu" aria-hidden="true">
+    <div>
+      <a href="#services">Expertise</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+      <a href="/face5">Report</a>
+    </div>
+  </div>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-content">
+        <p class="label">Futuristic AI agency</p>
+        <h1><span id="typed">Building Tomorrow</span><span class="cursor">_</span></h1>
+      </div>
+      <a class="scroll-down" href="#brands">Scroll down</a>
+    </section>
+
+    <section id="brands" class="marquee" aria-label="Trusted brands">
+      <div class="marquee-track">
+        <span class="brand">◇ Neural Labs</span><span class="brand">◎ Vector Bank</span><span class="brand">△ Orbit Retail</span><span class="brand">□ Nova Cloud</span><span class="brand">✕ Atlas AI</span>
+        <span class="brand">◇ Neural Labs</span><span class="brand">◎ Vector Bank</span><span class="brand">△ Orbit Retail</span><span class="brand">□ Nova Cloud</span><span class="brand">✕ Atlas AI</span>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="split">
+        <div>
+          <p class="label">Our expertise</p>
+          <h2 class="section-title">Systems that think, sell and scale.</h2>
+          <div class="service-list">
+            <button class="service active" data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1100&auto=format&fit=crop" data-copy="AI strategy, positioning and experience architecture for ambitious digital brands.">AI Strategy</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1100&auto=format&fit=crop" data-copy="Conversion systems, dashboards and full-funnel growth experiments.">Growth Systems</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1100&auto=format&fit=crop" data-copy="Editorial web interfaces with premium motion, content hierarchy and data storytelling.">Brand Interfaces</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1100&auto=format&fit=crop" data-copy="Automation layers for lead scoring, creative testing and retention.">Automation Labs</button>
+          </div>
+        </div>
+        <aside class="media-panel" aria-live="polite">
+          <img id="service-img" src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1100&auto=format&fit=crop" alt="AI strategy visual">
+          <div id="service-copy" class="media-caption">AI strategy, positioning and experience architecture for ambitious digital brands.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="work" class="work">
+      <p class="label">Selected work</p>
+      <h2 class="section-title">Premium sticky case studies.</h2>
+      <div class="cards">
+        <article class="case-card" data-title="Predictive Commerce" data-copy="A retail intelligence layer that forecasts demand and personalizes landing pages by intent.">
+          <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1400&auto=format&fit=crop" alt="Predictive commerce case">
+          <div><span class="label">AI retail</span><h3>Predictive Commerce</h3></div>
+        </article>
+        <article class="case-card" data-title="Signal CRM" data-copy="A machine-learning CRM experience for lead scoring, sales routing and automated follow-up.">
+          <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1400&auto=format&fit=crop" alt="Signal CRM case">
+          <div><span class="label">Growth ops</span><h3>Signal CRM</h3></div>
+        </article>
+        <article class="case-card" data-title="Vision Studio" data-copy="A cinematic brand system for AI-generated content workflows and campaign testing.">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400&auto=format&fit=crop" alt="Vision studio case">
+          <div><span class="label">Creative AI</span><h3>Vision Studio</h3></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="manifesto">
+      <p id="manifesto-text">Artificial intelligence becomes valuable when strategy, interface, data and creative direction move as one operating system.</p>
+    </section>
+    <div class="values" aria-hidden="true"><div>Artificial intelligence - Brand strategy - Growth systems - Creative automation - Artificial intelligence - Brand strategy - Growth systems - Creative automation - </div></div>
+
+    <section id="insights" class="insights">
+      <p class="label">Insights</p>
+      <h2 class="section-title">Signals worth reading.</h2>
+      <div class="article-row" data-img="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=700&auto=format&fit=crop"><span class="muted">AI</span><h3>How predictive funnels reduce wasted media spend</h3><span>2026</span><span>↗</span></div>
+      <div class="article-row" data-img="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=700&auto=format&fit=crop"><span class="muted">Brand</span><h3>Why luxury web systems need quieter interfaces</h3><span>2026</span><span>↗</span></div>
+      <div class="article-row" data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=700&auto=format&fit=crop"><span class="muted">Ops</span><h3>Turning CRM events into creative testing loops</h3><span>2026</span><span>↗</span></div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div>
+        <h2>Let's Build<br>The Future.</h2>
+        <a class="magnetic" href="/face5">Torna al report</a>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    <strong>PIXZEN</strong>
+    <span>hello@pixzen.ai</span>
+    <span>AI Strategy</span>
+    <span>2026</span>
+  </footer>
+
+  <img id="cursor-image" alt="" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=700&auto=format&fit=crop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-panel">
+      <button class="close" type="button">Close</button>
+      <p class="label">Case study</p>
+      <h2 id="modal-title" class="section-title">Case study</h2>
+      <p id="modal-copy">Project details.</p>
+    </div>
+  </div>
+
+  <script>
+    const navbar = document.querySelector(".navbar");
+    const hamburger = document.querySelector(".hamburger");
+    const mobileMenu = document.querySelector(".mobile-menu");
+    const words = ["Building Tomorrow", "Shaping Futures", "Driving Growth"];
+    const typed = document.getElementById("typed");
+    let wordIndex = 0;
+    let letterIndex = 0;
+    let deleting = false;
+
+    window.addEventListener("scroll", () => {
+      navbar.classList.toggle("scrolled", window.scrollY > 50);
+      highlightManifesto();
+    }, { passive: true });
+
+    hamburger.addEventListener("click", () => {
+      mobileMenu.classList.toggle("open");
+    });
+    mobileMenu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => mobileMenu.classList.remove("open")));
+
+    function typeLoop() {
+      const word = words[wordIndex];
+      typed.textContent = word.slice(0, letterIndex);
+      if (!deleting && letterIndex < word.length) letterIndex++;
+      else if (!deleting) deleting = true;
+      else if (letterIndex > 0) letterIndex--;
+      else {
+        deleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+      }
+      setTimeout(typeLoop, deleting ? 42 : 82);
+    }
+    typeLoop();
+
+    const serviceImg = document.getElementById("service-img");
+    const serviceCopy = document.getElementById("service-copy");
+    document.querySelectorAll(".service").forEach(button => {
+      button.addEventListener("mouseenter", () => {
+        document.querySelectorAll(".service").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        serviceImg.style.opacity = "0";
+        setTimeout(() => {
+          serviceImg.src = button.dataset.img;
+          serviceCopy.textContent = button.dataset.copy;
+          serviceImg.style.opacity = "1";
+        }, 160);
+      });
+    });
+
+    const modal = document.querySelector(".modal");
+    const modalTitle = document.getElementById("modal-title");
+    const modalCopy = document.getElementById("modal-copy");
+    document.querySelectorAll(".case-card").forEach(card => {
+      card.addEventListener("click", () => {
+        modalTitle.textContent = card.dataset.title;
+        modalCopy.textContent = card.dataset.copy;
+        modal.classList.add("open");
+        document.body.classList.add("modal-open");
+      });
+    });
+    document.querySelector(".close").addEventListener("click", () => {
+      modal.classList.remove("open");
+      document.body.classList.remove("modal-open");
+    });
+
+    const manifesto = document.getElementById("manifesto-text");
+    manifesto.innerHTML = manifesto.textContent.split(" ").map(word => `<span>${word}</span>`).join(" ");
+    function highlightManifesto() {
+      const rect = manifesto.getBoundingClientRect();
+      const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight + rect.height)));
+      const spans = manifesto.querySelectorAll("span");
+      const active = Math.floor(progress * spans.length);
+      spans.forEach((span, index) => span.classList.toggle("active", index <= active));
+    }
+    highlightManifesto();
+
+    const cursorImage = document.getElementById("cursor-image");
+    document.querySelectorAll(".article-row").forEach(row => {
+      row.addEventListener("mouseenter", () => {
+        cursorImage.src = row.dataset.img;
+        cursorImage.classList.add("visible");
+      });
+      row.addEventListener("mousemove", event => {
+        cursorImage.style.left = event.clientX + "px";
+        cursorImage.style.top = event.clientY + "px";
+      });
+      row.addEventListener("mouseleave", () => cursorImage.classList.remove("visible"));
+    });
+
+    const magnetic = document.querySelector(".magnetic");
+    magnetic.addEventListener("mousemove", event => {
+      const rect = magnetic.getBoundingClientRect();
+      const x = (event.clientX - rect.left - rect.width / 2) * 0.28;
+      const y = (event.clientY - rect.top - rect.height / 2) * 0.28;
+      magnetic.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    magnetic.addEventListener("mouseleave", () => {
+      magnetic.style.transform = "translate(0, 0)";
+    });
+  </script>
 </body>
 </html>
