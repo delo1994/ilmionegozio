@@ -178,6 +178,7 @@
     let coffeeProjectile = null;
     let coffeeDiamond = null;
     let coffeeExploded = false;
+    let coffeeExplosionTimer = null;
     const coffeeDiamondPalette = [
       new THREE.Color(0x33ccff),
       new THREE.Color(0x9b5cff),
@@ -720,6 +721,12 @@
       coffeeProjectile.userData.age = 0;
       coffeeProjectile.userData.startPosition = coffeeProjectile.position.clone();
       scene.add(coffeeProjectile);
+      clearTimeout(coffeeExplosionTimer);
+      coffeeExplosionTimer = setTimeout(() => {
+        if (coffeeProjectile && !coffeeExploded) {
+          explodeCoffeeIntoDiamond(coffeeProjectile.position);
+        }
+      }, isMobileViewport ? 520 : 620);
       document.documentElement.dataset.coffeeState = "launched";
       document.getElementById('message').textContent = "Un caffe' e' uscito dalla SpaceDrive!";
     }
@@ -813,6 +820,8 @@
     function explodeCoffeeIntoDiamond(positionOverride) {
       if (!coffeeProjectile || coffeeExploded) return;
       coffeeExploded = true;
+      clearTimeout(coffeeExplosionTimer);
+      coffeeExplosionTimer = null;
       const position = positionOverride ? positionOverride.clone() : coffeeProjectile.position.clone();
       scene.remove(coffeeProjectile);
       coffeeProjectile = null;
