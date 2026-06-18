@@ -1,0 +1,356 @@
+<!DOCTYPE html> 
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Montaggio Video - ilmionegozio.com</title>
+  <meta name="description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
+  <style>
+    /* Stili generali */
+    body {
+      margin: 0;
+      background: #003300; /* Verde scuro per il background */
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden; /* La pagina principale non è scrollabile */
+    }
+    /* Cornice Cinema */
+    .cinema-frame {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      border: 40px solid #004d00; /* bordo verde leggermente più chiaro */
+      box-sizing: border-box;
+      background: #003300;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+    /* Schermo Cinema */
+    .cinema-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: url('/static/background.webp') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: flicker 5s infinite;
+    }
+    /* Contenitore per il contenuto interno scrollabile */
+    .content {
+      position: relative;
+      z-index: 3;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      max-width: 800px;
+      text-align: center;
+      max-height: 90vh; /* Solo l'interno è scrollabile */
+      overflow-y: auto;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+    .programs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .program {
+      width: 150px;
+      padding: 10px;
+      background: #222;
+      border: 1px solid #444;
+      text-align: center;
+    }
+    .program img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    a.back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #fff;
+      text-decoration: underline;
+    }
+    /* Sezione Video Collections */
+    .video-collections {
+      margin-top: 30px;
+    }
+    .video-collection {
+      margin-bottom: 30px;
+    }
+    .video-collection h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #aaffaa;
+    }
+    .videos-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .videos-container video {
+      width: 100%;
+      height: auto;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #000;
+      cursor: pointer;
+    }
+    /* Tende Cinepresa 3D - colore verde profondo */
+    .curtain {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #005500;
+      z-index: 2;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+      transform-origin: center;
+      animation-duration: 3s;
+      animation-fill-mode: forwards;
+    }
+    .curtain.left {
+      left: 0;
+      transform: perspective(800px) rotateY(0deg);
+      animation-name: openCurtainLeft;
+    }
+    .curtain.right {
+      right: 0;
+      transform: perspective(800px) rotateY(0deg);
+      animation-name: openCurtainRight;
+    }
+    @keyframes openCurtainLeft {
+      0% { transform: perspective(800px) rotateY(0deg); }
+      100% { transform: perspective(800px) rotateY(40deg) translateX(-100%); }
+    }
+    @keyframes openCurtainRight {
+      0% { transform: perspective(800px) rotateY(0deg); }
+      100% { transform: perspective(800px) rotateY(-40deg) translateX(100%); }
+    }
+    /* Effetto flicker opzionale sullo schermo */
+    @keyframes flicker {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 1; }
+    }
+    /* Footer: usa Flexbox per distribuire il contenuto */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background-color: #002200;
+      font-size: 0.85rem;
+      color: #ccc;
+      border-top: 1px solid #004d00;
+      z-index: 10;
+    }
+    .footer .footer-left {
+      /* Contenuto a sinistra */
+    }
+    .footer .footer-right {
+      margin-right: 20px; /* Sposta il link leggermente a sinistra dal bordo destro */
+    }
+    .footer a {
+      color: #aaffaa;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    /* Mobile: rendi il menu dei programmi orizzontalmente scorrevole */
+    @media (max-width: 600px) {
+      .programs {
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+      .program {
+        flex: 0 0 auto;
+        margin-right: 10px;
+      }
+    }
+
+    .video-placeholder {
+      width: 200px;
+      min-height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      margin: 5px;
+      border: 1px dashed rgba(255,255,255,0.45);
+      color: #e6ffe6;
+      background: rgba(0,0,0,0.55);
+      font-size: 0.9rem;
+    }
+  </style>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Montaggio Video - ilmionegozio.com">
+  <meta property="og:description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Montaggio Video - ilmionegozio.com">
+  <meta name="twitter:description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
+  <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Contenuto principale -->
+  <main id="main-content" role="main">
+    <div class="cinema-frame">
+      <!-- Tende Cinepresa -->
+      <div class="curtain left"></div>
+      <div class="curtain right"></div>
+      
+      <div class="cinema-screen">
+        <div class="content" aria-labelledby="page-title">
+          <h1 id="page-title">Montaggio Video</h1>
+          <p>
+            Vivi un'esperienza immersiva. Scopri le nostre competenze in software di montaggio video e grafica: Adobe Illustrator, Photoshop, Da Vinci Resolve, Capcut e altri.
+          </p>
+          <div class="programs">
+            <div class="program">
+              <img src="/static/adobe_illustrator.png" alt="Logo Adobe Illustrator">
+              <p>Adobe Illustrator</p>
+            </div>
+            <div class="program">
+              <img src="/static/adobe_photoshop.png" alt="Logo Adobe Photoshop">
+              <p>Adobe Photoshop</p>
+            </div>
+            <div class="program">
+              <img src="/static/da_vinci.png" alt="Logo Da Vinci Resolve">
+              <p>Da Vinci Resolve</p>
+            </div>
+            <div class="program">
+              <img src="/static/capcut.png" alt="Logo Capcut">
+              <p>Capcut</p>
+            </div>
+          </div>
+          
+          <!-- Sezione Video Collections -->
+          <div class="video-collections">
+            <!-- Video per Adobe Illustrator -->
+            <div class="video-collection">
+              <h2>Adobe Illustrator</h2>
+              <div class="videos-container">
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+              </div>
+            </div>
+            <!-- Video per Adobe Photoshop -->
+            <div class="video-collection">
+              <h2>Adobe Photoshop</h2>
+              <div class="videos-container">
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+              </div>
+            </div>
+            <!-- Video per Da Vinci Resolve -->
+            <div class="video-collection">
+              <h2>Da Vinci Resolve</h2>
+              <div class="videos-container">
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+              </div>
+            </div>
+            <!-- Video per Capcut -->
+            <div class="video-collection">
+              <h2>Capcut</h2>
+              <div class="videos-container">
+                <video controls>
+                  <source src="/static/capcut1.mp4" type="video/mp4">
+                  Il tuo browser non supporta il tag video.
+                </video>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+                <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-left">
+      <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
+      <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
+      <a href="/cookie-policy" target="_blank">Cookie Policy</a> |
+      <a href="/Accessibilita" target="_blank">Accessibilità</a> |  
+      <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+    </div>
+    <div class="footer-right">
+      <a class="back-link" href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
+    </div>
+  </footer>
+
+  <!-- Il resto del codice (ad esempio eventuali effetti 3D, particelle ecc.) rimane invariato -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Creazione del greenRenderer per le particelle
+    const greenScene = new THREE.Scene();
+    const greenCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    greenCamera.position.z = 5;
+    const greenRenderer = new THREE.WebGLRenderer({ alpha: true });
+    greenRenderer.setSize(window.innerWidth, window.innerHeight);
+    // Posizionamento assoluto del canvas in modo da non spingere il contenuto
+    greenRenderer.domElement.style.position = "absolute";
+    greenRenderer.domElement.style.top = "0";
+    greenRenderer.domElement.style.left = "0";
+    greenRenderer.domElement.style.zIndex = "0";
+    // Il canvas del greenRenderer è marcato come decorativo
+    greenRenderer.domElement.setAttribute("aria-hidden", "true");
+    document.body.insertBefore(greenRenderer.domElement, document.body.firstChild);
+    
+    const greenParticleCount = 500;
+    const greenParticlesGeometry = new THREE.BufferGeometry();
+    const greenPositions = new Float32Array(greenParticleCount * 3);
+    for (let i = 0; i < greenParticleCount; i++) {
+      greenPositions[i * 3] = THREE.MathUtils.randFloatSpread(400);
+      greenPositions[i * 3 + 1] = THREE.MathUtils.randFloatSpread(400);
+      greenPositions[i * 3 + 2] = THREE.MathUtils.randFloatSpread(400) - 200;
+    }
+    greenParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(greenPositions, 3));
+    const greenParticlesMaterial = new THREE.PointsMaterial({
+      color: 0x00ff00,
+      size: 3,
+      transparent: true,
+      opacity: 0.15
+    });
+    const greenParticleSystem = new THREE.Points(greenParticlesGeometry, greenParticlesMaterial);
+    greenScene.add(greenParticleSystem);
+    
+    function animateGreen() {
+      requestAnimationFrame(animateGreen);
+      greenParticleSystem.rotation.y += 0.0005;
+      greenRenderer.render(greenScene, greenCamera);
+    }
+    animateGreen();
+  </script>
+</body>
+</html>
+
+
+
+
+

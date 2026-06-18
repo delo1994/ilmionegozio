@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Round 1 - Apps & Giochi - ilmionegozio.com</title>
+  <meta name="description" content="Round giocabile originale con canvas, audio e sfondo video.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Classe per contenuti nascosti ma accessibili agli screen reader */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body, html {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      height: 100%;
+    }
+    canvas {
+      display: block;
+      position: relative;
+      z-index: 1;
+      touch-action: none; /* Impedisce il pinch-to-zoom durante il gioco */
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+      z-index: 10;
+    }
+    #bgVideo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    #backBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      background: #222;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 5px;
+    }
+    /* Footer visibile in fondo alla pagina con sfondo trasparente */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      background-color: transparent;
+      font-size: 0.85rem;
+      color: #ccc;
+      border-top: 1px solid #004d00;
+      z-index: 100;
+    }
+    .footer a {
+      color: #aaffaa;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .video-placeholder {
+      width: 200px;
+      min-height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      margin: 5px;
+      border: 1px dashed rgba(255,255,255,0.45);
+      color: #e6ffe6;
+      background: rgba(0,0,0,0.55);
+      font-size: 0.9rem;
+    }
+  </style>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Round 1 - Apps & Giochi - ilmionegozio.com">
+  <meta property="og:description" content="Round giocabile originale con canvas, audio e sfondo video.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Round 1 - Apps & Giochi - ilmionegozio.com">
+  <meta name="twitter:description" content="Round giocabile originale con canvas, audio e sfondo video.">
+  <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <h1 class="sr-only">Round 1 - Apps & Giochi - ilmionegozio.com</h1>
+  <!-- Skip link per saltare direttamente all'area interattiva -->
+  <a href="#main-content" class="sr-only">Salta al gioco</a>
+
+  <!-- Istruzioni per gli utenti con screen reader -->
+  <div id="game-instructions" class="sr-only">
+    Utilizza le frecce direzionali per muovere il giocatore e la barra spaziatrice per sparare, oppure tocca e trascina per muoverti. Su mobile il tiro avviene automaticamente.
+  </div>
+
+  <button id="backBtn" onclick="window.location.href='/'" aria-label="Torna al Cubo Interattivo">
+    Torna al Cubo Interattivo
+  </button>
+
+  <!-- Video di background, marcato come decorativo -->
+  <video id="bgVideo" autoplay loop muted aria-hidden="true">
+    <source src="/static/BackgroundRound1.mp4" type="video/mp4">
+    Il tuo browser non supporta il tag video.
+  </video>
+
+  <!-- Informazioni aggiornate dinamicamente, annunciate tramite screen reader -->
+  <div id="info" role="status" aria-live="polite">Punteggio: 0 - Livello: 1 - Vite: 3</div>
+
+  <!-- Area di gioco interattiva -->
+  <main id="main-content" role="application" aria-label="Area di gioco - Gara Triangolare Avanzata">
+    <canvas id="gameCanvas"></canvas>
+  </main>
+
+  <audio id="bgMusic" src="/static/cartoon-game-theme-loop.wav" loop autoplay></audio>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let score = 0, level = 1, lives = 3;
+    let gameEnded = false; // per controllare il termine del 6° round
+    const player = { x: canvas.width / 2, y: canvas.height - 50, size: 20, speed: 5 };
+    const bullets = [], enemies = [], enemyBullets = [], hearts = [], keys = {};
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Eventi da tastiera per desktop
+    document.addEventListener('keydown', e => {
+      keys[e.key] = true;
+      if (e.code === 'Space') {
+        // Colpo principale
+        bullets.push({ x: player.x, y: player.y, size: 5, vy: -8 });
+        if (level >= 3) {
+          bullets.push({ x: player.x, y: player.y, size: 5, vx: 8, vy: 0 });
+          bullets.push({ x: player.x, y: player.y, size: 5, vx: -8, vy: 0 });
+          bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: 8 });
+          bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: -8 });
+        }
+      }
+    });
+
+    document.addEventListener('keyup', e => keys[e.key] = false);
+
+    // Eventi touch per dispositivi mobili: muovi il giocatore con il dito e spara automaticamente
+    let autoFireInterval = null;
+    canvas.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      player.x = touch.clientX;
+      player.y = touch.clientY;
+      // Avvia il fuoco automatico se non già attivo
+      if (!autoFireInterval) {
+        autoFireInterval = setInterval(() => {
+          bullets.push({ x: player.x, y: player.y, size: 5, vy: -8 });
+          if (level >= 3) {
+            bullets.push({ x: player.x, y: player.y, size: 5, vx: 8, vy: 0 });
+            bullets.push({ x: player.x, y: player.y, size: 5, vx: -8, vy: 0 });
+            bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: 8 });
+            bullets.push({ x: player.x, y: player.y, size: 5, vx: 0, vy: -8 });
+          }
+        }, 300); // spara ogni 300ms
+      }
+    });
+
+    canvas.addEventListener("touchmove", function(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      player.x = touch.clientX;
+      player.y = touch.clientY;
+    });
+
+    canvas.addEventListener("touchend", function(e) {
+      e.preventDefault();
+      clearInterval(autoFireInterval);
+      autoFireInterval = null;
+    });
+
+    // Funzione per disegnare un poligono (usato per il nemico shooter)
+    function drawPolygon(x, y, radius, sides) {
+      let angle = Math.PI * 2 / sides;
+      ctx.beginPath();
+      for(let i = 0; i < sides; i++){
+        let dx = x + radius * Math.cos(i * angle - Math.PI/2);
+        let dy = y + radius * Math.sin(i * angle - Math.PI/2);
+        if(i === 0) ctx.moveTo(dx, dy);
+        else ctx.lineTo(dx, dy);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Funzione per disegnare un cuore verde
+    function drawHeart(x, y, size) {
+      ctx.save();
+      ctx.fillStyle = "green";
+      ctx.beginPath();
+      let topCurveHeight = size * 0.3;
+      ctx.moveTo(x, y + topCurveHeight);
+      ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+      ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + (size + topCurveHeight) / 2, x, y + size);
+      ctx.bezierCurveTo(x, y + (size + topCurveHeight) / 2, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+      ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Funzione per riprodurre il suono quando il giocatore viene colpito
+    function playHitSound() {
+      let hitAudio = new Audio("/static/doh.wav");
+      hitAudio.play();
+    }
+
+    // Funzione per riprodurre il suono quando il giocatore prende una vita extra
+    function playExtraLifeSound() {
+      let extraLifeAudio = new Audio("/static/Extra Life 8 Bit.wav");
+      extraLifeAudio.play();
+    }
+
+    // Funzioni di collisione (approssimando il giocatore come un quadrato)
+    function collidesPlayer(obj) {
+      return obj.x < player.x + player.size &&
+             obj.x + obj.size > player.x - player.size &&
+             obj.y < player.y + player.size &&
+             obj.y + obj.size > player.y - player.size;
+    }
+    function collidesEnemyPlayer(e) {
+      return e.x < player.x + player.size &&
+             e.x + e.size > player.x - player.size &&
+             e.y < player.y + player.size &&
+             e.y + e.size > player.y - player.size;
+    }
+
+    // Funzione per generare nemici con differenti tipologie
+    function spawnEnemy() {
+      const types = ['normal', 'zigzag', 'fast', 'shooter', 'horizontal', 'tough'];
+      const type = types[Math.floor(Math.random() * types.length)];
+      let enemy = { x: 0, y: 0, speed: 0, size: 0, type: type, direction: 1 };
+
+      if(type === 'normal') {
+        enemy.x = Math.random() * canvas.width;
+        enemy.y = -20;
+        enemy.speed = 2 + level * 0.5;
+        enemy.size = 20 + level * 2;
+      } else if(type === 'zigzag') {
+        enemy.x = Math.random() * canvas.width;
+        enemy.y = -20;
+        enemy.speed = 2 + level * 0.5;
+        enemy.size = 20 + level * 2;
+        enemy.amplitude = 50;
+        enemy.frequency = 0.05;
+      } else if(type === 'fast') {
+        enemy.x = Math.random() * canvas.width;
+        enemy.y = -20;
+        enemy.speed = 5 + level;
+        enemy.size = 20 + level * 2;
+      } else if(type === 'shooter') {
+        enemy.x = Math.random() * canvas.width;
+        enemy.y = -20;
+        enemy.speed = 2 + level * 0.5;
+        enemy.size = 30;
+        enemy.shootInterval = 2000;
+        enemy.lastShot = Date.now();
+      } else if(type === 'horizontal') {
+        enemy.x = Math.random() < 0.5 ? -20 : canvas.width + 20;
+        enemy.y = Math.random() * canvas.height / 2;
+        enemy.speed = 2 + level * 0.5;
+        enemy.size = 20 + level * 2;
+        enemy.direction = enemy.x < canvas.width / 2 ? 1 : -1;
+      } else if(type === 'tough') {
+        enemy.x = Math.random() * canvas.width;
+        enemy.y = -20;
+        enemy.speed = 1 + level * 0.3;
+        enemy.size = 25 + level * 2;
+        enemy.health = 3;
+      }
+      enemies.push(enemy);
+    }
+    setInterval(spawnEnemy, 800);
+
+    // Funzione per generare power-up a forma di cuore
+    function spawnHeart() {
+      hearts.push({
+        x: Math.random() * canvas.width,
+        y: -20,
+        speed: 1,
+        size: 20
+      });
+    }
+    setInterval(() => {
+      if(Math.random() < 0.1) {
+        spawnHeart();
+      }
+    }, 3000);
+
+    function movePlayer() {
+      // Movimento tramite tastiera
+      if (keys['ArrowLeft'] && player.x > player.size) player.x -= player.speed;
+      if (keys['ArrowRight'] && player.x < canvas.width - player.size) player.x += player.speed;
+      if (keys['ArrowUp'] && player.y > player.size) player.y -= player.speed;
+      if (keys['ArrowDown'] && player.y < canvas.height - player.size) player.y += player.speed;
+    }
+
+    // Funzione per resettare lo stato del gioco
+    function resetGame() {
+      score = 0;
+      level = 1;
+      lives = 3;
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 50;
+      enemies.length = 0;
+      bullets.length = 0;
+      enemyBullets.length = 0;
+      hearts.length = 0;
+      gameEnded = false;
+    }
+
+    function update() {
+      if(lives <= 0) {
+        resetGame();
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      movePlayer();
+
+      // Aggiornamento e disegno dei proiettili del giocatore
+      bullets.forEach((b, bi) => {
+        b.x += b.vx || 0;
+        b.y += b.vy;
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(b.x, b.y, b.size, b.size * 2);
+        if (b.y < 0 || b.y > canvas.height || b.x < 0 || b.x > canvas.width)
+          bullets.splice(bi, 1);
+      });
+
+      // Aggiornamento dei nemici
+      enemies.forEach((e, ei) => {
+        if(e.type === 'zigzag') {
+          e.x += Math.sin(e.y * e.frequency) * 2;
+          e.y += e.speed;
+        } else if(e.type === 'horizontal') {
+          e.x += e.speed * e.direction;
+        } else {
+          e.y += e.speed;
+        }
+        if(e.type === 'shooter') {
+          if(Date.now() - e.lastShot > e.shootInterval) {
+            let angle = Math.atan2(player.y - e.y, player.x - e.x);
+            enemyBullets.push({
+              x: e.x,
+              y: e.y,
+              size: 5,
+              vx: Math.cos(angle) * 4,
+              vy: Math.sin(angle) * 4
+            });
+            e.lastShot = Date.now();
+          }
+        }
+        if(e.y > canvas.height || e.x < -50 || e.x > canvas.width + 50) {
+          enemies.splice(ei, 1);
+        }
+        if(collidesEnemyPlayer(e)) {
+          enemies.splice(ei, 1);
+          lives--;
+          playHitSound();
+        }
+        if(e.type === 'normal') {
+          ctx.fillStyle = "red";
+          ctx.fillRect(e.x, e.y, e.size, e.size);
+        } else if(e.type === 'zigzag') {
+          ctx.fillStyle = "purple";
+          ctx.beginPath();
+          ctx.moveTo(e.x, e.y);
+          ctx.lineTo(e.x - e.size/2, e.y + e.size);
+          ctx.lineTo(e.x + e.size/2, e.y + e.size);
+          ctx.closePath();
+          ctx.fill();
+        } else if(e.type === 'fast') {
+          ctx.fillStyle = "orange";
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.size/2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if(e.type === 'shooter') {
+          ctx.fillStyle = "blue";
+          drawPolygon(e.x, e.y, e.size/2, 5);
+        } else if(e.type === 'horizontal') {
+          ctx.fillStyle = "magenta";
+          ctx.fillRect(e.x, e.y, e.size, e.size/2);
+        } else if(e.type === 'tough') {
+          ctx.fillStyle = "cyan";
+          ctx.beginPath();
+          ctx.moveTo(e.x, e.y + e.size/2);
+          ctx.lineTo(e.x + e.size/2, e.y);
+          ctx.lineTo(e.x + e.size, e.y + e.size/2);
+          ctx.lineTo(e.x + e.size/2, e.y + e.size);
+          ctx.closePath();
+          ctx.fill();
+        }
+      });
+
+      // Collisione proiettili del giocatore vs nemici
+      bullets.forEach((bullet, bi) => {
+        enemies.forEach((enemy, ei) => {
+          if(bullet.x < enemy.x + enemy.size &&
+             bullet.x + bullet.size > enemy.x &&
+             bullet.y < enemy.y + enemy.size &&
+             bullet.y + bullet.size > enemy.y) {
+              bullets.splice(bi, 1);
+              if(enemy.type === 'tough') {
+                enemy.health--;
+                if(enemy.health <= 0) {
+                  enemies.splice(ei, 1);
+                  score++;
+                }
+              } else {
+                enemies.splice(ei, 1);
+                score++;
+              }
+              if(score % 10 === 0) level++;
+          }
+        });
+      });
+
+      // Aggiornamento e disegno dei proiettili nemici
+      enemyBullets.forEach((b, bi) => {
+        b.x += b.vx;
+        b.y += b.vy;
+        ctx.fillStyle = "orange";
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+        ctx.fill();
+        if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height)
+          enemyBullets.splice(bi, 1);
+        if(collidesPlayer(b)) {
+          enemyBullets.splice(bi, 1);
+          lives--;
+          playHitSound();
+        }
+      });
+
+      // Aggiornamento e disegno dei power-up a forma di cuore
+      hearts.forEach((heart, hi) => {
+        heart.y += heart.speed;
+        drawHeart(heart.x, heart.y, heart.size);
+        if(heart.y > canvas.height)
+          hearts.splice(hi, 1);
+        if(collidesPlayer(heart)) {
+          hearts.splice(hi, 1);
+          lives++;
+          playExtraLifeSound();
+        }
+      });
+
+      // Disegna il giocatore come un triangolo cyan
+      ctx.fillStyle = "cyan";
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y - player.size);
+      ctx.lineTo(player.x - player.size, player.y + player.size);
+      ctx.lineTo(player.x + player.size, player.y + player.size);
+      ctx.closePath();
+      ctx.fill();
+
+      document.getElementById("info").innerText = `Punteggio: ${score} - Livello: ${level} - Vite: ${lives}`;
+
+      if(level > 6 && !gameEnded) {
+        gameEnded = true;
+        let endAudio = new Audio("/static/Welldone.wav");
+        endAudio.play();
+        endAudio.addEventListener('ended', () => {
+          window.location.href = "https://nzp.gay/";
+        });
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+
+  <footer class="footer" role="contentinfo">
+    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
+    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
+    <a href="/cookie-policy" target="_blank">Cookie Policy</a> | 
+    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+  </footer>
+</body>
+</html>
+
+

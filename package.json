@@ -1,0 +1,9 @@
+{
+  "name": "ilmionegozio-original-preserved",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "static": "python -m http.server 8080"
+  }
+}

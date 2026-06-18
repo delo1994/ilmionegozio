@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Analisi di Mercato - ilmionegozio.com</title>
+  <meta name="description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Stile per il link per saltare il contenuto (skip link) */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #004080;
+      color: #fff;
+      padding: 8px;
+      z-index: 100;
+      transition: top 0.3s;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      padding: 20px;
+    }
+    header {
+      background: #004080;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #004080;
+      margin-top: 30px;
+    }
+    p, ul {
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    ul {
+      list-style: disc inside;
+      margin: 10px 0;
+    }
+    .chart-container {
+      margin: 20px 0;
+      padding: 15px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      max-width: 600px;
+      height: 300px;
+      position: relative;
+    }
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #004080;
+      font-weight: bold;
+    }
+    /* Aggiunto padding in fondo al main per evitare che il footer sovrapponga contenuti cliccabili */
+    main {
+      padding-bottom: 80px;
+    }
+    /* Footer fisso in fondo alla pagina con sfondo trasparente */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      background-color: transparent;
+      font-size: 0.85rem;
+      color: #ccc;
+      border-top: 1px solid #004080;
+      z-index: 100;
+    }
+    .footer a {
+      color: #004080;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Analisi di Mercato - ilmionegozio.com">
+  <meta property="og:description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Analisi di Mercato - ilmionegozio.com">
+  <meta name="twitter:description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Skip link per utenti che navigano da tastiera -->
+  <a href="#main-content" class="skip-link">Salta al contenuto</a>
+
+  <header role="banner">
+    <h1>Analisi di Mercato ed Esperienze</h1>
+  </header>
+
+  <main id="main-content" role="main">
+    <div class="content">
+      <section aria-labelledby="chi-siamo">
+        <h2 id="chi-siamo">Chi Siamo</h2>
+        <p>
+          Siamo un team con esperienze diversificate. Ho maturato anni di esperienza nella vendita porta a porta e nel network marketing, frequentando corsi di ecommerce e programmazione database con specializzazione in sistemi di archiviazione e blockchain, oltre ad aver svolto uno stage presso un adblocker specializzato in Google Ads con partnership Google. L'altro membro del team ha completato un corso in marketing e comunicazione digitale. Queste esperienze ci consentono di analizzare il mercato e di utilizzare i dati per ottimizzare l'interazione utente all'interno dei siti web.
+        </p>
+      </section>
+
+      <section aria-labelledby="le-nostre-analisi">
+        <h2 id="le-nostre-analisi">Le Nostre Analisi</h2>
+        <p>
+          Abbiamo condotto una ricerca di mercato approfondita sull'upcycling in Toscana. I dati raccolti ci hanno permesso di capire la distribuzione geografica degli intervistati, le interazioni per area del sito e il profilo demografico degli utenti.
+        </p>
+        
+        <div class="chart-container" role="img" aria-label="Grafico a torta: Distribuzione Geografica degli intervistati - Firenze 45%, Pisa 20%, Siena 15%, Lucca 10%, Altri 10%">
+          <canvas id="geoChart"></canvas>
+        </div>
+        
+        <div class="chart-container" role="img" aria-label="Grafico a barre: Interazioni sul sito per sezione - Home 180, Prodotti 130, Dettagli 90, Contatti 70, FAQ 40">
+          <canvas id="clickChart"></canvas>
+        </div>
+        
+        <div class="chart-container" role="img" aria-label="Grafico a ciambella: Profilo Demografico - Maschi 50%, Femmine 45%, Non Specificato 5%">
+          <canvas id="demoChart"></canvas>
+        </div>
+      </section>
+
+      <section aria-labelledby="esperienze-e-formazione">
+        <h2 id="esperienze-e-formazione">Esperienze e Formazione</h2>
+        <ul>
+          <li>Vendita porta a porta e network marketing</li>
+          <li>Corsi di ecommerce e programmazione database</li>
+          <li>Specializzazione in sistemi di archiviazione e blockchain</li>
+          <li>Stage presso un adblocker specializzato in Google Ads (con partnership Google)</li>
+          <li>Corso di marketing e comunicazione digitale</li>
+        </ul>
+      </section>
+
+      <nav role="navigation" aria-label="Navigazione di ritorno">
+        <a href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
+      </nav>
+    </div>
+  </main>
+
+  <script>
+    // Grafico: Distribuzione Geografica (Pie Chart)
+    const ctxGeo = document.getElementById('geoChart').getContext('2d');
+    const geoChart = new Chart(ctxGeo, {
+      type: 'pie',
+      data: {
+        labels: ['Firenze', 'Pisa', 'Siena', 'Lucca', 'Altri'],
+        datasets: [{
+          label: 'Intervistati (%)',
+          data: [45, 20, 15, 10, 10],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'right' },
+          title: { display: true, text: 'Distribuzione Geografica' }
+        }
+      }
+    });
+
+    // Grafico: Interazioni per Area del Sito (Bar Chart)
+    const ctxClick = document.getElementById('clickChart').getContext('2d');
+    const clickChart = new Chart(ctxClick, {
+      type: 'bar',
+      data: {
+        labels: ['Home', 'Prodotti', 'Dettagli', 'Contatti', 'FAQ'],
+        datasets: [{
+          label: 'Clic per Sezione',
+          data: [180, 130, 90, 70, 40],
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 20 } }
+        },
+        plugins: {
+          title: { display: true, text: 'Interazioni sul Sito' }
+        }
+      }
+    });
+
+    // Grafico: Profilo Demografico (Doughnut Chart)
+    const ctxDemo = document.getElementById('demoChart').getContext('2d');
+    const demoChart = new Chart(ctxDemo, {
+      type: 'doughnut',
+      data: {
+        labels: ['Maschi', 'Femmine', 'Non Specificato'],
+        datasets: [{
+          label: 'Percentuale',
+          data: [50, 45, 5],
+          backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: true, text: 'Profilo Demografico' }
+        }
+      }
+    });
+  </script>
+
+  <footer class="footer" role="contentinfo">
+    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
+    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
+    <a href="/cookie-policy" target="_blank">Cookie Policy</a> | 
+    <a href="/Accessibilita" target="_blank">Accessibilità</a> | 
+    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+  </footer>
+</body>
+</html>
+

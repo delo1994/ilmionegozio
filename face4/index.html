@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Apps & Giochi - ilmionegozio.com</title>
+  <meta name="description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Stili generali */
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+    /* Skip link: visibile al focus */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #fff;
+      color: #000;
+      padding: 8px;
+      z-index: 100;
+      text-decoration: none;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    /* Testo nascosto per screen reader */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    /* Score display */
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 24px;
+      z-index: 10;
+    }
+    /* Pulsante di ritorno */
+    #backBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #backBtn:hover {
+      background-color: #555;
+    }
+    /* Stile per il video del round */
+    #roundVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 20;
+      background: #000;
+      display: none;
+    }
+    canvas { 
+      display: block; 
+    }
+    /* Footer visibile in fondo alla pagina */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      background-color: #002200;
+      font-size: 0.85rem;
+      color: #ccc;
+      border-top: 1px solid #004d00;
+      z-index: 100;
+    }
+    .footer a {
+      color: #aaffaa;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    /* Media query per versioni mobile: rimpicciolisce il footer */
+    @media (max-width: 600px) {
+      .footer {
+        padding: 8px;
+        font-size: 0.75rem;
+      }
+    }
+
+    .video-placeholder {
+      width: 200px;
+      min-height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      margin: 5px;
+      border: 1px dashed rgba(255,255,255,0.45);
+      color: #e6ffe6;
+      background: rgba(0,0,0,0.55);
+      font-size: 0.9rem;
+    }
+  </style>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Apps & Giochi - ilmionegozio.com">
+  <meta property="og:description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Apps & Giochi - ilmionegozio.com">
+  <meta name="twitter:description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
+  <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <h1 class="sr-only">Apps & Giochi - ilmionegozio.com</h1>
+  <!-- Skip link per utenti che navigano da tastiera -->
+  <a href="#game" class="skip-link">Salta al gioco</a>
+  
+  <!-- Istruzioni per utenti con screen reader -->
+  <div id="gameInstructions" class="sr-only">
+    Gioco 3D Slicing. Usa il mouse per muovere il puntatore e clicca per attivare la modalità slicing. Su dispositivi touch, tocca lo schermo per attivare.
+  </div>
+  
+  <!-- Visualizzazione dinamica del punteggio -->
+  <div id="score" role="status" aria-live="polite">Punteggio: 0</div>
+  
+  <!-- Pulsante di ritorno con etichetta accessibile -->
+  <button id="backBtn" onclick="window.location.href='/'" aria-label="Torna al Cubo Interattivo">
+    Torna al Cubo Interattivo
+  </button>
+  
+  <!-- Video per il round, marcato come decorativo -->
+  <video id="roundVideo" src="/static/Round1.mp4" type="video/mp4" aria-hidden="true"></video>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    /* === Setup Scena, Camera, Renderer e Sfondo === */
+    let scene, camera, renderer;
+    initScene();
+    animate();
+
+    function initScene() {
+      scene = new THREE.Scene();
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(
+        '/static/backgroundFace4.webp',
+        function(texture) {
+          scene.background = texture;
+          console.log("Sfondo caricato correttamente");
+        },
+        undefined,
+        function(error) {
+          console.error("Errore nel caricamento dello sfondo:", error);
+        }
+      );
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+      camera.position.set(0, 0, 20);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      // Imposta attributi di accessibilità sul canvas
+      renderer.domElement.setAttribute("role", "application");
+      renderer.domElement.setAttribute("aria-label", "Gioco 3D Slicing - Face4. Utilizza il mouse o il touch per interagire.");
+      document.body.appendChild(renderer.domElement);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(0, 1, 1);
+      scene.add(directionalLight);
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    /* === Puntatore === */
+    const pointerRadius = 0.5;
+    const pointerGeom = new THREE.SphereGeometry(pointerRadius, 16, 16);
+    const pointerMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const pointer = new THREE.Mesh(pointerGeom, pointerMat);
+    scene.add(pointer);
+    let pointerPos = new THREE.Vector3();
+
+    function updatePointer(clientX, clientY) {
+      const mouse = new THREE.Vector2(
+        (clientX / window.innerWidth) * 2 - 1,
+        - (clientY / window.innerHeight) * 2 + 1
+      );
+      const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+      vector.unproject(camera);
+      const dir = vector.sub(camera.position).normalize();
+      const distance = - camera.position.z / dir.z;
+      pointerPos = camera.position.clone().add(dir.multiplyScalar(distance));
+      pointer.position.copy(pointerPos);
+    }
+
+    let slicingActive = false;
+    window.addEventListener('mousemove', (e) => {
+      updatePointer(e.clientX, e.clientY);
+      if(slicingActive) checkCollisions();
+    });
+    window.addEventListener('mousedown', (e) => {
+      if(e.button === 0) {
+        slicingActive = true;
+        updatePointer(e.clientX, e.clientY);
+        checkCollisions();
+      }
+    });
+    window.addEventListener('mouseup', (e) => {
+      if(e.button === 0) slicingActive = false;
+    });
+    window.addEventListener('touchstart', (e) => {
+      slicingActive = true;
+      const touch = e.touches[0];
+      updatePointer(touch.clientX, touch.clientY);
+      checkCollisions();
+    });
+    window.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      updatePointer(touch.clientX, touch.clientY);
+      checkCollisions();
+      e.preventDefault();
+    });
+    window.addEventListener('touchend', (e) => {
+      slicingActive = false;
+    });
+
+    /* === Audio: Suono di colpo e Audio Round === */
+    const hitSound = new Audio("/static/slice.wav");
+    const roundSound = new Audio("/static/Round1.wav");
+
+    /* === Gestione degli Oggetti 3D === */
+    let objects = [];
+    let score = 0;
+    const scoreDiv = document.getElementById('score');
+    let spawnInterval = 500;
+    let spawnTimer = 0;
+    let gameEnded = false;
+
+    function spawnObject() {
+      const shapes = ["sphere", "cube", "cone", "cylinder", "torus"];
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const size = 1 + Math.random() * 2;
+      let geometry;
+      switch(shape) {
+        case "sphere":
+          geometry = new THREE.SphereGeometry(size, 32, 32);
+          break;
+        case "cube":
+          geometry = new THREE.BoxGeometry(size, size, size);
+          break;
+        case "cone":
+          geometry = new THREE.ConeGeometry(size, size * 2, 32);
+          break;
+        case "cylinder":
+          geometry = new THREE.CylinderGeometry(size, size, size * 2, 32);
+          break;
+        case "torus":
+          geometry = new THREE.TorusGeometry(size, size / 3, 16, 100);
+          break;
+      }
+      const material = new THREE.MeshStandardMaterial({ 
+        color: new THREE.Color(`hsl(${Math.random()*360},80%,60%)`), 
+        roughness: 0.5, 
+        metalness: 0.3 
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      const side = Math.floor(Math.random() * 4);
+      let pos = new THREE.Vector3();
+      let vel = new THREE.Vector3();
+      const margin = 5;
+      if(side === 0) {
+        pos.x = (Math.random() - 0.5) * 20;
+        pos.y = 10 + margin;
+        pos.z = 0;
+        vel.x = (Math.random() - 0.5) * 10;
+        vel.y = - (Math.random() * 10 + 5);
+      } else if(side === 1) {
+        pos.x = (Math.random() - 0.5) * 20;
+        pos.y = -10 - margin;
+        pos.z = 0;
+        vel.x = (Math.random() - 0.5) * 10;
+        vel.y = (Math.random() * 10 + 5);
+      } else if(side === 2) {
+        pos.x = -15 - margin;
+        pos.y = (Math.random() - 0.5) * 20;
+        pos.z = 0;
+        vel.x = Math.random() * 10 + 5;
+        vel.y = (Math.random() - 0.5) * 10;
+      } else {
+        pos.x = 15 + margin;
+        pos.y = (Math.random() - 0.5) * 20;
+        pos.z = 0;
+        vel.x = - (Math.random() * 10 + 5);
+        vel.y = (Math.random() - 0.5) * 10;
+      }
+      mesh.position.copy(pos);
+      mesh.userData.velocity = vel;
+      mesh.userData.size = size;
+      mesh.userData.sliced = false;
+      objects.push(mesh);
+      scene.add(mesh);
+      console.log("Oggetto generato:", shape, pos);
+    }
+
+    function updateObjects(dt) {
+      for(let obj of objects) {
+        if(!obj.userData.disintegrating) {
+          obj.position.addScaledVector(obj.userData.velocity, dt);
+          obj.userData.velocity.y -= 2 * dt;
+        }
+      }
+      objects = objects.filter(obj => {
+        if(obj.position.x < -30 || obj.position.x > 30 || obj.position.y < -30 || obj.position.y > 30) {
+          scene.remove(obj);
+          return false;
+        }
+        // Se la disintegrazione è completa, rimuovilo
+        if(obj.userData.disintegrationComplete) {
+          scene.remove(obj);
+          return false;
+        }
+        // Se tagliato ma non in fase di disintegrazione (caso raro), rimuovilo
+        if(obj.userData.sliced && !obj.userData.disintegrating) {
+          scene.remove(obj);
+          return false;
+        }
+        return true;
+      });
+    }
+
+    function checkCollisions() {
+      for(let obj of objects) {
+        if(!obj.userData.sliced) {
+          const dist = pointer.position.distanceTo(obj.position);
+          if(dist < (pointerRadius + obj.userData.size)) {
+            obj.userData.sliced = true;
+            score++;
+            scoreDiv.textContent = "Punteggio: " + score;
+            console.log("Oggetto tagliato! Punteggio:", score);
+            hitSound.currentTime = 0;
+            hitSound.play();
+            disintegrateObject(obj); // Avvia effetto di disintegrazione
+            if(score >= 20 && !gameEnded) {
+              gameEnded = true;
+              playVideoThenNewPage();
+            }
+          }
+        }
+      }
+    }
+
+    // Funzione per avviare l'effetto di disintegrazione
+    function disintegrateObject(obj) {
+      obj.userData.disintegrationStart = performance.now();
+      obj.userData.disintegrationDuration = 500; // durata in millisecondi
+      obj.userData.originalScale = obj.scale.clone();
+      obj.userData.disintegrating = true;
+      // Abilita trasparenza per il materiale se non già abilitata
+      obj.material.transparent = true;
+    }
+
+    function playVideoThenNewPage() {
+      const video = document.getElementById("roundVideo");
+      video.style.display = "block";
+      video.play();
+      roundSound.currentTime = 0;
+      roundSound.play();
+      video.addEventListener("ended", function() {
+        window.location.href = "/face4Round1";
+      });
+    }
+
+    let lastTime = performance.now();
+    function gameLoop() {
+      if(gameEnded) return;
+      const now = performance.now();
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      spawnTimer += dt * 1000;
+      if(spawnTimer > spawnInterval) {
+        spawnObject();
+        spawnTimer = 0;
+      }
+      updateObjects(dt);
+      
+      // Aggiorna l'effetto di disintegrazione sugli oggetti
+      for(let obj of objects) {
+        if(obj.userData.disintegrating) {
+          let elapsed = performance.now() - obj.userData.disintegrationStart;
+          let t = elapsed / obj.userData.disintegrationDuration;
+          if(t < 1) {
+            let factor = 1 - t;
+            obj.scale.set(
+              obj.userData.originalScale.x * factor,
+              obj.userData.originalScale.y * factor,
+              obj.userData.originalScale.z * factor
+            );
+            obj.material.opacity = factor;
+          } else {
+            obj.userData.disintegrationComplete = true;
+          }
+        }
+      }
+      
+      if(slicingActive) {
+        checkCollisions();
+      }
+      requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+  </script>
+
+  <!-- Footer posizionato in fondo alla pagina -->
+  <footer class="footer" role="contentinfo">
+    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
+    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
+    <a href="/cookie-policy" target="_blank">Cookie Policy</a> |
+    <a href="/Accessibilita" target="_blank">Accessibilità</a> |  
+    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+  </footer>
+</body>
+</html>
+

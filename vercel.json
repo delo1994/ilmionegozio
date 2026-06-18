@@ -1,0 +1,83 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/face1",
+      "destination": "/face1.html"
+    },
+    {
+      "source": "/face2",
+      "destination": "/face2.html"
+    },
+    {
+      "source": "/face3",
+      "destination": "/face3.html"
+    },
+    {
+      "source": "/face4",
+      "destination": "/face4.html"
+    },
+    {
+      "source": "/face4Round1",
+      "destination": "/Face4Round1.html"
+    },
+    {
+      "source": "/face5",
+      "destination": "/face5.html"
+    },
+    {
+      "source": "/face6",
+      "destination": "/face6.html"
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/privacy-policy.html"
+    },
+    {
+      "source": "/cookie-policy",
+      "destination": "/cookie-policy.html"
+    },
+    {
+      "source": "/Termini_Condizioni",
+      "destination": "/Termini_Condizioni.html"
+    },
+    {
+      "source": "/termini-condizioni",
+      "destination": "/Termini_Condizioni.html"
+    },
+    {
+      "source": "/Accessibilita",
+      "destination": "/Accessibilita.html"
+    },
+    {
+      "source": "/accessibilita",
+      "destination": "/Accessibilita.html"
+    },
+    {
+      "source": "/book_appointment",
+      "destination": "/api/book_appointment"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}

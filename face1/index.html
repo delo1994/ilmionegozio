@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gifler/0.1.0/gifler.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambienti 3D - ilmionegozio.com</title>
+  <meta name="description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: Arial, sans-serif; 
+    }
+    /* Istruzioni per screen reader, visibili solo agli assistive tech */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 100;
+    }
+    /* Il messaggio dinamico viene annunciato ai lettori di schermo */
+    #message {
+      margin-top: 5px;
+    }
+    #back-link {
+      margin-top: 10px;
+      display: inline-block;
+      color: #004080;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    canvas { display: block; }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.8);
+      text-align: center;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      z-index: 100;
+    }
+    /* Riduci dimensioni per mobile senza modificare gli oggetti 3D */
+    @media (max-width: 600px) {
+      #info {
+        font-size: 0.8rem;
+        padding: 5px;
+      }
+      footer {
+        padding: 5px 0;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+  <!-- Includi fflate per FBXLoader se necessario -->
+  <script src="/static/vendor/fflate-umd.js"></script>
+  <!-- Includi Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Includi FBXLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/FBXLoader.js"></script>
+  <!-- Includi GLTFLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ambienti 3D - ilmionegozio.com">
+  <meta property="og:description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ambienti 3D - ilmionegozio.com">
+  <meta name="twitter:description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
+  <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Istruzioni accessibili (visibili solo ai lettori di schermo) -->
+  <div class="sr-only" id="accessibility-instructions">
+    Utilizza il mouse (o tocca lo schermo su mobile) per interagire con gli oggetti 3D. Clicca sul terreno per far volare Charizard, sulla sfera per il Facehugger, sull'ottaedro per cambiare colore. Dopo 10 click sull'ottaedro apparirà il personaggio controllabile; su desktop usa le frecce, su mobile trascina il dito per spostarlo.
+  </div>
+
+  <!-- Contenitore informativo -->
+  <div id="info" role="status" aria-live="polite">
+    <h1>Ambienti 3D & Animazioni Interattive</h1>
+    <p id="message">
+      Clicca sugli oggetti per interagire: sul terreno per far volare Charizard, sulla sfera per il Facehugger, sull'ottaedro per cambiare colore. Dopo 10 click sull'ottaedro apparirà il personaggio controllabile!
+    </p>
+    <a id="back-link" href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
+  </div>
+
+  <script>
+    // === Variabili Globali ===
+    let spacedrive = null;    // Modello spacedrive (Overdrive)
+    let charizard = null;     // Modello Charizard
+    let character = null;     // Personaggio controllabile (modello 3D)
+    let octaClickCount = 0;   // Contatore click sull'ottaedro
+    let mixer;                // AnimationMixer globale
+
+    // === Scena, Camera e Renderer ===
+    const scene = new THREE.Scene();
+    
+    // Background video
+    const video = document.createElement('video');
+    video.src = '/static/Backgroundvideoface1.mp4';
+    video.crossOrigin = 'anonymous';
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.addEventListener('canplay', () => {
+      video.play().catch(error => {
+        console.error("Errore nell'autoplay del video:", error);
+      });
+      document.body.addEventListener('touchstart', () => {
+        video.play();
+      }, { once: true });
+      const videoTexture = new THREE.VideoTexture(video);
+      videoTexture.minFilter = THREE.LinearFilter;
+      videoTexture.magFilter = THREE.LinearFilter;
+      videoTexture.format = THREE.RGBFormat;
+      scene.background = videoTexture;
+    });
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+    // Se siamo su mobile, sposta la camera indietro per rendere gli oggetti più contenuti
+    if (window.innerWidth <= 600) {
+      camera.position.set(0, 5, 30);
+    } else {
+      camera.position.set(0, 5, 20);
+    }
+    scene.add(camera);
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    // === Luci ===
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 20, 10);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.set(1024, 1024);
+    scene.add(directionalLight);
+
+    // === Piano di Terreno (Ground) ===
+    const groundGeometry = new THREE.PlaneGeometry(200, 200);
+    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    ground.name = "ground";
+    scene.add(ground);
+
+    // === Ottaedro Rotante ===
+    const octaGeometry = new THREE.OctahedronGeometry(2, 0);
+    const octaMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
+    const octahedron = new THREE.Mesh(octaGeometry, octaMaterial);
+    octahedron.position.set(-6, 2, 0);
+    octahedron.castShadow = true;
+    octahedron.name = "octahedron";
+    scene.add(octahedron);
+
+    // === Sfera Riflettente ===
+    const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const sphereMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3399ff,
+      metalness: 0.7,
+      roughness: 0.1
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.position.set(6, 3, -3);
+    sphere.castShadow = true;
+    scene.add(sphere);
+
+    // === Carica il Modello FBX (model.fbx) con Animazione ===
+    const fbxLoader = new THREE.FBXLoader();
+    fbxLoader.load('/static/model.fbx', function(object) {
+      object.scale.set(2, 2, 2);
+      object.position.set(0, 0, 0);
+      object.traverse(child => {
+        if(child.isMesh) child.castShadow = true;
+      });
+      scene.add(object);
+      if (object.animations && object.animations.length > 0) {
+        mixer = new THREE.AnimationMixer(object);
+        const action = mixer.clipAction(object.animations[0]);
+        action.play();
+      }
+    }, undefined, function(error) {
+      console.error('Errore nel caricamento del modello FBX:', error);
+      scene.background = new THREE.Color(0x1a1a1a);
+    });
+
+    // === Carica il Modello GLB "spacedrive.glb" (Overdrive) ===
+    const gltfLoader = new THREE.GLTFLoader();
+    gltfLoader.load('/static/spacedrive.glb', function(gltf) {
+      spacedrive = gltf.scene;
+      spacedrive.name = "spaceDrive";
+      spacedrive.scale.set(2, 2, 2);
+      spacedrive.position.set(0, 0, 0);
+      spacedrive.traverse(child => {
+        if(child.isMesh && child.material) {
+          child.castShadow = true;
+          child.material.transparent = true;
+          child.material.opacity = 0.5;
+        }
+      });
+      scene.add(spacedrive);
+      if (gltf.animations && gltf.animations.length > 0) {
+        const gltfMixer = new THREE.AnimationMixer(spacedrive);
+        gltfMixer.clipAction(gltf.animations[0]).play();
+        mixer = mixer || gltfMixer;
+      }
+    }, undefined, function(error) {
+      console.error('Errore nel caricamento del modello GLB spacedrive:', error);
+    });
+
+    // === Funzione per Caricare Charizard (clic sul terreno) ===
+    function loadCharizard() {
+      if (charizard) return;
+      gltfLoader.load('/static/charizard_flying_animation.glb', function(gltf) {
+        charizard = gltf.scene;
+        // Lascialo come nella versione desktop
+        charizard.scale.set(2, 2, 2);
+        charizard.position.set(-50, 5, 0);
+        charizard.traverse(child => {
+          if(child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        scene.add(charizard);
+        if (gltf.animations && gltf.animations.length > 0) {
+          const charizardMixer = new THREE.AnimationMixer(charizard);
+          const action = charizardMixer.clipAction(gltf.animations[0]);
+          action.play();
+          charizard.userData.mixer = charizardMixer;
+        }
+      }, undefined, function(error) {
+        console.error('Errore nel caricamento del modello GLB Charizard:', error);
+      });
+    }
+
+    // === Funzione per Caricare il Facehugger (clic sulla sfera) ===
+    function loadFacehugger() {
+      gltfLoader.load('/static/surprise_facehugger_animated.glb', function(gltf) {
+        console.log("Facehugger animazioni:", gltf.animations);
+        const facehugger = gltf.scene;
+        facehugger.scale.set(2, 2, 2);
+        facehugger.position.copy(sphere.position);
+        facehugger.traverse(child => {
+          if(child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        scene.add(facehugger);
+        if (gltf.animations && gltf.animations.length > 0) {
+          const facehuggerMixer = new THREE.AnimationMixer(facehugger);
+          const action = facehuggerMixer.clipAction(gltf.animations[0]);
+          action.reset();
+          action.play();
+          mixer = mixer || facehuggerMixer;
+          console.log("Facehugger animazione avviata");
+        } else {
+          console.warn("Il modello Facehugger non contiene animazioni.");
+        }
+      }, undefined, function(error) {
+        console.error('Errore nel caricamento del modello GLB Facehugger:', error);
+      });
+    }
+
+    // === Funzione per Creare il Personaggio (dopo 10 click sull'ottaedro) con modello glTF ===
+    function createCharacter() {
+      // Controlla se il personaggio esiste già per evitare duplicati
+      if (character) return;
+      console.log("createCharacter() chiamato!");
+      gltfLoader.load('/static/character_model.glb', function(gltf) {
+        console.log("Animazioni caricate:", gltf.animations);
+        character = gltf.scene;
+        character.scale.set(2, 2, 2);
+        character.position.set(0, 1.5, 0);
+        scene.add(character);
+        if (gltf.animations && gltf.animations.length > 0) {
+          const characterMixer = new THREE.AnimationMixer(character);
+          const action = characterMixer.clipAction(gltf.animations[0]);
+          action.reset();
+          action.play();
+          character.userData.mixer = characterMixer;
+        } else {
+          console.warn("Il modello GLTF non contiene animazioni.");
+        }
+        document.getElementById('message').textContent = "Usa le frecce per muovere il personaggio!";
+        // Se siamo su mobile, aggiungiamo la gestione del movimento tramite tocco
+        if (window.matchMedia("(max-width:600px)").matches) {
+          let touchStart = null;
+          renderer.domElement.addEventListener("touchstart", (e) => {
+            if (character) {
+              touchStart = e.touches[0];
+              // Salva la posizione iniziale del personaggio
+              character.userData.initialPosition = { x: character.position.x, z: character.position.z };
+            }
+          }, false);
+          renderer.domElement.addEventListener("touchmove", (e) => {
+            if (character && touchStart) {
+              let touchCurrent = e.touches[0];
+              let deltaX = touchCurrent.clientX - touchStart.clientX;
+              let deltaY = touchCurrent.clientY - touchStart.clientY;
+              // Fattore di movimento per calibrare lo spostamento
+              let movementFactor = 0.05;
+              character.position.x = character.userData.initialPosition.x + deltaX * movementFactor;
+              character.position.z = character.userData.initialPosition.z + deltaY * movementFactor;
+            }
+          }, false);
+          renderer.domElement.addEventListener("touchend", () => {
+            touchStart = null;
+          }, false);
+          // Aggiorna il messaggio per mobile
+          document.getElementById('message').textContent = "Trascina il dito per muovere il personaggio!";
+        }
+      }, undefined, function(error) {
+        console.error('Errore nel caricamento del modello GLTF del personaggio:', error);
+      });
+    }
+
+    // === Movimento del Personaggio con Tasti Direzionali (solo su desktop) ===
+    document.addEventListener('keydown', (event) => {
+      if (window.innerWidth <= 600) return; // su mobile gestiamo il movimento tramite tocco
+      if (!character) return;
+      const step = 1;
+      switch(event.key) {
+        case "ArrowUp":
+          character.position.z -= step;
+          break;
+        case "ArrowDown":
+          character.position.z += step;
+          break;
+        case "ArrowLeft":
+          character.position.x -= step;
+          break;
+        case "ArrowRight":
+          character.position.x += step;
+          break;
+      }
+    });
+
+    // === Interazione: Raycaster e Click Event ===
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    document.addEventListener('click', onDocumentClick, false);
+    function onDocumentClick(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      if (intersects.length > 0) {
+        const clickedObject = intersects[0].object;
+        // Se il terreno (ground) è cliccato: cambia colore e carica Charizard
+        if (clickedObject.name === "ground") {
+          clickedObject.material.color.setHex(Math.random() * 0xffffff);
+          loadCharizard();
+          document.getElementById('message').textContent = "Charizard sta volando!";
+        }
+        // Se la sfera viene cliccata: sostituiscila con il Facehugger
+        else if (clickedObject === sphere || (clickedObject.parent && clickedObject.parent === sphere)) {
+          scene.remove(sphere);
+          loadFacehugger();
+          document.getElementById('message').textContent = "La sfera è stata sostituita dal Facehugger!";
+        }
+        // Se il clic appartiene al modello spacedrive (overdrive)
+        else {
+          let target = clickedObject;
+          while (target.parent && target.name !== "spaceDrive") {
+            target = target.parent;
+          }
+          if (target.name === "spaceDrive") {
+            const randomColor = new THREE.Color(Math.random(), Math.random(), Math.random());
+            target.traverse(obj => {
+              if (obj.isMesh && obj.material) {
+                obj.material.color.set(randomColor);
+              }
+            });
+            document.getElementById('message').textContent = "Spacedrive ha cambiato colore!";
+          }
+          // Se il clic appartiene all'ottaedro
+          else {
+            let octaTarget = clickedObject;
+            while (octaTarget.parent && octaTarget.name !== "octahedron") {
+              octaTarget = octaTarget.parent;
+            }
+            if (octaTarget.name === "octahedron") {
+              octaTarget.material.color.setHex(Math.random() * 0xffffff);
+              octaClickCount++;
+              console.log("Click sull'ottaedro:", octaClickCount);
+              document.getElementById('message').textContent = "Ottaedro ha cambiato colore (" + octaClickCount + " click)!";
+              if (octaClickCount >= 10 && !character) {
+                createCharacter();
+              }
+            } else {
+              if (clickedObject.material && clickedObject.material.color) {
+                clickedObject.material.color.setHex(Math.random() * 0xffffff);
+              }
+              document.getElementById('message').textContent = "Hai cliccato su un oggetto 3D!";
+            }
+          }
+        }
+      } else {
+        loadCharizard();
+        document.getElementById('message').textContent = "Charizard sta volando!";
+      }
+    }
+
+    // === Loop di Animazione ===
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      if (mixer) mixer.update(delta);
+      // Ruota l'ottaedro
+      octahedron.rotation.x += 0.01;
+      octahedron.rotation.y += 0.01;
+      // Aggiorna l'animazione di Charizard se presente
+      if (charizard && charizard.userData.mixer) {
+        charizard.userData.mixer.update(delta);
+        charizard.position.x += delta * 20;
+        if (charizard.position.x > 50) {
+          scene.remove(charizard);
+          charizard = null;
+          document.getElementById('message').textContent = "Charizard è scomparso!";
+        }
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // === Gestione Ridimensionamento Finestra ===
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+
+  <!-- Footer posizionato in fondo alla pagina con sfondo trasparente -->
+  <footer class="footer" role="contentinfo">
+    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
+    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
+    <a href="/cookie-policy" target="_blank">Cookie Policy</a> | 
+    <a href="/Accessibilita" target="_blank">Accessibilità</a> | 
+    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+  </footer>
+</body>
+</html>
+
+
