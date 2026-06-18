@@ -113,6 +113,7 @@ Dimensione totale: 230.41 MB
 - Accessibilita.html: aggiunto H1 sr-only senza impatto visivo
 - Accessibilita.html: creato documento HTML completo da frammento originale
 - Face4Round1.html: aggiunto H1 sr-only senza impatto visivo
+- face2.html: corretto overflow orizzontale causato da tenda destra/footer mantenendo animazione originale
 - face3.html: corretto overflow orizzontale con box-sizing
 - face3.html: fallback WhatsApp se Twilio/env Vercel non sono configurati
 - face4.html: aggiunto H1 sr-only senza impatto visivo
