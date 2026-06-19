@@ -361,10 +361,10 @@
       Puoi comunque usare il menu per entrare nelle sezioni del sito.
     </div>
   </div>
-  <div id="meteor-overlay" aria-hidden="true">
+  <div id="meteor-overlay" data-meteor-count="38" aria-hidden="true">
     <picture>
-      <source media="(prefers-reduced-motion: reduce)" srcset="/static/meteoriti-spazio-static.png?v=20260619-1">
-      <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-1" alt="" width="640" height="360" decoding="async" fetchpriority="low">
+      <source media="(prefers-reduced-motion: reduce)" srcset="/static/meteoriti-spazio-static.png?v=20260619-2">
+      <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-2" alt="" width="640" height="360" decoding="async" fetchpriority="low">
     </picture>
   </div>
   <div id="cube-topic-tooltip" aria-hidden="true"></div>
@@ -583,6 +583,14 @@
     camera.position.set(0, 0, 5);
     scene.add(camera);
 
+    // Illuminazione dedicata ai mini-cubi; il cubo centrale usa materiali non illuminati.
+    const legendAmbientLight = new THREE.HemisphereLight(0xffffff, 0x182038, 1.15);
+    const legendKeyLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    const legendRimLight = new THREE.DirectionalLight(0x66ccff, 0.75);
+    legendKeyLight.position.set(6, 8, 10);
+    legendRimLight.position.set(-6, -2, 5);
+    scene.add(legendAmbientLight, legendKeyLight, legendRimLight);
+
     const renderer = new THREE.WebGLRenderer({
       antialias: !isMobileViewport,
       powerPreference: "high-performance"
@@ -688,18 +696,33 @@
         return sprite;
       }
 
-      const miniCubeSize = 0.1;
+      const miniCubeSize = 0.12;
       const spacing = 0.3;
       navTopics.forEach((entry, index) => {
         const miniGeo = new THREE.BoxGeometry(miniCubeSize, miniCubeSize, miniCubeSize);
-        const miniMat = new THREE.MeshBasicMaterial({
+        const miniMat = new THREE.MeshStandardMaterial({
           color: entry.miniColor,
+          roughness: 0.28,
+          metalness: 0.34,
+          emissive: new THREE.Color(entry.miniColor).multiplyScalar(0.1),
           wireframe: false,
           depthTest: false,
           depthWrite: false
         });
         const miniCube = new THREE.Mesh(miniGeo, miniMat);
         miniCube.renderOrder = 1200;
+        const miniEdges = new THREE.LineSegments(
+          new THREE.EdgesGeometry(miniGeo),
+          new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.72,
+            depthTest: false,
+            depthWrite: false
+          })
+        );
+        miniEdges.renderOrder = 1201;
+        miniCube.add(miniEdges);
         miniCube.isMiniCube = true;
         miniCube.userData.pageUrl = entry.page;
         miniCube.userData.label = entry.label;
@@ -903,6 +926,9 @@
           innerFilled: innerCube.material.wireframe === false,
           miniCubeCount: miniCubes.length,
           miniCubesFilled: miniCubes.every(child => child.material.wireframe === false),
+          miniCubeMaterials3D: miniCubes.every(child => child.material.isMeshStandardMaterial === true),
+          miniCubeEdges: miniCubes.every(child => child.children.some(item => item.isLineSegments)),
+          meteorCount: Number(document.getElementById("meteor-overlay")?.dataset.meteorCount || 0),
           meteorReady: Boolean(meteorImage && meteorImage.complete && meteorImage.naturalWidth),
           meteorSource: meteorImage ? meteorImage.currentSrc : ""
         };
