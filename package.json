@@ -6,6 +6,6 @@
     "dev": "vercel dev",
     "static": "python -m http.server 8080",
     "check": "node scripts/validate-site.js",
-    "test": "node scripts/test-booking.js"
+    "test": "node scripts/test-booking.js && node scripts/test-cursor-themes.js"
   }
 }

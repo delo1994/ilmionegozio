@@ -52,6 +52,76 @@ html[data-input-mode="keyboard"] :where(a, button, input, select, textarea, summ
   opacity: 0.62;
 }
 
+.site-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483646;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-80px, -80px, 0);
+  transition: opacity 120ms ease, filter 120ms ease;
+  will-change: transform;
+}
+
+.site-cursor.is-visible {
+  opacity: 1;
+}
+
+.site-cursor.is-over-native {
+  opacity: 0;
+}
+
+.site-cursor__object {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 25px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 6px rgba(66, 217, 255, 0.5));
+  transform: rotate(var(--cursor-rotation, 0deg)) scale(1);
+  transform-origin: center;
+  transition: transform 110ms ease, filter 110ms ease;
+  will-change: transform;
+}
+
+.site-cursor.is-over-interactive .site-cursor__object {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 11px rgba(255, 255, 255, 0.8));
+  transform: rotate(var(--cursor-rotation, 0deg)) scale(1.22);
+}
+
+.site-cursor.is-pressed .site-cursor__object {
+  transform: rotate(var(--cursor-rotation, 0deg)) scale(0.82);
+}
+
+html[data-cursor-theme="analisi"] .site-cursor__object,
+html[data-cursor-theme="pixzen"] .site-cursor__object {
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 7px rgba(255, 101, 119, 0.58));
+}
+
+html[data-cursor-theme="giochi"] .site-cursor__object,
+html[data-cursor-theme="round"] .site-cursor__object {
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 8px rgba(255, 213, 79, 0.62));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-custom-cursor="true"],
+  html[data-custom-cursor="true"] body,
+  html[data-custom-cursor="true"] :where(a, button, canvas, video, summary, [role="button"], [tabindex]) {
+    cursor: none !important;
+  }
+
+  html[data-custom-cursor="true"] :where(input, textarea, select, option) {
+    cursor: auto !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
