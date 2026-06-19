@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIXZEN - Agenzia AI futuristica</title>
-  <meta name="description" content="Esempio PIXZEN: sito di un'agenzia AI futuristica con estetica editoriale monocromatica, testo animato, marchi in movimento, anteprime interattive e casi studio.">
+  <title>Orizzonte AI - Agenzia italiana AI e marketing</title>
+  <meta name="description" content="Orizzonte AI unisce intelligenza artificiale, Google Ads, Meta Ads, automazioni, funnel e analisi dati.">
   <link rel="canonical" href="https://www.ilmionegozio.com/examples/esempio-2/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="it_IT">
-  <meta property="og:title" content="PIXZEN - Agenzia AI futuristica">
+  <meta property="og:title" content="Orizzonte AI - Agenzia italiana AI e marketing">
   <meta property="og:description" content="Agenzia digitale italiana dedicata a strategia AI, campagne, funnel e direzione creativa.">
   <meta property="og:url" content="https://www.ilmionegozio.com/examples/esempio-2/">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PIXZEN - Agenzia AI futuristica">
+  <meta name="twitter:title" content="Orizzonte AI - Agenzia italiana AI e marketing">
   <meta name="twitter:description" content="Strategia AI, campagne pubblicitarie, funnel e direzione creativa.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -185,10 +185,19 @@
     }
     h1 {
       margin: 0;
-      font-size: clamp(3.3rem, 11vw, 9.2rem);
+      font-size: clamp(3rem, 8vw, 7.8rem);
       font-weight: 900;
-      line-height: 0.9;
+      line-height: 0.94;
       letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .typing-line {
+      min-height: 1.7em;
+      margin: 22px 0 0;
+      color: #292929;
+      font-size: clamp(1.15rem, 2.4vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
     .hero-copy {
@@ -311,7 +320,7 @@
     }
     .agency-cards {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
       width: min(1180px, calc(100% - 42px));
       margin: -52px auto 92px;
@@ -552,23 +561,23 @@
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
-  <nav class="navbar" aria-label="Navigazione PIXZEN">
-    <a class="logo" href="#home">PIXZEN</a>
+  <nav class="navbar" aria-label="Navigazione Orizzonte AI">
+    <a class="logo" href="#home">ORIZZONTE AI</a>
     <div class="nav-center">
-      <a href="#services">Competenze</a>
-      <a href="#work">Progetti</a>
-      <a href="#insights">Approfondimenti</a>
+      <a href="#services">Servizi</a>
+      <a href="#work">Casi studio</a>
+      <a href="#insights">Analisi dati</a>
       <a href="#contact">Contatti</a>
     </div>
     <div class="nav-right">
-      <a class="talk" href="#contact">Parliamone</a>
-      <button class="hamburger" type="button" aria-label="Apri menu"><span></span></button>
+      <a class="talk" href="#contact">Prenota una call</a>
+      <button class="hamburger" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
     </div>
   </nav>
   <div class="mobile-menu" aria-hidden="true">
     <div>
-      <a href="#services">Competenze</a>
-      <a href="#work">Progetti</a>
+      <a href="#services">Servizi</a>
+      <a href="#work">Casi studio</a>
       <a href="#contact">Contatti</a>
       <a href="/face5">Report</a>
     </div>
@@ -577,10 +586,11 @@
   <main id="home">
     <section class="hero">
       <div class="hero-content">
-        <p class="label">Agenzia AI futuristica</p>
-        <h1><span id="typed">Costruiamo il domani</span><span class="cursor">_</span></h1>
-        <p class="hero-copy">PIXZEN progetta sistemi di acquisizione basati sull'intelligenza artificiale: posizionamento più preciso, campagne pubblicitarie, funnel automatizzati e una direzione creativa dal taglio cinematografico.</p>
-        <a class="hero-cta" href="#contact">Avvia un progetto</a>
+        <p class="label">Agenzia italiana AI e marketing</p>
+        <h1>Costruiamo il futuro digitale della tua azienda.</h1>
+        <p class="typing-line"><span id="typed">Strategie digitali</span><span class="cursor">_</span></p>
+        <p class="hero-copy">Uniamo intelligenza artificiale, creativit&agrave; e performance marketing per trasformare visite in clienti.</p>
+        <a class="hero-cta" href="#contact">Avvia il progetto</a>
       </div>
       <a class="scroll-down" href="#brands">Scorri in basso</a>
     </section>
@@ -595,13 +605,15 @@
     <section id="services">
       <div class="split">
         <div>
-          <p class="label">Le nostre competenze</p>
+          <p class="label">Servizi integrati</p>
           <h2 class="section-title">Sistemi che pensano, vendono e crescono.</h2>
           <div class="service-list">
             <button class="service active" data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1100&auto=format&fit=crop" data-copy="Strategia AI, posizionamento e architettura dell'esperienza per marchi digitali ambiziosi.">Strategia AI</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1100&auto=format&fit=crop" data-copy="Sistemi pubblicitari che collegano intenzione, messaggio, pagina di atterraggio ed eventi di conversione misurabili.">Pubblicità a pagamento</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1100&auto=format&fit=crop" data-copy="Funnel automatizzati per valutazione dei contatti, remarketing, ricontatto e fidelizzazione.">Automazione funnel</button>
-            <button class="service" data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1100&auto=format&fit=crop" data-copy="Direzione creativa cinematografica per campagne, prove sociali, pagine di atterraggio e contenuti pubblicitari.">Direzione creativa</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1100&auto=format&fit=crop" data-copy="Campagne Google Ads basate su intento, parole chiave, pagine dedicate e conversioni reali.">Google Ads</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1100&auto=format&fit=crop" data-copy="Campagne Meta Ads con creativit&agrave;, pubblici, remarketing e test strutturati.">Meta Ads</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1100&auto=format&fit=crop" data-copy="Automazioni CRM, qualificazione dei contatti e ricontatto per ridurre tempi e dispersioni.">Automazioni</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1100&auto=format&fit=crop" data-copy="Funnel misurabili che accompagnano ogni persona dalla scoperta alla richiesta commerciale.">Funnel</button>
+            <button class="service" data-img="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1100&auto=format&fit=crop" data-copy="Dashboard e analisi dati per trasformare segnali, costi e ricavi in decisioni operative.">Analisi dati</button>
           </div>
         </div>
         <aside class="media-panel" aria-live="polite">
@@ -611,15 +623,17 @@
       </div>
       <div class="agency-cards" aria-label="Servizi principali">
         <article class="agency-card"><span>01</span><h3>Strategia AI</h3><p>Piani operativi, casi d'uso dell'AI, posizionamento e intelligenza del sito orientati ai risultati aziendali.</p></article>
-        <article class="agency-card"><span>02</span><h3>Pubblicità a pagamento</h3><p>Campagne su motori di ricerca, social e retargeting con pagine dedicate e tracciamento preciso delle conversioni.</p></article>
-        <article class="agency-card"><span>03</span><h3>Automazione funnel</h3><p>Acquisizione e qualificazione dei contatti, attivazioni CRM e sequenze di ricontatto per ridurre gli sprechi.</p></article>
-        <article class="agency-card"><span>04</span><h3>Direzione creativa</h3><p>Concetti di campagna, sistemi visivi e contenuti animati che rendono premium ogni attività pubblicitaria.</p></article>
+        <article class="agency-card"><span>02</span><h3>Pubblicit&agrave; Google Ads</h3><p>Ricerca, Performance Max e remarketing collegati a pagine dedicate e conversioni affidabili.</p></article>
+        <article class="agency-card"><span>03</span><h3>Campagne Meta Ads</h3><p>Creativit&agrave;, pubblici e test continui per generare domanda e acquisire contatti qualificati.</p></article>
+        <article class="agency-card"><span>04</span><h3>Automazione funnel</h3><p>Acquisizione, qualificazione, CRM e sequenze di ricontatto per ridurre gli sprechi commerciali.</p></article>
+        <article class="agency-card"><span>05</span><h3>Direzione creativa</h3><p>Concetti di campagna e contenuti animati coerenti su annunci, pagine e canali social.</p></article>
+        <article class="agency-card"><span>06</span><h3>Analisi dati</h3><p>Dashboard, attribuzione e lettura dei KPI per scegliere investimenti e prossimi esperimenti.</p></article>
       </div>
     </section>
 
     <section id="work" class="work">
-      <p class="label">Progetti selezionati</p>
-      <h2 class="section-title">Casi studio premium in evidenza.</h2>
+      <p class="label">Casi studio</p>
+      <h2 class="section-title">Risultati misurabili, non semplici campagne.</h2>
       <div class="cards">
         <article class="case-card" data-title="Commercio predittivo" data-copy="Un sistema di analisi per il commercio che prevede la domanda e personalizza le pagine in base all'intenzione dell'utente.">
           <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1400&auto=format&fit=crop" alt="Caso studio sul commercio predittivo">
@@ -651,15 +665,15 @@
 
     <section id="contact" class="contact">
       <div>
-        <h2>Costruiamo<br>il futuro.</h2>
-        <a class="magnetic" href="/face5">Avvia un progetto</a>
+        <h2>Facciamo crescere<br>la tua azienda.</h2>
+        <a class="magnetic" href="mailto:contatti@ilmionegozio.com?subject=Prenotazione%20call%20Orizzonte%20AI">Prenota una call</a>
       </div>
     </section>
   </main>
 
   <footer>
-    <strong>PIXZEN</strong>
-    <span>ciao@pixzen.ai</span>
+    <strong>ORIZZONTE AI</strong>
+    <span>ciao@orizzonte.ai</span>
     <span>Strategia AI</span>
     <span>2026</span>
   </footer>
@@ -678,7 +692,7 @@
     const navbar = document.querySelector(".navbar");
     const hamburger = document.querySelector(".hamburger");
     const mobileMenu = document.querySelector(".mobile-menu");
-    const words = ["Costruiamo il domani", "Diamo forma al futuro", "Guidiamo la crescita"];
+    const words = ["Strategie digitali", "Automazioni intelligenti", "Campagne che convertono"];
     const typed = document.getElementById("typed");
     let wordIndex = 0;
     let letterIndex = 0;
@@ -690,9 +704,16 @@
     }, { passive: true });
 
     hamburger.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
+      const isOpen = mobileMenu.classList.toggle("open");
+      mobileMenu.setAttribute("aria-hidden", String(!isOpen));
+      hamburger.setAttribute("aria-expanded", String(isOpen));
+      hamburger.setAttribute("aria-label", isOpen ? "Chiudi menu" : "Apri menu");
     });
-    mobileMenu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => mobileMenu.classList.remove("open")));
+    mobileMenu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      mobileMenu.setAttribute("aria-hidden", "true");
+      hamburger.setAttribute("aria-expanded", "false");
+    }));
 
     function typeLoop() {
       const word = words[wordIndex];

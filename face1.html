@@ -718,18 +718,23 @@
     function launchCoffeeFromSpaceDrive() {
       if (!spacedrive || coffeeProjectile || coffeeDiamond) return false;
       coffeeExploded = false;
+      delete document.documentElement.dataset.coffeeTrigger;
       coffeeProjectile = createCoffeeObject();
       coffeeProjectile.position.copy(spacedrive.position).add(new THREE.Vector3(-2.8, 1.9, -0.2));
       coffeeProjectile.userData.velocity = new THREE.Vector3(4.2, 1.55, 0.25);
       coffeeProjectile.userData.age = 0;
       coffeeProjectile.userData.startPosition = coffeeProjectile.position.clone();
+      coffeeProjectile.userData.previousPosition = coffeeProjectile.position.clone();
+      const initialDriveBounds = getSpaceDriveBounds();
+      coffeeProjectile.userData.wasInsideDrive = Boolean(initialDriveBounds && initialDriveBounds.containsPoint(coffeeProjectile.position));
+      coffeeProjectile.userData.driveTransitioned = false;
       scene.add(coffeeProjectile);
       clearTimeout(coffeeExplosionTimer);
       coffeeExplosionTimer = setTimeout(() => {
         if (coffeeProjectile && !coffeeExploded) {
           explodeCoffeeIntoDiamond(coffeeProjectile.position);
         }
-      }, isMobileViewport ? 520 : 620);
+      }, isMobileViewport ? 900 : 1050);
       document.documentElement.dataset.coffeeState = "launched";
       document.getElementById('message').textContent = "Un caffe' e' uscito dalla SpaceDrive!";
       return true;
@@ -739,7 +744,10 @@
       if (!spacedrive) return null;
       spacedrive.updateWorldMatrix(true, true);
       const box = new THREE.Box3().setFromObject(spacedrive);
-      if (box.isEmpty()) {
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const invalidBox = box.isEmpty() || !Number.isFinite(size.length()) || Math.max(size.x, size.y, size.z) > 80;
+      if (invalidBox) {
         const center = spacedrive.position.clone();
         box.setFromCenterAndSize(center, new THREE.Vector3(4.8, 4.8, 4.8));
       } else {
@@ -752,20 +760,34 @@
       if (!coffee || !drive) return false;
       const position = coffee.position;
       const driveBounds = getSpaceDriveBounds();
-      if (driveBounds && driveBounds.containsPoint(position)) return true;
-
       const driveCenter = new THREE.Vector3();
+      const driveSize = new THREE.Vector3(4.8, 4.8, 4.8);
       if (driveBounds) {
         driveBounds.getCenter(driveCenter);
+        driveBounds.getSize(driveSize);
       } else {
         drive.getWorldPosition(driveCenter);
       }
 
-      const distance = position.distanceTo(driveCenter);
-      const crossedDrive = coffee.userData.startPosition && coffee.userData.startPosition.x < driveCenter.x && position.x >= driveCenter.x;
-      const beyondDrive = position.x > driveCenter.x + (isMobileViewport ? 4.4 : 3.6);
-      const tooOld = coffee.userData.age > 1.35;
-      return crossedDrive || beyondDrive || distance < (isMobileViewport ? 3.9 : 3.25) || tooOld;
+      const currentInside = Boolean(driveBounds && driveBounds.containsPoint(position));
+      const previousInside = Boolean(coffee.userData.wasInsideDrive);
+      const age = coffee.userData.age || 0;
+      const travel = coffee.userData.startPosition ? position.distanceTo(coffee.userData.startPosition) : 0;
+      const crossedBoundary = age > 0.06 && previousInside !== currentInside;
+      const surfaceDistance = driveBounds ? driveBounds.distanceToPoint(position) : position.distanceTo(driveCenter);
+      const touchedDrive = age > 0.08 && travel > 0.3 && surfaceDistance <= (isMobileViewport ? 0.52 : 0.38);
+      const driveRadius = Math.max(1.8, Math.max(driveSize.x, driveSize.y, driveSize.z) * 0.56);
+      const passedDriveLimit = age > 0.16 && travel > driveRadius + (isMobileViewport ? 0.7 : 0.45);
+      const beyondDrive = age > 0.12 && travel > 0.75 && position.distanceTo(driveCenter) > driveRadius + 0.7;
+      const fallbackLimit = age > 0.92;
+
+      coffee.userData.previousPosition.copy(position);
+      coffee.userData.wasInsideDrive = currentInside;
+      if (crossedBoundary) coffee.userData.driveTransitioned = true;
+
+      const triggerReason = crossedBoundary ? "boundary" : touchedDrive ? "contact" : passedDriveLimit ? "limit" : beyondDrive ? "beyond" : fallbackLimit ? "fallback" : "";
+      if (triggerReason) document.documentElement.dataset.coffeeTrigger = triggerReason;
+      return Boolean(triggerReason);
     }
 
     function triggerCoffeeExplosion(position) {
@@ -860,6 +882,21 @@
       document.documentElement.dataset.coffeeDiamondColor = ["blue", "purple", "green", "gold", "red"][coffeeDiamond.userData.colorStep % coffeeDiamondPalette.length];
       document.getElementById('message').textContent = "Il diamante ha cambiato colore!";
     }
+
+    window.Face1CoffeeDebug = Object.freeze({
+      launch: launchCoffeeFromSpaceDrive,
+      state: function() {
+        return {
+          state: document.documentElement.dataset.coffeeState || "idle",
+          trigger: document.documentElement.dataset.coffeeTrigger || null,
+          explosions: Number(document.documentElement.dataset.coffeeExplosions || "0"),
+          color: document.documentElement.dataset.coffeeDiamondColor || null,
+          hasCoffee: Boolean(coffeeProjectile),
+          hasDiamond: Boolean(coffeeDiamond)
+        };
+      },
+      changeDiamondColor: changeDiamondColor
+    });
 
     function changeSpaceDriveColorAndLaunchCoffee() {
       if (!spacedrive) return;
@@ -1052,5 +1089,3 @@
   </footer>
 </body>
 </html>
-
-

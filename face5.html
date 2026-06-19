@@ -95,6 +95,8 @@
       border-radius: 5px;
       background: linear-gradient(180deg, #f9fbff, #dfeeff);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8);
+      transform: perspective(520px) rotateX(0) rotateY(0);
+      transition: transform 260ms ease, box-shadow 260ms ease;
     }
     .preview-screen::before {
       content: "";
@@ -106,6 +108,22 @@
       transform: translateY(-30%);
       animation: previewScroll 5.5s linear infinite;
     }
+    .preview-screen::after {
+      position: absolute;
+      left: 8px;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      content: "";
+      border-radius: 50%;
+      background: #ff6b6b;
+      box-shadow: 9px 0 #ffd166, 18px 0 #4bc0c0;
+    }
+    .preview-main:hover .preview-screen,
+    .preview-main:focus-visible .preview-screen {
+      transform: perspective(520px) rotateX(2deg) rotateY(-3deg) translateY(-3px);
+      box-shadow: 0 14px 26px rgba(0,48,96,0.16), inset 0 0 0 1px rgba(255,255,255,0.8);
+    }
     .preview-screen span {
       position: absolute;
       left: 14px;
@@ -116,9 +134,9 @@
       opacity: 0.8;
       animation: previewPulse 2.4s ease-in-out infinite alternate;
     }
-    .preview-screen span:nth-child(1) { top: 20px; width: 70%; }
-    .preview-screen span:nth-child(2) { top: 48px; width: 48%; background: #36A2EB; animation-delay: 0.25s; }
-    .preview-screen span:nth-child(3) { top: 76px; width: 84%; background: #4BC0C0; animation-delay: 0.5s; }
+    .preview-screen span:nth-child(1) { top: 27px; width: 70%; }
+    .preview-screen span:nth-child(2) { top: 54px; width: 48%; background: #36A2EB; animation-delay: 0.25s; }
+    .preview-screen span:nth-child(3) { top: 82px; width: 84%; background: #4BC0C0; animation-delay: 0.5s; }
     .site-preview strong {
       display: block;
       margin-top: 8px;
@@ -168,6 +186,7 @@
     .preview-button:hover,
     .preview-button:focus-visible {
       filter: brightness(1.06);
+      transform: translateY(-1px);
     }
     .preview-gridline .preview-screen {
       background: linear-gradient(135deg, #ffffff, #e7e7e7);
@@ -286,23 +305,21 @@
       color: #004080;
       font-weight: bold;
     }
-    /* Aggiunto padding in fondo al main per evitare che il footer sovrapponga contenuti cliccabili */
     main {
-      padding-bottom: 80px;
+      padding-bottom: 34px;
     }
-    /* Footer fisso in fondo alla pagina con sfondo trasparente */
     .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
+      position: relative;
       width: 100%;
+      box-sizing: border-box;
       text-align: center;
-      padding: 15px;
-      background-color: transparent;
+      padding: 20px 15px;
+      background-color: #fff;
       font-size: 0.85rem;
-      color: #ccc;
+      color: #52677d;
       border-top: 1px solid #004080;
-      z-index: 100;
+      z-index: 2;
+      overflow-wrap: anywhere;
     }
     .footer a {
       color: #004080;
@@ -378,29 +395,29 @@
   <main id="main-content" role="main">
     <div class="analysis-layout">
       <aside class="example-rail" aria-label="Esempi siti animati">
-        <h2>Esempi siti</h2>
+        <h2>Demo professionali</h2>
         <article class="site-preview preview-gridline">
-          <a class="preview-main" href="/examples/esempio-1/" aria-label="Apri Esempio 1 GRIDLINE">
+          <a class="preview-main" href="/examples/esempio-1/" aria-label="Apri Esempio 1 Studio Creativo Premium">
             <div class="preview-screen"><span></span><span></span><span></span></div>
             <strong>Esempio 1</strong>
-            <em>GRIDLINE</em>
+            <em>Studio Creativo Premium</em>
           </a>
-          <p class="preview-copy">Studio minimalista di lusso con apertura 3D, servizi, progetti e piè di pagina elegante.</p>
+          <p class="preview-copy">Studio italiano minimalista con scultura 3D, portfolio, metodo e richiesta preventivo.</p>
           <div class="preview-actions">
             <a class="preview-button primary" href="/examples/esempio-1/">Apri demo</a>
-            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-1/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+            <a class="preview-button" href="/examples/esempio-1/#about">Maggiori informazioni</a>
           </div>
         </article>
         <article class="site-preview preview-pixzen">
-          <a class="preview-main" href="/examples/esempio-2/" aria-label="Apri Esempio 2 PIXZEN">
+          <a class="preview-main" href="/examples/esempio-2/" aria-label="Apri Esempio 2 Agenzia AI e Marketing">
             <div class="preview-screen"><span></span><span></span><span></span></div>
             <strong>Esempio 2</strong>
-            <em>PIXZEN</em>
+            <em>Agenzia AI &amp; Marketing</em>
           </a>
-          <p class="preview-copy">Agenzia AI con typing effect, marquee, card servizi, lavori e insight interattivi.</p>
+          <p class="preview-copy">Agenzia italiana con strategie AI, Google Ads, Meta Ads, automazioni e case study.</p>
           <div class="preview-actions">
             <a class="preview-button primary" href="/examples/esempio-2/">Apri demo</a>
-            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-2/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+            <a class="preview-button" href="/examples/esempio-2/#services">Maggiori informazioni</a>
           </div>
         </article>
       </aside>
@@ -486,7 +503,7 @@
           <canvas id="geoChart"></canvas>
         </div>
 
-        <div class="chart-container" role="img" aria-label="Grafico a barre: Interazioni sul sito per sezione - Home 180, Prodotti 130, Dettagli 90, Contatti 70, FAQ 40">
+        <div class="chart-container" role="img" aria-label="Grafico a barre: Interazioni sul sito per sezione - Inizio 180, Prodotti 130, Dettagli 90, Contatti 70, Domande frequenti 40">
           <canvas id="clickChart"></canvas>
         </div>
 
@@ -512,17 +529,17 @@
       </div>
 
       <aside class="example-rail" aria-label="Esempio sito animato aggiuntivo">
-        <h2>Portfolio dinamico</h2>
+        <h2>Portfolio professionale</h2>
         <article class="site-preview preview-zedian">
-          <a class="preview-main" href="/examples/esempio-3/" aria-label="Apri Esempio 3 ZEDIAN">
+          <a class="preview-main" href="/examples/esempio-3/" aria-label="Apri Esempio 3 Portfolio Professionale Tech">
             <div class="preview-screen"><span></span><span></span><span></span></div>
             <strong>Esempio 3</strong>
-            <em>ZEDIAN</em>
+            <em>Portfolio Professionale Tech</em>
           </a>
-          <p class="preview-copy">Portfolio dark cyber con card trascinabile, stack lavori 3D e servizi accordion.</p>
+          <p class="preview-copy">Portfolio italiano scuro con card trascinabile, progetti 3D, tecnologie e collaborazioni.</p>
           <div class="preview-actions">
             <a class="preview-button primary" href="/examples/esempio-3/">Apri demo</a>
-            <a class="preview-button" href="https://github.com/delo1994/ilmionegozio/blob/main/examples/esempio-3/index.html" target="_blank" rel="noopener">Visualizza codice</a>
+            <a class="preview-button" href="/examples/esempio-3/#about">Maggiori informazioni</a>
           </div>
         </article>
         <p>Anteprime leggere in CSS: movimento continuo senza video aggiuntivi.</p>
@@ -565,7 +582,7 @@
     const clickChart = new Chart(ctxClick, {
       type: 'bar',
       data: {
-        labels: ['Home', 'Prodotti', 'Dettagli', 'Contatti', 'FAQ'],
+        labels: ['Inizio', 'Prodotti', 'Dettagli', 'Contatti', 'Domande frequenti'],
         datasets: [{
           label: 'Clic per Sezione',
           data: [180, 130, 90, 70, 40],
@@ -616,4 +633,3 @@
   </footer>
 </body>
 </html>
-

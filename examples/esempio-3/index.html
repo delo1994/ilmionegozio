@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZEDIAN - Portfolio tecnologico scuro</title>
-  <meta name="description" content="Demo portfolio ZEDIAN con stile tecnologico scuro, tessera trascinabile, progetti 3D interattivi, strumenti e servizi a fisarmonica.">
-  <meta property="og:title" content="ZEDIAN - Portfolio tecnologico scuro">
+  <title>Luca Ferri - Designer e sviluppatore digitale</title>
+  <meta name="description" content="Portfolio professionale italiano di Luca Ferri: interfacce, siti e applicazioni veloci, accessibili e orientate alla conversione.">
+  <meta property="og:title" content="Luca Ferri - Portfolio professionale tech">
   <meta property="og:description" content="Una demo portfolio premium con griglia scura, accenti verde neon, tessera trascinabile e progetti interattivi.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.ilmionegozio.com/examples/esempio-3/">
@@ -194,6 +194,45 @@
       border-color: rgba(0,223,143,0.7);
       background: rgba(0,223,143,0.1);
     }
+
+    .mobile-menu-toggle {
+      display: none;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+    }
+
+    .mobile-menu-toggle span,
+    .mobile-menu-toggle::before,
+    .mobile-menu-toggle::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      margin: 4px auto;
+      content: "";
+      background: var(--accent);
+    }
+
+    .mobile-nav {
+      position: fixed;
+      inset: 76px 0 auto;
+      z-index: 38;
+      display: grid;
+      visibility: hidden;
+      padding: 18px 20px 24px;
+      border-bottom: 1px solid rgba(0,223,143,0.28);
+      background: rgba(13,17,22,0.98);
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .mobile-nav.open { visibility: visible; opacity: 1; transform: translateY(0); }
+    .mobile-nav a { padding: 14px 4px; border-bottom: 1px solid rgba(255,255,255,0.09); font-weight: 700; }
 
     :focus-visible {
       outline: 2px solid var(--accent);
@@ -658,6 +697,43 @@
       max-width: 940px;
     }
 
+    .collaborations {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .collaboration-grid {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .collaboration-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .collaboration-item {
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(20,24,31,0.64);
+      transition: border-color 180ms ease, transform 180ms ease;
+    }
+
+    .collaboration-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .collaboration-item span { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 0.76rem; }
+    .collaboration-item strong { font-size: 1.2rem; }
+
     .service-list {
       margin-top: 44px;
     }
@@ -864,6 +940,9 @@
         display: none;
       }
 
+      .action-dot { display: none; }
+      .mobile-menu-toggle { display: grid; }
+
       .section {
         width: min(100% - 32px, 720px);
       }
@@ -871,6 +950,8 @@
       .hero,
       .two-col,
       .work-grid,
+      .collaboration-grid,
+      .collaboration-list,
       .footer-grid {
         grid-template-columns: 1fr;
       }
@@ -899,6 +980,7 @@
 
       .about,
       .works,
+      .collaborations,
       .services,
       .footer-grid {
         padding: 92px 0;
@@ -1043,38 +1125,46 @@
   <a class="skip-link" href="#main">Vai al contenuto</a>
   <div class="grid-bg" aria-hidden="true"></div>
 
-  <nav class="navbar" aria-label="Navigazione ZEDIAN">
-    <a class="logo" href="#top" aria-label="Pagina iniziale ZEDIAN">ZEDIAN<span>.</span></a>
+  <nav class="navbar" aria-label="Navigazione portfolio Luca Ferri">
+    <a class="logo" href="#top" aria-label="Pagina iniziale Luca Ferri">LUCA FERRI<span>.</span></a>
     <div class="nav-links">
       <a href="#about">Profilo</a>
       <a href="#work">Progetti</a>
       <a href="#services">Servizi</a>
       <a href="#contact">Contatti</a>
     </div>
-    <a class="action-dot" href="#contact" aria-label="Contatta ZEDIAN"></a>
+    <a class="action-dot" href="#contact" aria-label="Contatta Luca Ferri"></a>
+    <button class="mobile-menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
   </nav>
+  <div class="mobile-nav" aria-hidden="true">
+    <a href="#about">Presentazione e competenze</a>
+    <a href="#work">Progetti</a>
+    <a href="#collaborazioni">Collaborazioni</a>
+    <a href="#services">Servizi</a>
+    <a href="#contact">Contatti</a>
+  </div>
 
   <main id="main">
     <section id="top" class="section hero">
       <div class="ghost-word" aria-hidden="true">PROGETTO</div>
 
       <div class="hero-copy reveal">
-        <span class="eyebrow">Progettista UX/UI</span>
-        <h1 class="hero-title" aria-label="Esperienze digitali">Esperienze<br><span class="outline">digitali</span><span class="green">.</span></h1>
-        <p class="lead">Creo prodotti digitali immersivi che uniscono estetica e funzionalità, trasformando idee complesse in percorsi utente chiari, eleganti e misurabili.</p>
+        <span class="eyebrow">Designer e sviluppatore italiano</span>
+        <h1 class="hero-title" aria-label="Esperienze digitali che lasciano il segno">Esperienze digitali<br><span class="outline">che lasciano il segno</span><span class="green">.</span></h1>
+        <p class="lead">Progetto interfacce, siti e applicazioni con attenzione a estetica, velocit&agrave; e conversione.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="#work">Guarda i progetti</a>
-          <a class="btn" href="/face5"><span class="button-dot" aria-hidden="true"></span>Torna al report</a>
+          <a class="btn primary" href="#contact">Parliamo del progetto</a>
+          <a class="btn" href="#work"><span class="button-dot" aria-hidden="true"></span>Guarda i progetti</a>
         </div>
       </div>
 
       <div class="badge-wrap reveal" aria-label="Tessera identificativa trascinabile del progettista">
         <div class="lanyard" aria-hidden="true"></div>
-        <article class="id-card" id="id-card" aria-label="Tessera trascinabile del progettista ZEDIAN">
+        <article class="id-card" id="id-card" aria-label="Tessera trascinabile del progettista Luca Ferri">
           <img class="portrait" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" alt="Ritratto della progettista" fetchpriority="high" decoding="async">
           <div class="card-copy">
-            <h2>Zedian.</h2>
-            <p>Responsabile UX/UI</p>
+            <h2>Luca Ferri.</h2>
+            <p>Designer e sviluppatore</p>
           </div>
         </article>
       </div>
@@ -1082,8 +1172,9 @@
 
     <section id="about" class="section about two-col">
       <div class="reveal">
+        <span class="eyebrow">Presentazione</span>
         <h2 class="section-title">Progettare<br>con uno scopo.</h2>
-        <p class="copy">Con oltre dieci anni di esperienza, ZEDIAN unisce direzione creativa e pensiero strategico per realizzare prodotti digitali distintivi ed efficaci.</p>
+        <p class="copy">Con oltre dieci anni di esperienza, Luca unisce direzione creativa e pensiero strategico per realizzare prodotti digitali distintivi ed efficaci.</p>
         <p class="copy">Dalle startup ai marchi consolidati, ogni interfaccia viene costruita attorno a chiarezza, conversione, accessibilità e movimento memorabile.</p>
         <div class="stats" aria-label="Statistiche del portfolio">
           <div class="stat"><strong>20+</strong><span>Premi</span></div>
@@ -1093,7 +1184,7 @@
       </div>
 
       <div class="reveal">
-        <h3 class="toolkit-title">I miei strumenti</h3>
+        <h3 class="toolkit-title">Tecnologie e competenze</h3>
         <div class="toolkit" aria-label="Strumenti di progettazione e sviluppo">
           <span class="chip">Progettazione UI/UX</span>
           <span class="chip">Figma</span>
@@ -1133,6 +1224,22 @@
           <div id="project-tags" class="tags" aria-label="Tecnologie del progetto"></div>
           <a class="btn primary" href="/face5">Esplora il progetto</a>
         </aside>
+      </div>
+    </section>
+
+    <section id="collaborazioni" class="section collaborations">
+      <div class="collaboration-grid reveal">
+        <div>
+          <span class="eyebrow">Collaborazioni</span>
+          <h2 class="section-title">Lavorare bene<br>insieme.</h2>
+          <p class="copy">Collaboro con aziende, studi e agenzie quando servono visione, velocit&agrave; di esecuzione e una responsabilit&agrave; chiara sul risultato digitale.</p>
+        </div>
+        <div class="collaboration-list" aria-label="Collaborazioni selezionate">
+          <article class="collaboration-item"><span>01 / PRODOTTO</span><strong>Officina Digitale Milano</strong></article>
+          <article class="collaboration-item"><span>02 / CULTURA</span><strong>Archivio Forma Torino</strong></article>
+          <article class="collaboration-item"><span>03 / TECNOLOGIA</span><strong>Nodo Cloud Bologna</strong></article>
+          <article class="collaboration-item"><span>04 / OSPITALITA</span><strong>Dimora Luce Firenze</strong></article>
+        </div>
       </div>
     </section>
 
@@ -1187,8 +1294,8 @@
     <section class="section footer-grid">
       <div>
         <h2 class="section-title">Come posso<br>aiutarti?</h2>
-        <p class="copy">Porta un'idea complessa, un funnel che non funziona o un marchio che ha bisogno di più presenza. ZEDIAN lo trasforma in un'esperienza digitale curata.</p>
-        <a class="email-btn" href="mailto:ciao@zedian.design">ciao@zedian.design</a>
+        <p class="copy">Porta un'idea complessa, un funnel che non funziona o un marchio che ha bisogno di pi&ugrave; presenza. Luca lo trasforma in un'esperienza digitale curata.</p>
+        <a class="email-btn" href="mailto:contatti@ilmionegozio.com?subject=Progetto%20digitale%20con%20Luca%20Ferri">Parliamo del progetto</a>
       </div>
       <div>
         <h3>Menu</h3>
@@ -1209,13 +1316,27 @@
       </div>
     </section>
     <div class="bottom">
-      <span>&copy; 2026 Portfolio Zedian. Tutti i diritti riservati.</span>
+      <span>&copy; 2026 Portfolio Luca Ferri. Tutti i diritti riservati.</span>
       <span>Informativa privacy / Termini di servizio</span>
     </div>
   </footer>
 
   <script>
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+    const mobileNav = document.querySelector(".mobile-nav");
+
+    mobileMenuToggle.addEventListener("click", () => {
+      const isOpen = mobileNav.classList.toggle("open");
+      mobileNav.setAttribute("aria-hidden", String(!isOpen));
+      mobileMenuToggle.setAttribute("aria-expanded", String(isOpen));
+      mobileMenuToggle.setAttribute("aria-label", isOpen ? "Chiudi menu" : "Apri menu");
+    });
+    mobileNav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+      mobileNav.classList.remove("open");
+      mobileNav.setAttribute("aria-hidden", "true");
+      mobileMenuToggle.setAttribute("aria-expanded", "false");
+    }));
 
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {

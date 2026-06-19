@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GRIDLINE - Studio 3D minimalista</title>
-  <meta name="description" content="Esempio GRIDLINE: hero premium minimalista con scultura matematica 3D, tipografia editoriale e interazioni fluide.">
+  <title>Linea Studio - Studio creativo premium italiano</title>
+  <meta name="description" content="Linea Studio realizza siti, applicazioni ed esperienze digitali premium per aziende italiane.">
   <link rel="canonical" href="https://www.ilmionegozio.com/examples/esempio-1/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="it_IT">
-  <meta property="og:title" content="GRIDLINE - Studio 3D minimalista">
-  <meta property="og:description" content="Studio digitale minimalista con scultura 3D, servizi e progetti premium.">
+  <meta property="og:title" content="Linea Studio - Studio creativo premium">
+  <meta property="og:description" content="Studio creativo italiano con scultura 3D, portfolio, metodo e servizi digitali premium.">
   <meta property="og:url" content="https://www.ilmionegozio.com/examples/esempio-1/">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GRIDLINE - Studio 3D minimalista">
-  <meta name="twitter:description" content="Studio digitale minimalista con scultura 3D, servizi e progetti premium.">
+  <meta name="twitter:title" content="Linea Studio - Studio creativo premium">
+  <meta name="twitter:description" content="Studio creativo italiano con scultura 3D, portfolio, metodo e servizi digitali premium.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scrollbar-width: none; }
+    html { scroll-behavior: smooth; scrollbar-width: none; overflow-x: hidden; }
     html::-webkit-scrollbar { display: none; }
     body {
       margin: 0;
@@ -304,6 +304,52 @@
       position: relative;
       z-index: 2;
     }
+    .method-grid,
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .method-step,
+    .testimonial {
+      min-height: 210px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(12px);
+    }
+    .method-step span {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid #111827;
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .method-step h3,
+    .testimonial h3 { margin: 34px 0 10px; font-size: 1.25rem; font-weight: 600; }
+    .method-step p,
+    .testimonial p { margin: 0; color: #6b7280; line-height: 1.65; }
+    .testimonial blockquote {
+      margin: 0;
+      color: #111827;
+      font-size: 1.2rem;
+      line-height: 1.55;
+    }
+    .contact-cta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 28px;
+      align-items: center;
+      padding: 52px;
+      border: 1px solid #111827;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(18px);
+    }
+    .contact-cta h2 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 500; line-height: 1; }
+    .contact-cta p { max-width: 650px; margin: 0; color: #6b7280; line-height: 1.65; }
     .demo-footer {
       width: min(1120px, calc(100% - 48px));
       margin: 0 auto;
@@ -355,7 +401,24 @@
       .section-head { display: block; }
       .section-head p { margin-top: 16px; }
       .service-grid,
-      .portfolio-grid { grid-template-columns: 1fr; }
+      .portfolio-grid,
+      .method-grid,
+      .testimonial-grid { grid-template-columns: 1fr; }
+      .nav-links.open {
+        position: fixed;
+        top: 78px;
+        left: 18px;
+        right: 18px;
+        display: grid;
+        gap: 0;
+        padding: 14px;
+        border: 1px solid #e5e7eb;
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 18px 50px rgba(17,24,39,0.14);
+        backdrop-filter: blur(18px);
+      }
+      .nav-links.open a { padding: 13px 10px; border-bottom: 1px solid #eceff3; }
+      .contact-cta { grid-template-columns: 1fr; padding: 30px 24px; }
       .demo-footer { display: block; padding-bottom: 120px; }
     }
   </style>
@@ -364,29 +427,30 @@
 </head>
 <body>
   <canvas id="sculpture" aria-hidden="true"></canvas>
-  <nav class="navbar" aria-label="Navigazione GRIDLINE">
+  <nav class="navbar" aria-label="Navigazione Linea Studio">
     <div class="nav-inner">
-      <a class="logo" href="#top">GRIDLINE</a>
+      <a class="logo" href="#top">LINEA STUDIO</a>
       <div class="nav-links" aria-label="Sezioni demo">
         <a href="#top">Inizio</a>
         <a href="#about">Chi siamo</a>
         <a href="#services">Servizi</a>
         <a href="#portfolio">Progetti</a>
+        <a href="#metodo">Metodo</a>
         <a href="#contact">Contatti</a>
       </div>
-      <button class="menu-btn" type="button" aria-label="Menu"><span></span></button>
+      <button class="menu-btn" type="button" aria-label="Apri il menu" aria-expanded="false"><span></span></button>
     </div>
   </nav>
 
   <main id="top" class="page">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-content">
-        <p class="overline">Progettiamo il futuro</p>
-        <h1 id="hero-title">Dove la visione<br>incontra il design.</h1>
-        <p class="lead">Creiamo esperienze digitali capaci di ispirare, coinvolgere e valorizzare il tuo marchio attraverso eleganza, movimento e interazioni precise.</p>
+        <p class="overline">Studio creativo italiano</p>
+        <h1 id="hero-title">Dove le idee diventano esperienze digitali.</h1>
+        <p class="lead">Realizziamo siti web, applicazioni ed esperienze digitali per aziende che vogliono distinguersi.</p>
         <div class="actions">
-          <a class="primary-btn" href="#portfolio">Esplora i progetti <span aria-hidden="true">/</span></a>
-          <a class="watch" href="#about"><span class="play" aria-hidden="true">&#9654;</span> Guarda la presentazione</a>
+          <a class="primary-btn" href="#about">Scopri di pi&ugrave; <span aria-hidden="true">/</span></a>
+          <a class="watch" href="#contact"><span class="play" aria-hidden="true">&#9654;</span> Richiedi preventivo</a>
         </div>
       </div>
       <div class="stats" aria-label="Statistiche demo">
@@ -394,7 +458,7 @@
         <div class="divider" aria-hidden="true"></div>
         <div class="stat"><strong>98%</strong><span>Clienti soddisfatti</span></div>
         <div class="divider" aria-hidden="true"></div>
-        <div class="stat"><strong>15+</strong><span>Premi ricevuti</span></div>
+        <div class="stat"><strong>15+</strong><span>Premi e riconoscimenti</span></div>
       </div>
     </section>
 
@@ -445,10 +509,41 @@
         </article>
       </div>
     </section>
+
+    <section id="metodo" class="content-section">
+      <div class="section-head">
+        <h2>Un metodo chiaro, dal primo incontro al lancio.</h2>
+        <p>Strategia, prototipo e sviluppo procedono insieme, con verifiche rapide e decisioni motivate.</p>
+      </div>
+      <div class="method-grid">
+        <article class="method-step"><span>01</span><h3>Ascolto e direzione</h3><p>Obiettivi, pubblico e posizionamento diventano una mappa condivisa del progetto.</p></article>
+        <article class="method-step"><span>02</span><h3>Prototipo e identit&agrave;</h3><p>Gerarchie, contenuti e linguaggio visivo vengono provati prima dello sviluppo definitivo.</p></article>
+        <article class="method-step"><span>03</span><h3>Sviluppo e lancio</h3><p>Costruiamo, misuriamo e rifiniamo prestazioni, accessibilit&agrave; e conversione.</p></article>
+      </div>
+    </section>
+
+    <section id="testimonianze" class="content-section">
+      <div class="section-head">
+        <h2>Collaborazioni costruite sulla fiducia.</h2>
+        <p>Tre testimonianze dimostrative per raccontare il tono e la qualit&agrave; del servizio.</p>
+      </div>
+      <div class="testimonial-grid">
+        <article class="testimonial"><blockquote>"Il progetto ha reso il nostro valore immediatamente percepibile."</blockquote><h3>Elena Riva</h3><p>Direzione, Atelier Forma</p></article>
+        <article class="testimonial"><blockquote>"Metodo rigoroso, comunicazione semplice e un risultato sopra le aspettative."</blockquote><h3>Marco Bellini</h3><p>Fondatore, Nodo Casa</p></article>
+        <article class="testimonial"><blockquote>"Finalmente un sito veloce che sembra davvero nostro."</blockquote><h3>Giulia Serra</h3><p>Marketing, Lume Italia</p></article>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="contact-title">
+      <div class="contact-cta">
+        <div><h2 id="contact-title">Hai un progetto ambizioso?</h2><p>Raccontaci obiettivi, tempi e punto di partenza. Prepariamo una direzione concreta e un preventivo trasparente.</p></div>
+        <a class="primary-btn" href="mailto:contatti@ilmionegozio.com?subject=Richiesta%20preventivo%20Linea%20Studio">Richiedi preventivo</a>
+      </div>
+    </section>
   </main>
   <footer id="contact" class="demo-footer">
-    <strong>GRIDLINE</strong>
-    <span>Concept di studio 3D minimalista e raffinato</span>
+    <strong>LINEA STUDIO</strong>
+    <span>Studio creativo italiano per esperienze digitali premium</span>
     <a class="primary-btn" href="/face5">Torna al report</a>
   </footer>
   <a class="back" href="/face5">Torna al report</a>
@@ -456,9 +551,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     const nav = document.querySelector(".navbar");
+    const menuButton = document.querySelector(".menu-btn");
+    const navLinks = document.querySelector(".nav-links");
     window.addEventListener("scroll", () => {
       nav.classList.toggle("scrolled", window.scrollY > 50);
     }, { passive: true });
+    menuButton.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? "Chiudi il menu" : "Apri il menu");
+    });
+    navLinks.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+      menuButton.setAttribute("aria-expanded", "false");
+    }));
 
     const canvas = document.getElementById("sculpture");
     if (window.THREE && canvas) {
