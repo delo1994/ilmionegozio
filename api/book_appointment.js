@@ -24,6 +24,10 @@ function localIsoDate(date) {
 }
 
 function validatePayload(raw) {
+  if (raw.privacyConsent !== true) {
+    return { error: 'Devi accettare l\'informativa privacy.' };
+  }
+
   const data = {
     nome: cleanText(raw.nome, 80),
     email: cleanText(raw.email, 120).toLowerCase(),

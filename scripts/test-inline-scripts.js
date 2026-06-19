@@ -7,6 +7,7 @@ const root = path.join(__dirname, "..");
 const targets = [
   "face1.html",
   "face2.html",
+  "face3.html",
   "face5.html",
   "examples/esempio-1/index.html",
   "examples/esempio-2/index.html",

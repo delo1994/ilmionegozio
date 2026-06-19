@@ -249,23 +249,90 @@
     .field.valid select { border-color: rgba(84,227,158,0.72); }
 
     .privacy-check {
+      position: relative;
       display: grid;
-      grid-template-columns: 22px minmax(0, 1fr);
-      gap: 10px;
-      align-items: start;
+      width: 100%;
+      min-width: 0;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
       margin: 0;
       color: var(--muted);
       font-size: 0.82rem;
       font-weight: 500;
       line-height: 1.5;
+      cursor: pointer;
     }
     .privacy-check input {
-      width: 20px;
-      min-height: 20px;
-      margin: 1px 0 0;
-      accent-color: var(--cyan);
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      min-height: 1px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      opacity: 0;
+    }
+    .privacy-box {
+      position: relative;
+      display: block;
+      width: 24px;
+      height: 24px;
+      grid-column: 1;
+      border: 2px solid rgba(220,230,235,0.72);
+      border-radius: 5px;
+      background: rgba(4,12,17,0.82);
+      box-shadow: inset 0 0 0 2px rgba(4,12,17,0.75);
+      transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+    .privacy-box::after {
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 7px;
+      height: 12px;
+      content: "";
+      border-right: 3px solid #041218;
+      border-bottom: 3px solid #041218;
+      opacity: 0;
+      transform: rotate(45deg) scale(0.5);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+    .privacy-copy {
+      min-width: 0;
+      grid-column: 2;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    .privacy-check:hover .privacy-box { border-color: var(--cyan); transform: translateY(-1px); }
+    .privacy-check input:checked + .privacy-box {
+      border-color: var(--cyan);
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(66,217,255,0.12), 0 0 18px rgba(66,217,255,0.25);
+    }
+    .privacy-check input:checked + .privacy-box::after {
+      opacity: 1;
+      transform: rotate(45deg) scale(1);
+    }
+    .privacy-check input:focus-visible + .privacy-box {
+      outline: 3px solid var(--cyan);
+      outline-offset: 4px;
+    }
+    .privacy-check.invalid .privacy-box {
+      border-color: var(--error);
+      box-shadow: 0 0 0 4px rgba(255,128,144,0.12);
     }
     .privacy-check a { color: var(--cyan); }
+    .privacy-feedback {
+      display: none;
+      grid-column: 2;
+      margin: -4px 0 0;
+      color: var(--error);
+      font-size: 0.76rem;
+    }
+    .privacy-check.invalid .privacy-feedback { display: block; }
     .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
     .submit-button {
@@ -444,8 +511,10 @@
           </div>
 
           <label class="privacy-check" for="privacyConsent">
-            <input type="checkbox" id="privacyConsent" required>
-            <span>Ho letto l'<a href="/privacy-policy">informativa privacy</a> e autorizzo il trattamento dei dati necessario a rispondere alla richiesta. <span class="required">*</span></span>
+            <input type="checkbox" id="privacyConsent" name="privacyConsent" value="accepted" required aria-describedby="privacy-feedback">
+            <span class="privacy-box" aria-hidden="true"></span>
+            <span class="privacy-copy">Ho letto l'<a href="/privacy-policy">informativa privacy</a> e autorizzo il trattamento dei dati necessario a rispondere alla richiesta. <span class="required">*</span></span>
+            <span class="privacy-feedback" id="privacy-feedback">Devi accettare l'informativa privacy per inviare la richiesta.</span>
           </label>
 
           <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
@@ -482,7 +551,9 @@
       const buttonLabel = submitButton.querySelector(".button-label");
       const dateInput = document.getElementById("dataAppuntamento");
       const submittedAt = document.getElementById("submittedAt");
-      const controls = Array.from(form.querySelectorAll("input:not([type='hidden']):not(#website), select"));
+      const privacyConsent = document.getElementById("privacyConsent");
+      const privacyCheck = document.querySelector(".privacy-check");
+      const controls = Array.from(form.querySelectorAll("input:not([type='hidden']):not(#website):not(#privacyConsent), select"));
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       const phonePattern = /^\+?[0-9 ()-]{7,24}$/;
 
@@ -558,14 +629,30 @@
         buttonLabel.textContent = active ? "Invio in corso..." : "Invia richiesta";
       }
 
+      function validatePrivacy(showState) {
+        const valid = privacyConsent.checked;
+        if (showState) {
+          privacyCheck.classList.toggle("invalid", !valid);
+          privacyConsent.setAttribute("aria-invalid", valid ? "false" : "true");
+        }
+        return valid;
+      }
+
+      privacyConsent.addEventListener("change", function () {
+        validatePrivacy(true);
+        if (privacyConsent.checked && statusBox.classList.contains("error")) {
+          statusBox.className = "form-status";
+        }
+      });
+
       form.addEventListener("submit", async function (event) {
         event.preventDefault();
         statusBox.className = "form-status";
 
         const invalidControl = controls.find((control) => !validateControl(control, true));
-        if (!document.getElementById("privacyConsent").checked) {
+        if (!validatePrivacy(true)) {
           showStatus("error", "Per inviare la richiesta devi accettare l'informativa privacy.");
-          document.getElementById("privacyConsent").focus();
+          privacyConsent.focus();
           return;
         }
         if (invalidControl) {
@@ -581,6 +668,7 @@
           data: dateInput.value,
           slot: document.getElementById("slotAppuntamento").value,
           argomento: document.getElementById("argomento").value,
+          privacyConsent: privacyConsent.checked,
           website: document.getElementById("website").value,
           submittedAt: Number(submittedAt.value)
         };

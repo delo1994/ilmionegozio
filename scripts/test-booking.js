@@ -28,6 +28,7 @@ async function run() {
     data: tomorrow,
     slot: 'Mattina',
     argomento: 'Ambienti 3D',
+    privacyConsent: true,
     submittedAt: Date.now() - 3000
   });
   assert.equal(valid.code, 200);
@@ -42,9 +43,22 @@ async function run() {
     data: tomorrow,
     slot: 'Mattina',
     argomento: 'Ambienti 3D',
+    privacyConsent: true,
     submittedAt: Date.now() - 3000
   });
   assert.equal(invalidEmail.code, 400);
+
+  const missingConsent = await request('POST', {
+    nome: 'Mario Rossi',
+    email: 'mario@example.it',
+    telefono: '+39 333 1234567',
+    data: tomorrow,
+    slot: 'Mattina',
+    argomento: 'Ambienti 3D',
+    submittedAt: Date.now() - 3000
+  });
+  assert.equal(missingConsent.code, 400);
+  assert.equal(missingConsent.body.error, 'Devi accettare l\'informativa privacy.');
 
   const malformed = await request('POST', '{email:non-valida}');
   assert.equal(malformed.code, 400);
@@ -58,7 +72,7 @@ async function run() {
   assert.equal(method.code, 405);
   assert.equal(method.headers['Cache-Control'], 'no-store, max-age=0');
 
-  console.log('Test API appuntamenti completati: 5 casi superati.');
+  console.log('Test API appuntamenti completati: 6 casi superati.');
 }
 
 run().catch((error) => {
