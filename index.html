@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="theme-color" content="#02030a" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>ilmionegozio.com - Cubo 3D interattivo</title>
   <meta name="description" content="Il sito originale di ilmionegozio.com con cubo 3D, occhi animati, maschera universo e sezioni digitali interattive.">
   <link rel="canonical" href="https://www.ilmionegozio.com/">
@@ -37,20 +39,24 @@
     body {
       width: 100%;
       height: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
+      min-height: 100%;
       margin: 0;
       overflow: hidden;
-      background: #222;
+      background: #02030a;
+      overscroll-behavior: none;
     }
     body {
+      position: fixed;
+      inset: 0;
       touch-action: manipulation;
     }
     canvas {
+      position: fixed;
+      inset: 0;
       display: block;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: #02030a;
     }
 
     #meteor-overlay {
@@ -79,12 +85,9 @@
     /* Overlay per gli occhi (decorativi) */
     .eyes-container {
       position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
       z-index: 10;
-      display: flex;
-      gap: 20px;
+      pointer-events: none;
     }
     .eye {
       position: fixed;
@@ -109,7 +112,7 @@
       transform: translate(-50%, -50%);
       will-change: transform;
     }
-    @media (max-width: 600px) {
+    @media (max-width: 600px), (hover: none) and (pointer: coarse) {
       #meteor-overlay {
         opacity: 0.58;
         mask-image: radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(0,0,0,0.12) 31%, #000 48%);
@@ -552,7 +555,8 @@
     function syncMobileLegend() {
       const legend = document.getElementById("mobile-legend");
       if (!legend) return;
-      legend.style.display = window.matchMedia("(max-width: 600px)").matches ? "block" : "none";
+      const mobileQuery = "(max-width: 600px), (hover: none) and (pointer: coarse)";
+      legend.style.display = window.matchMedia(mobileQuery).matches ? "block" : "none";
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -575,11 +579,20 @@
       showWebGLFallback();
     } else {
       try {
-    const isMobileViewport = window.matchMedia("(max-width: 600px)").matches;
+    const mobileViewportQuery = "(max-width: 600px), (hover: none) and (pointer: coarse)";
+    const isMobileViewport = window.matchMedia(mobileViewportQuery).matches;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function getSceneViewport() {
+      const viewport = window.visualViewport;
+      return {
+        width: Math.max(1, Math.ceil(viewport ? viewport.width : window.innerWidth)),
+        height: Math.max(1, Math.ceil(viewport ? viewport.height : window.innerHeight))
+      };
+    }
+    const initialSceneViewport = getSceneViewport();
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222); // fallback
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    scene.background = new THREE.Color(0x02030a); // fallback
+    const camera = new THREE.PerspectiveCamera(75, initialSceneViewport.width / initialSceneViewport.height, 0.1, 1000);
     camera.position.set(0, 0, 5);
     scene.add(camera);
 
@@ -596,7 +609,7 @@
       powerPreference: "high-performance"
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2));
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.setSize(initialSceneViewport.width, initialSceneViewport.height, false);
     renderer.domElement.setAttribute("role", "img");
     renderer.domElement.setAttribute("aria-label", "Scena 3D interattiva: cubo rotante e sistema di particelle.");
     renderer.domElement.style.cursor = "grab";
@@ -609,7 +622,8 @@
     function fitBackgroundTexture(texture) {
       if (!texture || !texture.image || !texture.image.width || !texture.image.height) return;
       const imageAspect = texture.image.width / texture.image.height;
-      const viewportAspect = window.innerWidth / Math.max(window.innerHeight, 1);
+      const viewport = getSceneViewport();
+      const viewportAspect = viewport.width / Math.max(viewport.height, 1);
 
       texture.wrapS = THREE.ClampToEdgeWrapping;
       texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -642,6 +656,8 @@
       new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true })
     ];
     const mainCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+    let baseCubeScale = isMobileViewport && initialSceneViewport.width > initialSceneViewport.height ? 1.28 : 1;
+    mainCube.scale.setScalar(baseCubeScale);
     scene.add(mainCube);
 
     // Secondo tracciato additivo: fa pulsare le diagonali colorate senza alterare i click.
@@ -673,8 +689,8 @@
     // Scariche elettriche nello spazio tra il cuore bianco e le facce colorate.
     const electricDischargeGroup = new THREE.Group();
     const electricBoltColors = [0xffffff, 0x67e8f9, 0x22d3ee, 0xa78bfa];
-    const electricBoltCount = isMobileViewport ? 5 : 9;
-    const electricBoltSegments = isMobileViewport ? 6 : 8;
+    const electricBoltCount = isMobileViewport ? 8 : 18;
+    const electricBoltSegments = isMobileViewport ? 7 : 9;
 
     function setElectricBoltAnchors(bolt) {
       const axis = Math.floor(Math.random() * 3);
@@ -733,13 +749,30 @@
       const boltMaterial = new THREE.LineBasicMaterial({
         color: electricBoltColors[boltIndex % electricBoltColors.length],
         transparent: true,
-        opacity: 0.58,
+        opacity: isMobileViewport ? 0.82 : 0.64,
         blending: THREE.AdditiveBlending,
         depthTest: false,
         depthWrite: false,
         toneMapped: false
       });
       const bolt = new THREE.Line(boltGeometry, boltMaterial);
+      const boltGlow = new THREE.Points(
+        boltGeometry,
+        new THREE.PointsMaterial({
+          color: electricBoltColors[boltIndex % electricBoltColors.length],
+          size: isMobileViewport ? 0.052 : 0.026,
+          sizeAttenuation: true,
+          transparent: true,
+          opacity: isMobileViewport ? 0.58 : 0.38,
+          blending: THREE.AdditiveBlending,
+          depthTest: false,
+          depthWrite: false,
+          toneMapped: false
+        })
+      );
+      boltGlow.renderOrder = 5;
+      bolt.userData.glow = boltGlow;
+      bolt.add(boltGlow);
       bolt.renderOrder = 4;
       refreshElectricBolt(bolt, 0, true);
       electricDischargeGroup.add(bolt);
@@ -969,8 +1002,11 @@
         if (timestamp >= bolt.userData.nextRefresh) {
           refreshElectricBolt(bolt, timestamp, timestamp >= bolt.userData.repositionsAt);
         }
-        const flicker = prefersReducedMotion ? 0.46 : 0.34 + Math.random() * 0.28;
+        const flicker = prefersReducedMotion
+          ? (isMobileViewport ? 0.72 : 0.52)
+          : (isMobileViewport ? 0.62 + Math.random() * 0.3 : 0.42 + Math.random() * 0.32);
         bolt.material.opacity = Math.min(0.95, flicker + linePulse * 0.8);
+        bolt.userData.glow.material.opacity = Math.min(0.9, flicker * 0.72 + linePulse * 0.72);
         totalIntensity += bolt.material.opacity;
       });
       if (!prefersReducedMotion) electricDischargeGroup.rotation.z += 0.0007;
@@ -1006,7 +1042,7 @@
       if (cubeClicked) {
         if (!animationStartTime) animationStartTime = timestamp;
         const elapsed = timestamp - animationStartTime;
-        const scaleFactor = 1 + (elapsed / animationDuration) * 0.5;
+        const scaleFactor = baseCubeScale * (1 + (elapsed / animationDuration) * 0.5);
         mainCube.scale.set(scaleFactor, scaleFactor, scaleFactor);
         if (elapsed >= animationDuration) {
           window.location.href = targetURL;
@@ -1036,12 +1072,14 @@
         return {
           innerScale: innerCube.userData.heartbeatScale || 1,
           innerFilled: innerCube.material.wireframe === false,
+          baseCubeScale,
           hypercubeLinePulse: hypercubePulse.userData.linePulse || 0,
           hypercubePulseScale: hypercubePulse.scale.x,
           hypercubePulseOpacity: hypercubePulseMaterials[0].opacity,
           electricBoltCount: electricDischargeGroup.children.length,
           electricIntensity: electricDischargeGroup.userData.intensity || 0,
           electricGeometryVersion: electricDischargeGroup.children[0]?.geometry.attributes.position.version || 0,
+          electricGlowPoints: electricDischargeGroup.children.every(bolt => Boolean(bolt.userData.glow)),
           miniCubeCount: miniCubes.length,
           miniCubesFilled: miniCubes.every(child => child.material.wireframe === false),
           miniCubeMaterials3D: miniCubes.every(child => child.material.isMeshStandardMaterial === true),
@@ -1053,13 +1091,31 @@
       }
     });
 
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+    function resizeScene() {
+      const viewport = getSceneViewport();
+      baseCubeScale = isMobileViewport && viewport.width > viewport.height ? 1.28 : 1;
+      if (!cubeClicked) mainCube.scale.setScalar(baseCubeScale);
+      camera.aspect = viewport.width / viewport.height;
       camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.matchMedia("(max-width: 600px)").matches ? 1.5 : 2));
-      renderer.setSize(window.innerWidth, window.innerHeight, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2));
+      renderer.setSize(viewport.width, viewport.height, false);
       fitBackgroundTexture(backgroundTexture);
-    });
+    }
+
+    let resizeFrame = 0;
+    function queueSceneResize() {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(resizeScene);
+    }
+    window.addEventListener("resize", queueSceneResize, { passive: true });
+    window.addEventListener("orientationchange", () => {
+      queueSceneResize();
+      window.setTimeout(resizeScene, 180);
+      window.setTimeout(resizeScene, 420);
+    }, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", queueSceneResize, { passive: true });
+    }
 
     // Occhi che seguono il mouse
     const eyes = document.querySelectorAll('.eye');

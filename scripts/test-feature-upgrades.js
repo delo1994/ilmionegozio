@@ -22,9 +22,13 @@ assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco in
 assert.match(index, /hypercubePulseMaterials[\s\S]*THREE\.AdditiveBlending/, "Le diagonali colorate devono avere un alone pulsante");
 assert.match(index, /hypercubePulse\.scale\.setScalar\(1\.006 \+ linePulse \* 0\.16\)/, "Il battito deve espandere il tracciato colorato");
 assert.match(index, /material\.opacity = 0\.06 \+ linePulse \* 1\.15/, "Il battito deve aumentare la luminosita delle diagonali");
-assert.match(index, /const electricBoltCount = isMobileViewport \? 5 : 9/, "Le scariche devono essere ottimizzate per desktop e mobile");
+assert.match(index, /const electricBoltCount = isMobileViewport \? 8 : 18/, "Le scariche devono essere numerose su desktop e leggibili su mobile");
 assert.match(index, /function refreshElectricBolt/, "Le scariche elettriche devono rigenerare il proprio percorso");
 assert.match(index, /mainCube\.add\(electricDischargeGroup\)/, "Le scariche devono occupare lo spazio interno dell'ipercubo");
+assert.match(index, /new THREE\.PointsMaterial/, "Le scariche devono avere nodi luminosi visibili su mobile");
+assert.match(index, /viewport-fit=cover/, "La homepage deve coprire le aree di sicurezza in orizzontale");
+assert.match(index, /viewport\.width > viewport\.height \? 1\.28 : 1/, "Il cubo deve restare leggibile con il telefono in orizzontale");
+assert.match(index, /\.eyes-container\s*\{[\s\S]*?inset:\s*0;[\s\S]*?pointer-events:\s*none;/, "Gli occhi devono restare distribuiti nel viewport senza creare zone bianche in basso");
 assert.match(index, /miniMat[\s\S]*wireframe:\s*false/, "I mini-cubi della legenda devono essere pieni");
 assert.match(index, /miniMat\s*=\s*new THREE\.MeshStandardMaterial/, "I mini-cubi devono avere materiali illuminati tridimensionali");
 assert.match(index, /new THREE\.EdgesGeometry\(miniGeo\)/, "I mini-cubi devono avere spigoli tridimensionali visibili");
