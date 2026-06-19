@@ -217,6 +217,9 @@
     const player = { x: canvas.width / 2, y: canvas.height - 50, size: 20, speed: 5 };
     const bullets = [], enemies = [], enemyBullets = [], hearts = [], keys = {};
     const pressedLetters = new Set();
+    const recentLetters = new Map();
+    const jailbreakLetters = ["d", "e", "l", "o"];
+    const JAILBREAK_CHORD_MS = 1200;
     let spaceFireInterval = null;
     let jailbreakTriggered = false;
 
@@ -252,23 +255,40 @@
       spaceFireInterval = null;
     }
 
-    function checkJailbreakCombo() {
+    function getJailbreakLetter(event) {
+      const codeMatch = /^Key([DELO])$/.exec(event.code || "");
+      if (codeMatch) return codeMatch[1].toLowerCase();
+      const key = String(event.key || "").toLowerCase();
+      return jailbreakLetters.includes(key) ? key : "";
+    }
+
+    function triggerJailbreak() {
       if (jailbreakTriggered || gameEnded) return;
-      if (["d", "e", "l", "o"].every(letter => pressedLetters.has(letter))) {
-        jailbreakTriggered = true;
-        gameEnded = true;
-        stopSpaceFire();
-        const overlay = document.getElementById("jailbreakOverlay");
-        overlay.classList.add("active");
-        document.getElementById("info").innerText = "YOU JAILBREAK THE CODE YOU WIN";
-        setTimeout(() => {
-          window.location.href = END_URL;
-        }, 1800);
-      }
+      jailbreakTriggered = true;
+      gameEnded = true;
+      stopSpaceFire();
+      const overlay = document.getElementById("jailbreakOverlay");
+      overlay.classList.add("active");
+      overlay.setAttribute("aria-hidden", "false");
+      document.documentElement.dataset.jailbreakState = "active";
+      document.getElementById("info").innerText = "YOU JAILBREAK THE CODE YOU WIN";
+      setTimeout(() => {
+        window.location.href = END_URL;
+      }, 1800);
+    }
+
+    function checkJailbreakCombo(now = performance.now()) {
+      if (jailbreakTriggered || gameEnded) return;
+      const simultaneous = jailbreakLetters.every(letter => pressedLetters.has(letter));
+      const quickChord = jailbreakLetters.every(letter => {
+        const pressedAt = recentLetters.get(letter);
+        return Number.isFinite(pressedAt) && now - pressedAt <= JAILBREAK_CHORD_MS;
+      });
+      if (simultaneous || quickChord) triggerJailbreak();
     }
 
     // Eventi da tastiera per desktop
-    document.addEventListener('keydown', e => {
+    window.addEventListener('keydown', e => {
       if (isTypingField(e.target)) return;
       keys[e.key] = true;
       if (e.code === 'Space') {
@@ -276,24 +296,42 @@
         startSpaceFire();
         return;
       }
-      if (/^[a-zA-Z]$/.test(e.key)) {
-        pressedLetters.add(e.key.toLowerCase());
-        checkJailbreakCombo();
+      const jailbreakLetter = getJailbreakLetter(e);
+      if (jailbreakLetter) {
+        const now = performance.now();
+        pressedLetters.add(jailbreakLetter);
+        if (!e.repeat) recentLetters.set(jailbreakLetter, now);
+        for (const [letter, pressedAt] of recentLetters) {
+          if (now - pressedAt > JAILBREAK_CHORD_MS) recentLetters.delete(letter);
+        }
+        checkJailbreakCombo(now);
       }
-    });
+    }, true);
 
-    document.addEventListener('keyup', e => {
+    window.addEventListener('keyup', e => {
       keys[e.key] = false;
       if (e.code === 'Space') {
         stopSpaceFire();
       }
-      if (/^[a-zA-Z]$/.test(e.key)) {
-        pressedLetters.delete(e.key.toLowerCase());
-      }
-    });
+      const jailbreakLetter = getJailbreakLetter(e);
+      if (jailbreakLetter) pressedLetters.delete(jailbreakLetter);
+    }, true);
     window.addEventListener("blur", () => {
       stopSpaceFire();
       pressedLetters.clear();
+      recentLetters.clear();
+    });
+
+    window.Round1Jailbreak = Object.freeze({
+      trigger: triggerJailbreak,
+      state: function() {
+        return {
+          triggered: jailbreakTriggered,
+          held: Array.from(pressedLetters),
+          recent: Array.from(recentLetters.keys()),
+          windowMs: JAILBREAK_CHORD_MS
+        };
+      }
     });
 
     // Eventi touch per dispositivi mobili: muovi il giocatore con il dito e spara automaticamente
@@ -473,6 +511,11 @@
     }
 
     function update() {
+      if (jailbreakTriggered) {
+        document.getElementById("info").innerText = "YOU JAILBREAK THE CODE YOU WIN";
+        requestAnimationFrame(update);
+        return;
+      }
       if(lives <= 0) {
         resetGame();
       }
@@ -653,5 +696,4 @@
   </footer>
 </body>
 </html>
-
 

@@ -14,6 +14,12 @@ for (const voice of ["Homer Simpson", "Donald Trump", "Gerry Scotti", "Maria De 
 assert.equal((index.match(/weight: 18, favorite: true/g) || []).length, 5, "Devono esserci cinque voci principali con lo stesso peso");
 assert.match(index, /favoriteProbability: 0\.9/, "Le voci principali devono coprire il 90% delle estrazioni");
 
+const round1 = read("Face4Round1.html");
+assert.match(round1, /JAILBREAK_CHORD_MS\s*=\s*1200/, "DELO deve accettare un accordo rapido per tastiere con rollover limitato");
+assert.match(round1, /getJailbreakLetter/, "DELO deve usare KeyboardEvent.code e key");
+assert.match(round1, /window\.Round1Jailbreak/, "Il Round1 deve esporre lo stato diagnostico dell'easter egg");
+assert.match(round1, /overlay\.setAttribute\("aria-hidden", "false"\)/, "L'overlay DELO deve diventare accessibile quando attivo");
+
 const face2 = read("face2.html");
 for (const role of ["cameraman", "steadycam", "regista", "assistente", "audio", "luci"]) {
   assert.match(face2, new RegExp(`data-role="${role}"`), `Face2 deve includere il ruolo ${role}`);
