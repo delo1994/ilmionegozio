@@ -9,6 +9,9 @@
   <link rel="preload" as="image" href="/static/background.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="audio" href="/static/Voce1.mp3" type="audio/mpeg">
   <link rel="preload" as="audio" href="/static/Voce2.mp3" type="audio/mpeg">
+  <link rel="preload" as="audio" href="/static/Voce3.mp3" type="audio/mpeg">
+  <link rel="preload" as="audio" href="/static/Voce4.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce5.mp3" type="audio/mpeg">
   <script src="/static/media-optimizer.js" type="text/javascript" data-cookieconsent="ignore"></script>
 
   <style>
@@ -881,14 +884,21 @@
   </script>
 
   <script data-cookieconsent="ignore">
-    // Audio iniziale: usa file MP3 leggeri e Web Audio dopo il primo gesto valido.
+    // Le cinque voci principali coprono il 90% delle estrazioni; le altre restano come sorprese rare.
     (function () {
       const audioFiles = [
-        { id: "voce1", src: "/static/Voce1.mp3" },
-        { id: "voce2", src: "/static/Voce2.mp3" },
-        { id: "voce3", src: "/static/Voce3.mp3" },
-        { id: "voce5", src: "/static/Voce5.mp3" }
+        { id: "homer-simpson", label: "Homer Simpson", src: "/static/Voce1.mp3", weight: 18, favorite: true },
+        { id: "donald-trump", label: "Donald Trump", src: "/static/Voce2.mp3", weight: 18, favorite: true },
+        { id: "gerry-scotti", label: "Gerry Scotti", src: "/static/Voce3.mp3", weight: 18, favorite: true },
+        { id: "maria-de-filippi", label: "Maria De Filippi", src: "/static/Voce4.wav", weight: 18, favorite: true },
+        { id: "goku", label: "Goku", src: "/static/Voce5.mp3", weight: 18, favorite: true },
+        { id: "sorpresa-6", label: "Voce sorpresa 6", src: "/static/Voce6.wav", weight: 2, favorite: false },
+        { id: "sorpresa-7", label: "Voce sorpresa 7", src: "/static/Voce7.wav", weight: 2, favorite: false },
+        { id: "sorpresa-8", label: "Voce sorpresa 8", src: "/static/Voce8.wav", weight: 2, favorite: false },
+        { id: "sorpresa-9", label: "Voce sorpresa 9", src: "/static/Voce9.wav", weight: 2, favorite: false },
+        { id: "sorpresa-10", label: "Voce sorpresa 10", src: "/static/Voce10.wav", weight: 2, favorite: false }
       ];
+      const favoriteFiles = audioFiles.filter(file => file.favorite);
       const buffers = new Map();
       const pending = new Map();
       const fallbackAudio = new Map();
@@ -897,11 +907,20 @@
 
       audioFiles.forEach(file => {
         const audio = new Audio(file.src);
-        const essential = file.id === "voce1" || file.id === "voce2";
-        audio.preload = essential ? "auto" : "none";
-        if (essential) audio.load();
+        audio.preload = file.favorite ? "auto" : "none";
+        if (file.favorite) audio.load();
         fallbackAudio.set(file.id, audio);
       });
+
+      function chooseWeightedFile() {
+        const total = audioFiles.reduce((sum, file) => sum + file.weight, 0);
+        let ticket = Math.random() * total;
+        for (const file of audioFiles) {
+          ticket -= file.weight;
+          if (ticket < 0) return file;
+        }
+        return favoriteFiles[0];
+      }
 
       function getContext() {
         if (ctx) return ctx;
@@ -962,8 +981,7 @@
 
       function warmEssentialAudio() {
         unlock().then(function () {
-          preload(audioFiles[0]);
-          preload(audioFiles[1]);
+          favoriteFiles.forEach(preload);
         });
       }
 
@@ -972,15 +990,19 @@
         audioStarted = true;
         document.documentElement.dataset.indexAudio = "started";
         unlock().then(function () {
-          const readyFiles = audioFiles.filter(file => buffers.has(file.id));
-          const pool = readyFiles.length ? readyFiles : audioFiles;
-          const file = pool[Math.floor(Math.random() * pool.length)];
+          const file = chooseWeightedFile();
+          document.documentElement.dataset.indexVoice = file.id;
           playFile(file);
-          audioFiles.forEach(preload);
+          favoriteFiles.forEach(preload);
         });
       }
 
       window.startIndexAudio = startIndexAudio;
+      window.IndexVoicePool = Object.freeze({
+        favorites: favoriteFiles.map(file => file.label),
+        favoriteProbability: 0.9,
+        choose: chooseWeightedFile
+      });
       document.documentElement.dataset.indexAudio = "ready";
 
       const idle = window.requestIdleCallback || function (callback) { return window.setTimeout(callback, 700); };

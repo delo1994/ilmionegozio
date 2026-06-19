@@ -7,6 +7,13 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
 
+const index = read("index.html");
+for (const voice of ["Homer Simpson", "Donald Trump", "Gerry Scotti", "Maria De Filippi", "Goku"]) {
+  assert.match(index, new RegExp(voice), `Il pool principale deve includere ${voice}`);
+}
+assert.equal((index.match(/weight: 18, favorite: true/g) || []).length, 5, "Devono esserci cinque voci principali con lo stesso peso");
+assert.match(index, /favoriteProbability: 0\.9/, "Le voci principali devono coprire il 90% delle estrazioni");
+
 const face2 = read("face2.html");
 for (const role of ["cameraman", "steadycam", "regista", "assistente", "audio", "luci"]) {
   assert.match(face2, new RegExp(`data-role="${role}"`), `Face2 deve includere il ruolo ${role}`);
