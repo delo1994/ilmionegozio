@@ -8,11 +8,16 @@ const root = path.join(__dirname, "..");
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
 
 const index = read("index.html");
-for (const voice of ["Homer Simpson", "Donald Trump", "Gerry Scotti", "Maria De Filippi", "Goku"]) {
-  assert.match(index, new RegExp(voice), `Il pool principale deve includere ${voice}`);
+for (const voice of [1, 2, 4, 5, 6, 7, 8, 9, 10]) {
+  assert.match(index, new RegExp(`Voce${voice}\\.wav`), `Il pool deve includere Voce${voice}.wav`);
 }
-assert.equal((index.match(/weight: 18, favorite: true/g) || []).length, 5, "Devono esserci cinque voci principali con lo stesso peso");
-assert.match(index, /favoriteProbability: 0\.9/, "Le voci principali devono coprire il 90% delle estrazioni");
+assert.doesNotMatch(index, /Voce3\.(?:mp3|wav)/, "La homepage non deve usare Voce3");
+assert.doesNotMatch(index, /Voce(?:1|2|4|5|6|7|8|9|10)\.mp3/, "La homepage deve usare esclusivamente WAV");
+assert.match(index, /function playFileFromGesture[\s\S]*audio\.play\(\)/, "L'audio mobile deve partire direttamente dal gesto utente");
+assert.match(index, /dataset\.indexPlayback = "playing"/, "La homepage deve esporre lo stato della riproduzione audio");
+for (const voice of [1, 2, 4, 5, 6, 7, 8, 9, 10]) {
+  assert.ok(fs.statSync(path.join(root, `static/Voce${voice}.wav`)).size > 0, `static/Voce${voice}.wav deve essere presente`);
+}
 assert.match(index, /id="meteor-overlay"/, "La homepage deve includere lo strato meteoriti");
 assert.match(index, /data-meteor-count="38"/, "Lo sciame deve includere molti meteoriti piccoli");
 assert.match(index, /meteoriti-spazio\.gif/, "La homepage deve caricare la GIF trasparente dei meteoriti");
@@ -50,6 +55,14 @@ for (const role of ["cameraman", "steadycam", "regista", "assistente", "audio", 
 }
 assert.match(face2, /\.film-crew[\s\S]*pointer-events:\s*none/, "La troupe non deve intercettare i click");
 assert.match(face2, /IlmioFilmCrew/, "Face2 deve esporre lo stato diagnostico della troupe");
+assert.match(face2, /class="curtain-valance"/, "Face2 deve avere una mantovana teatrale");
+assert.match(face2, /repeating-linear-gradient\(90deg, #3c0209/, "Il sipario deve avere pieghe in velluto rosso");
+assert.match(face2, /class="crew-skills"/, "Face2 deve presentare le competenze della troupe");
+for (const skill of ["Fotografia professionale", "Videomaking e regia", "Riprese con droni", "Color grading"]) {
+  assert.match(face2, new RegExp(skill), `Face2 deve includere ${skill}`);
+}
+assert.match(face2, /class="studio-drone"/, "Face2 deve includere il drone decorativo");
+assert.match(face2, /legacy-green-particles-disabled/, "Il vecchio sfondo a particelle deve restare disattivato");
 
 const face5 = read("face5.html");
 for (const title of ["Studio Creativo Premium", "Agenzia AI &amp; Marketing", "Portfolio Professionale Tech"]) {
@@ -99,6 +112,13 @@ assert.match(demo3, /id="collaborazioni"/);
 assert.match(demo3, /Parliamo del progetto/);
 
 const face1 = read("face1.html");
+assert.match(face1, /new THREE\.DodecahedronGeometry\(2, 0\)/, "Il solido giallo principale deve essere un dodecaedro");
+assert.match(face1, /octahedron\.name = "dodecahedron"/, "Il dodecaedro deve essere riconosciuto dal raycaster");
+assert.match(face1, /id="face1StoryBubble"/, "Face1 deve includere le nuvolette narrative");
+assert.match(face1, /window\.Face1Story/, "Face1 deve esporre lo stato della missione staff");
+for (const skill of ["Rhinoceros", "NURBS", "Blender", "Unity", "Unreal Engine"]) {
+  assert.match(face1, new RegExp(skill), `La storia Face1 deve includere ${skill}`);
+}
 for (const condition of ["crossedBoundary", "touchedDrive", "passedDriveLimit", "fallbackLimit"]) {
   assert.match(face1, new RegExp(condition), `Face1 deve controllare ${condition}`);
 }

@@ -9,11 +9,15 @@
   <meta name="description" content="Il sito originale di ilmionegozio.com con cubo 3D, occhi animati, maschera universo e sezioni digitali interattive.">
   <link rel="canonical" href="https://www.ilmionegozio.com/">
   <link rel="preload" as="image" href="/static/background.webp" type="image/webp" fetchpriority="high">
-  <link rel="preload" as="audio" href="/static/Voce1.mp3" type="audio/mpeg">
-  <link rel="preload" as="audio" href="/static/Voce2.mp3" type="audio/mpeg">
-  <link rel="preload" as="audio" href="/static/Voce3.mp3" type="audio/mpeg">
+  <link rel="preload" as="audio" href="/static/Voce1.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce2.wav" type="audio/wav">
   <link rel="preload" as="audio" href="/static/Voce4.wav" type="audio/wav">
-  <link rel="preload" as="audio" href="/static/Voce5.mp3" type="audio/mpeg">
+  <link rel="preload" as="audio" href="/static/Voce5.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce6.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce7.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce8.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce9.wav" type="audio/wav">
+  <link rel="preload" as="audio" href="/static/Voce10.wav" type="audio/wav">
   <script src="/static/media-optimizer.js" type="text/javascript" data-cookieconsent="ignore"></script>
 
   <style>
@@ -91,28 +95,48 @@
     }
     .eye {
       position: fixed;
-      background: #fff;
-      border: 2px solid #000;
+      background:
+        radial-gradient(circle at 36% 28%, rgba(255,255,255,0.98) 0 13%, transparent 14%),
+        radial-gradient(circle at 50% 56%, #eefcff 0 48%, #a9c8d6 70%, #516976 100%);
+      border: 2px solid rgba(5, 13, 20, 0.96);
       border-radius: 50%;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(255,255,255,0.28);
+      box-shadow:
+        0 8px 15px rgba(0,0,0,0.62),
+        0 0 14px rgba(135,225,255,0.38),
+        inset 7px 8px 10px rgba(255,255,255,0.82),
+        inset -8px -10px 13px rgba(20,47,62,0.48);
+      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.46));
+      transform-style: preserve-3d;
       will-change: transform;
     }
+    .eye::after {
+      content: "";
+      position: absolute;
+      inset: 4% 8% 47%;
+      border-radius: 50% 50% 42% 42%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));
+      pointer-events: none;
+    }
     .eye.eye1 { top: 8%; left: 8%; width: 40px; height: 40px; }
-    .eye.eye2 { top: 12%; right: 10%; width: 50px; height: 50px; }
+    .eye.eye2 { top: 3%; right: 2.5%; width: 50px; height: 50px; }
     .eye.eye3 { bottom: 15%; left: 15%; width: 45px; height: 45px; }
     .eye.eye4 { bottom: 10%; right: 12%; width: 55px; height: 55px; }
     .eye.eye5 { top: 5%; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; }
     .pupil {
       position: absolute;
-      background: #000;
+      background:
+        radial-gradient(circle at 38% 32%, #ffffff 0 9%, transparent 10%),
+        radial-gradient(circle, #05080a 0 42%, #16394d 43% 65%, #020405 66% 100%);
       border-radius: 50%;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.82), inset 0 0 7px rgba(79,206,255,0.7);
+      transform: translate(calc(-50% + var(--pupil-x, 0px)), calc(-50% + var(--pupil-y, 0px))) translateZ(5px);
       will-change: transform;
     }
     @media (max-width: 600px), (hover: none) and (pointer: coarse) {
+      .eye.eye2 { top: 18%; right: 4%; }
       #meteor-overlay {
         opacity: 0.58;
         mask-image: radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(0,0,0,0.12) 31%, #000 48%);
@@ -1131,7 +1155,8 @@
         const distance = Math.min(15, Math.hypot(deltaX, deltaY) / 20);
         const offsetX = distance * Math.cos(angle);
         const offsetY = distance * Math.sin(angle);
-        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        pupil.style.setProperty("--pupil-x", offsetX + "px");
+        pupil.style.setProperty("--pupil-y", offsetY + "px");
       });
     }
     document.addEventListener('mousemove', (event) => {
@@ -1149,42 +1174,32 @@
   </script>
 
   <script data-cookieconsent="ignore">
-    // Le cinque voci principali coprono il 90% delle estrazioni; le altre restano come sorprese rare.
+    // Pool WAV esclusivo: la riproduzione parte direttamente nel gesto utente anche su mobile.
     (function () {
-      const audioFiles = [
-        { id: "homer-simpson", label: "Homer Simpson", src: "/static/Voce1.mp3", weight: 18, favorite: true },
-        { id: "donald-trump", label: "Donald Trump", src: "/static/Voce2.mp3", weight: 18, favorite: true },
-        { id: "gerry-scotti", label: "Gerry Scotti", src: "/static/Voce3.mp3", weight: 18, favorite: true },
-        { id: "maria-de-filippi", label: "Maria De Filippi", src: "/static/Voce4.wav", weight: 18, favorite: true },
-        { id: "goku", label: "Goku", src: "/static/Voce5.mp3", weight: 18, favorite: true },
-        { id: "sorpresa-6", label: "Voce sorpresa 6", src: "/static/Voce6.wav", weight: 2, favorite: false },
-        { id: "sorpresa-7", label: "Voce sorpresa 7", src: "/static/Voce7.wav", weight: 2, favorite: false },
-        { id: "sorpresa-8", label: "Voce sorpresa 8", src: "/static/Voce8.wav", weight: 2, favorite: false },
-        { id: "sorpresa-9", label: "Voce sorpresa 9", src: "/static/Voce9.wav", weight: 2, favorite: false },
-        { id: "sorpresa-10", label: "Voce sorpresa 10", src: "/static/Voce10.wav", weight: 2, favorite: false }
-      ];
-      const favoriteFiles = audioFiles.filter(file => file.favorite);
+      const allowedVoiceNumbers = [1, 2, 4, 5, 6, 7, 8, 9, 10];
+      const audioFiles = allowedVoiceNumbers.map(number => ({
+        id: "voce-" + number,
+        label: "Voce " + number,
+        src: "/static/Voce" + number + ".wav"
+      }));
       const buffers = new Map();
       const pending = new Map();
       const fallbackAudio = new Map();
       let ctx = null;
       let audioStarted = false;
+      let activeAudio = null;
 
       audioFiles.forEach(file => {
         const audio = new Audio(file.src);
-        audio.preload = file.favorite ? "auto" : "none";
-        if (file.favorite) audio.load();
+        audio.preload = "auto";
+        audio.playsInline = true;
+        audio.setAttribute("playsinline", "");
+        audio.load();
         fallbackAudio.set(file.id, audio);
       });
 
-      function chooseWeightedFile() {
-        const total = audioFiles.reduce((sum, file) => sum + file.weight, 0);
-        let ticket = Math.random() * total;
-        for (const file of audioFiles) {
-          ticket -= file.weight;
-          if (ticket < 0) return file;
-        }
-        return favoriteFiles[0];
+      function chooseVoiceFile() {
+        return audioFiles[Math.floor(Math.random() * audioFiles.length)];
       }
 
       function getContext() {
@@ -1228,53 +1243,66 @@
         return job;
       }
 
-      function playFile(file) {
+      function playDecodedFile(file) {
         const audioCtx = getContext();
-        if (audioCtx && buffers.has(file.id)) {
-          const source = audioCtx.createBufferSource();
-          source.buffer = buffers.get(file.id);
-          source.connect(audioCtx.destination);
-          source.start(0);
-          return Promise.resolve(true);
-        }
-        preload(file);
-        const audio = fallbackAudio.get(file.id);
-        if (!audio) return Promise.resolve(false);
-        try { audio.currentTime = 0; } catch (error) {}
-        return audio.play().then(function () { return true; }).catch(function () { return false; });
+        if (!audioCtx || !buffers.has(file.id)) return false;
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffers.get(file.id);
+        source.connect(audioCtx.destination);
+        source.start(0);
+        return true;
       }
 
-      function warmEssentialAudio() {
+      function playFileFromGesture(file) {
+        const audio = fallbackAudio.get(file.id);
+        if (!audio) return false;
+        if (activeAudio && activeAudio !== audio) {
+          activeAudio.pause();
+          try { activeAudio.currentTime = 0; } catch (error) {}
+        }
+        activeAudio = audio;
+        try { audio.currentTime = 0; } catch (error) {}
+        document.documentElement.dataset.indexPlayback = "pending";
+        const playback = audio.play();
+        if (playback && typeof playback.then === "function") {
+          playback.then(function () {
+            document.documentElement.dataset.indexPlayback = "playing";
+          }).catch(function () {
+            document.documentElement.dataset.indexPlayback = "fallback";
+            unlock().then(function () {
+              return preload(file);
+            }).then(function () {
+              if (playDecodedFile(file)) document.documentElement.dataset.indexPlayback = "playing-web-audio";
+            });
+          });
+        } else {
+          document.documentElement.dataset.indexPlayback = "playing";
+        }
         unlock().then(function () {
-          favoriteFiles.forEach(preload);
+          preload(file);
         });
+        return true;
       }
 
       function startIndexAudio() {
-        if (audioStarted) return;
+        if (audioStarted) return false;
         audioStarted = true;
         document.documentElement.dataset.indexAudio = "started";
-        unlock().then(function () {
-          const file = chooseWeightedFile();
-          document.documentElement.dataset.indexVoice = file.id;
-          playFile(file);
-          favoriteFiles.forEach(preload);
-        });
+        const file = chooseVoiceFile();
+        document.documentElement.dataset.indexVoice = file.id;
+        return playFileFromGesture(file);
       }
 
       window.startIndexAudio = startIndexAudio;
       window.IndexVoicePool = Object.freeze({
-        favorites: favoriteFiles.map(file => file.label),
-        favoriteProbability: 0.9,
-        choose: chooseWeightedFile
+        files: audioFiles.map(file => file.src),
+        format: "wav",
+        choose: chooseVoiceFile
       });
       document.documentElement.dataset.indexAudio = "ready";
 
-      const idle = window.requestIdleCallback || function (callback) { return window.setTimeout(callback, 700); };
-      idle(warmEssentialAudio, { timeout: 1200 });
-
       // Desktop conserva il vecchio comportamento: primo gesto = audio.
-      if (!window.matchMedia("(max-width: 600px)").matches) {
+      if (!window.matchMedia("(max-width: 600px), (hover: none) and (pointer: coarse)").matches) {
         document.addEventListener("pointerdown", startIndexAudio, { once: true, passive: true });
       }
     })();

@@ -10,7 +10,7 @@
     /* Stili generali */
     body {
       margin: 0;
-      background: #003300; /* Verde scuro per il background */
+      background: #032b1d;
       color: #fff;
       font-family: 'Courier New', Courier, monospace;
       overflow: hidden; /* La pagina principale non è scrollabile */
@@ -27,21 +27,41 @@
       position: relative;
       width: 100%;
       height: 100vh;
-      border: 40px solid #004d00; /* bordo verde leggermente più chiaro */
+      overflow: hidden;
+      border: 40px solid #15392e;
       box-sizing: border-box;
-      background: #003300;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+      background: #075c36;
+      box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.82), 0 0 0 2px #081a14;
     }
     /* Schermo Cinema */
     .cinema-screen {
       position: relative;
       width: 100%;
       height: 100%;
-      background: url('/static/background.webp') center/cover no-repeat;
+      background-color: #087a43;
+      background-image:
+        radial-gradient(ellipse at 50% 38%, rgba(55,196,112,0.32), transparent 48%),
+        radial-gradient(ellipse at center, transparent 42%, rgba(0,35,19,0.66) 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, rgba(0,0,0,0.035) 1px 3px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 4px),
+        linear-gradient(112deg, #075f38, #109052 46%, #087342 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: flicker 5s infinite;
+      animation: clothLight 7s ease-in-out infinite alternate;
+      isolation: isolate;
+    }
+    .cinema-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.48;
+      background:
+        linear-gradient(90deg, transparent 49.8%, rgba(210,255,225,0.11) 50%, transparent 50.2%),
+        repeating-linear-gradient(92deg, transparent 0 84px, rgba(0,48,26,0.1) 85px 87px, transparent 88px 172px);
+      mix-blend-mode: soft-light;
     }
     /* Contenitore per il contenuto interno scrollabile */
     .content {
@@ -83,6 +103,27 @@
       height: auto;
       margin-bottom: 10px;
     }
+    .crew-skills {
+      margin: 24px 0 8px;
+      text-align: left;
+    }
+    .crew-skills h2 { margin: 0 0 7px; color: #baffce; font-size: 1.55rem; text-align: center; }
+    .crew-skills > p { margin: 0 auto 15px; max-width: 680px; color: rgba(255,255,255,0.8); font-size: 0.96rem; text-align: center; }
+    .crew-skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .crew-skill {
+      min-height: 132px;
+      padding: 13px;
+      border: 1px solid rgba(181,255,202,0.28);
+      border-radius: 6px;
+      background: rgba(3,35,22,0.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 20px rgba(0,0,0,0.22);
+    }
+    .crew-skill strong { display: block; margin-bottom: 6px; color: #d9ffe3; font-size: 0.93rem; }
+    .crew-skill span { display: block; color: rgba(255,255,255,0.7); font: 0.78rem/1.42 Arial, sans-serif; }
     a.back-link {
       display: inline-block;
       margin-top: 20px;
@@ -122,6 +163,47 @@
       pointer-events: none;
       overflow: hidden;
     }
+    .studio-drone {
+      position: absolute;
+      right: 8%;
+      top: 18%;
+      z-index: 2;
+      width: 74px;
+      height: 28px;
+      pointer-events: none;
+      animation: droneFlight 7s ease-in-out infinite alternate;
+      filter: drop-shadow(0 8px 8px rgba(0,0,0,0.5));
+    }
+    .studio-drone::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 7px;
+      width: 28px;
+      height: 15px;
+      border-radius: 5px 5px 10px 10px;
+      background: linear-gradient(180deg, #d9e4e0, #384841);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+    }
+    .studio-drone::after {
+      content: "";
+      position: absolute;
+      left: 33px;
+      top: 20px;
+      width: 10px;
+      height: 8px;
+      border-radius: 50%;
+      background: #07120e;
+      box-shadow: inset 0 0 0 2px #5ed69d;
+    }
+    .drone-arm { position: absolute; top: 10px; width: 28px; height: 4px; background: #202b27; }
+    .drone-arm.left { left: 3px; transform: rotate(-12deg); }
+    .drone-arm.right { right: 1px; transform: rotate(12deg); }
+    .drone-rotor { position: absolute; top: 3px; width: 24px; height: 3px; border-radius: 50%; background: rgba(225,255,240,0.8); animation: rotorSpin 0.12s linear infinite; }
+    .drone-rotor.left { left: 0; }
+    .drone-rotor.right { right: 0; }
+    @keyframes droneFlight { from { transform: translate3d(-20px, 0, 0) rotate(-2deg); } to { transform: translate3d(22px, 12px, 0) rotate(3deg); } }
+    @keyframes rotorSpin { to { transform: rotateY(180deg) scaleX(0.35); } }
     .crew-member {
       position: absolute;
       bottom: 12%;
@@ -582,37 +664,78 @@
     .curtain {
       position: absolute;
       top: 0;
-      width: 50%;
+      width: 52%;
       height: 100%;
-      background: #005500;
-      z-index: 2;
-      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-      transform-origin: center;
-      animation-duration: 3s;
+      z-index: 6;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(20,0,3,0.9), transparent 5% 95%, rgba(20,0,3,0.92)),
+        repeating-linear-gradient(90deg, #3c0209 0 5%, #8f1020 9%, #c2293a 13%, #6d0916 18%, #2b0107 22%);
+      box-shadow: inset 0 0 46px rgba(0,0,0,0.9), 0 8px 24px rgba(0,0,0,0.68);
+      transform-origin: top center;
+      animation-duration: 4.2s;
+      animation-timing-function: cubic-bezier(0.58, 0.05, 0.18, 1);
       animation-fill-mode: forwards;
+    }
+    .curtain::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,190,177,0.14), transparent 18%, rgba(0,0,0,0.16) 62%, rgba(0,0,0,0.55));
+      mix-blend-mode: screen;
+    }
+    .curtain::after {
+      content: "";
+      position: absolute;
+      top: 55%;
+      width: 28px;
+      height: 9px;
+      border: 2px solid #d6ad52;
+      border-radius: 50%;
+      background: linear-gradient(#f4d986, #8b6421);
+      box-shadow: 0 2px 7px rgba(0,0,0,0.7);
     }
     .curtain.left {
       left: 0;
-      transform: perspective(800px) rotateY(0deg);
+      transform-origin: left top;
       animation-name: openCurtainLeft;
     }
+    .curtain.left::after { right: 4%; }
     .curtain.right {
       right: 0;
-      transform: perspective(800px) rotateY(0deg);
+      transform-origin: right top;
       animation-name: openCurtainRight;
     }
+    .curtain.right::after { left: 4%; }
+    .curtain-valance {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 7;
+      height: 78px;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 10% -10%, #bd2537 0 48%, transparent 50%) 0 0 / 20% 100% repeat-x,
+        linear-gradient(180deg, #8e1020, #3a0209 82%, #d6ad52 84% 90%, #3a0209 92%);
+      filter: drop-shadow(0 8px 9px rgba(0,0,0,0.62));
+      animation: liftValance 4.2s cubic-bezier(0.58,0.05,0.18,1) forwards;
+    }
     @keyframes openCurtainLeft {
-      0% { transform: perspective(800px) rotateY(0deg); }
-      100% { transform: perspective(800px) rotateY(40deg) translateX(-100%); }
+      0%, 12% { transform: perspective(900px) translateX(0) scaleX(1) skewY(0); }
+      58% { transform: perspective(900px) translateX(-48%) scaleX(0.72) skewY(2deg); }
+      100% { transform: perspective(900px) translateX(-82%) scaleX(0.43) skewY(4deg); }
     }
     @keyframes openCurtainRight {
-      0% { transform: perspective(800px) rotateY(0deg); }
-      100% { transform: perspective(800px) rotateY(-40deg) translateX(100%); }
+      0%, 12% { transform: perspective(900px) translateX(0) scaleX(1) skewY(0); }
+      58% { transform: perspective(900px) translateX(48%) scaleX(0.72) skewY(-2deg); }
+      100% { transform: perspective(900px) translateX(82%) scaleX(0.43) skewY(-4deg); }
     }
     /* Effetto flicker opzionale sullo schermo */
-    @keyframes flicker {
-      0%, 100% { opacity: 0.9; }
-      50% { opacity: 1; }
+    @keyframes liftValance { 0%, 28% { transform: translateY(0); } 100% { transform: translateY(-54px); } }
+    @keyframes clothLight {
+      from { filter: brightness(0.92) saturate(0.95); }
+      to { filter: brightness(1.05) saturate(1.08); }
     }
     /* Footer: usa Flexbox per distribuire il contenuto */
     .footer {
@@ -671,6 +794,9 @@
         flex: 0 0 auto;
         margin-right: 10px;
       }
+      .crew-skills-grid { grid-template-columns: 1fr; }
+      .crew-skill { min-height: 0; }
+      .curtain-valance { height: 54px; }
       .crew-member {
         bottom: 3%;
         width: 62px;
@@ -765,6 +891,7 @@
       <!-- Tende Cinepresa -->
       <div class="curtain left"></div>
       <div class="curtain right"></div>
+      <div class="curtain-valance" aria-hidden="true"></div>
 
       <div class="cinema-screen">
         <div class="film-crew" aria-hidden="true" data-ready="false">
@@ -787,11 +914,24 @@
             <div class="crew-avatar"><span class="crew-head"></span><span class="crew-eye left"></span><span class="crew-eye right"></span><span class="crew-mouth"></span><span class="crew-body"></span><span class="crew-arm left"></span><span class="crew-arm right"></span><span class="crew-legs"></span><span class="light-stand"></span><span class="light-beam"></span><span class="crew-callout">Luce pronta!</span></div>
           </div>
         </div>
+        <div class="studio-drone" aria-hidden="true"><span class="drone-arm left"></span><span class="drone-arm right"></span><span class="drone-rotor left"></span><span class="drone-rotor right"></span></div>
         <div class="content" aria-labelledby="page-title">
           <h1 id="page-title">Montaggio Video</h1>
           <p>
-            Vivi un'esperienza immersiva. Scopri le nostre competenze in software di montaggio video e grafica: Adobe Illustrator, Photoshop, Da Vinci Resolve, Capcut e altri.
+            Vivi un set immersivo con fotografi, videomaker, operatori drone e specialisti di post-produzione. Seguiamo il progetto dal sopralluogo alla consegna finale.
           </p>
+          <section class="crew-skills" aria-labelledby="crew-skills-title">
+            <h2 id="crew-skills-title">Competenze della troupe</h2>
+            <p>Una squadra coordinata per immagini, riprese, audio e contenuti destinati a web, social, advertising ed eventi.</p>
+            <div class="crew-skills-grid">
+              <article class="crew-skill"><strong>Fotografia professionale</strong><span>Still life, ritratto, corporate, eventi, illuminazione da studio e sviluppo colore coerente.</span></article>
+              <article class="crew-skill"><strong>Videomaking e regia</strong><span>Scaletta, storyboard, interviste, multicamera, movimenti stabilizzati e direzione sul set.</span></article>
+              <article class="crew-skill"><strong>Riprese con droni</strong><span>Pianificazione delle inquadrature aeree e operazioni svolte nel rispetto delle regole applicabili e della sicurezza.</span></article>
+              <article class="crew-skill"><strong>Montaggio e ritmo</strong><span>DaVinci Resolve, CapCut e workflow professionali per spot, reel, documentari e video aziendali.</span></article>
+              <article class="crew-skill"><strong>Color grading</strong><span>Correzione primaria, look creativo, gestione incarnati e uniformità tra camere differenti.</span></article>
+              <article class="crew-skill"><strong>Audio e consegna</strong><span>Registrazione in presa diretta, pulizia voce, sound design, sottotitoli ed esportazioni ottimizzate.</span></article>
+            </div>
+          </section>
           <div class="programs">
             <div class="program">
               <img src="/static/adobe_illustrator.png" alt="Logo Adobe Illustrator" loading="lazy" decoding="async">
@@ -943,8 +1083,8 @@
       }
     });
   </script>
-  <script>
-    // Creazione del greenRenderer per le particelle
+  <script type="text/plain" id="legacy-green-particles-disabled">
+    // Renderer storico disattivato: il fondale attivo e il panno verde CSS.
     const greenScene = new THREE.Scene();
     const greenCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     greenCamera.position.z = 5;
@@ -986,6 +1126,3 @@
   </script>
 </body>
 </html>
-
-
-

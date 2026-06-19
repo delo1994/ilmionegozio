@@ -80,6 +80,59 @@
       display: block;
       animation: coffeeFlashPulse 0.42s ease-out both;
     }
+    .face1-story-bubble {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 430;
+      width: min(360px, calc(100vw - 30px));
+      padding: 16px 18px 14px;
+      border: 3px solid #10151b;
+      border-radius: 48% 44% 46% 42% / 42% 48% 44% 46%;
+      color: #10151b;
+      background: #fffef4;
+      box-shadow: 7px 9px 0 rgba(8,18,28,0.8), 0 0 28px rgba(72,215,255,0.38);
+      font: 700 0.94rem/1.42 Arial, sans-serif;
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 28px)) scale(0.92) rotate(-1deg);
+      opacity: 0;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .face1-story-bubble[hidden] { display: none; }
+    .face1-story-bubble.active {
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 28px)) scale(1) rotate(-1deg);
+      animation: storyBubbleFloat 2.8s ease-in-out infinite;
+    }
+    .face1-story-bubble::after {
+      content: "";
+      position: absolute;
+      left: 48%;
+      bottom: -22px;
+      width: 28px;
+      height: 28px;
+      border-right: 3px solid #10151b;
+      border-bottom: 3px solid #10151b;
+      background: #fffef4;
+      transform: rotate(45deg) skew(-7deg, -7deg);
+    }
+    .face1-story-bubble strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #006a8c;
+      font: 900 0.75rem/1.2 "Courier New", monospace;
+      text-transform: uppercase;
+    }
+    .face1-story-progress {
+      display: block;
+      margin-top: 8px;
+      color: #5e3d00;
+      font: 700 0.72rem/1.2 "Courier New", monospace;
+    }
+    @keyframes storyBubbleFloat {
+      0%, 100% { margin-top: 0; }
+      50% { margin-top: -7px; }
+    }
     @keyframes miniGameGlow {
       from { filter: brightness(1); }
       to { filter: brightness(1.35); }
@@ -254,6 +307,7 @@
       .face1-arcade-footer { align-items: flex-start; flex-direction: column; padding: 12px 14px; }
       .face1-arcade-footer p { font-size: 0.82rem; }
       .face1-arcade-restart { width: 100%; min-height: 42px; }
+      .face1-story-bubble { width: min(310px, calc(100vw - 24px)); padding: 13px 15px 12px; font-size: 0.82rem; }
     }
   </style>
   <!-- Includi fflate per FBXLoader se necessario -->
@@ -280,19 +334,24 @@
 <body>
   <!-- Istruzioni accessibili (visibili solo ai lettori di schermo) -->
   <div class="sr-only" id="accessibility-instructions">
-    Utilizza il mouse (o tocca lo schermo su mobile) per interagire con gli oggetti 3D. Clicca sul terreno per far volare Charizard, sulla sfera per il Facehugger, sull'ottaedro per cambiare colore. Dopo 10 click sull'ottaedro apparirà il personaggio controllabile; su desktop usa le frecce, su mobile trascina il dito per spostarlo.
+    Utilizza il mouse o tocca lo schermo per interagire con gli oggetti 3D. Ogni oggetto apre un capitolo sulle competenze dello staff. Il dodecaedro giallo racconta la modellazione Rhinoceros e dopo 10 click sblocca il personaggio controllabile.
   </div>
 
   <!-- Contenitore informativo -->
   <div id="info" role="status" aria-live="polite">
     <h1>Ambienti 3D & Animazioni Interattive</h1>
     <p id="message">
-      Clicca sugli oggetti per interagire: sul terreno per far volare Charizard, sulla sfera per il Facehugger, sull'ottaedro per cambiare colore. Dopo 10 click sull'ottaedro apparirà il personaggio controllabile!
+      Clicca sugli oggetti per avanzare nella missione dello staff 3D. Il dodecaedro giallo racconta Rhinoceros; gli altri personaggi sbloccano competenze e minigiochi.
     </p>
     <a id="back-link" href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
   </div>
   <div id="miniGameHud" aria-live="polite"></div>
   <div id="coffeeFlash" aria-hidden="true"></div>
+  <aside class="face1-story-bubble" id="face1StoryBubble" role="status" aria-live="polite" hidden>
+    <strong id="face1StoryTitle">Missione staff 3D</strong>
+    <span id="face1StoryText"></span>
+    <span class="face1-story-progress" id="face1StoryProgress"></span>
+  </aside>
 
   <section class="face1-arcade" id="face1Arcade" role="dialog" aria-modal="true" aria-labelledby="face1ArcadeTitle" aria-hidden="true">
     <button class="face1-arcade-backdrop" type="button" aria-label="Chiudi il minigioco"></button>
@@ -319,7 +378,7 @@
     let charizard = null;     // Modello Charizard
     let facehugger = null;    // Modello Facehugger interattivo
     let character = null;     // Personaggio controllabile (modello 3D)
-    let octaClickCount = 0;   // Contatore click sull'ottaedro
+    let octaClickCount = 0;   // Contatore click sul dodecaedro
     let mixer;                // AnimationMixer globale
     let charizardColorStep = 0;
     let octaMiniGameActive = false;
@@ -346,6 +405,63 @@
     ];
     const miniGameHud = document.getElementById("miniGameHud");
     const coffeeFlash = document.getElementById("coffeeFlash");
+    const storyBubble = document.getElementById("face1StoryBubble");
+    const storyTitle = document.getElementById("face1StoryTitle");
+    const storyText = document.getElementById("face1StoryText");
+    const storyProgressLabel = document.getElementById("face1StoryProgress");
+    const storyCompleted = new Set();
+    const storyChapters = {
+      concept: { title: "Capitolo 1 - Concept", text: "Partiamo da briefing, schizzi e riferimenti. Il nostro staff traduce l'idea in proporzioni, volumi e una direzione artistica pronta per il 3D." },
+      rhino: { title: "Capitolo 2 - Rhinoceros", text: "Tecnici qualificati modellano superfici NURBS precise con Rhinoceros: curve, raccordi, tolleranze, solidi chiusi e file adatti a rendering, prototipazione e stampa 3D." },
+      scanning: { title: "Capitolo 3 - Dal reale al digitale", text: "Usiamo fotogrammetria, scansione e retopology per trasformare persone e oggetti reali in modelli puliti, misurabili e ottimizzati." },
+      animation: { title: "Capitolo 4 - Rig e animazione", text: "Rigger e animatori preparano scheletri, pesi, pose e movimenti credibili. Il modello viene testato in tempo reale prima della consegna." },
+      materials: { title: "Capitolo 5 - Materiali e rendering", text: "Creiamo UV, texture PBR, luci e materiali con Blender, Substance 3D e motori realtime. Ogni superficie reagisce correttamente alla luce." },
+      delivery: { title: "Capitolo 6 - Pipeline completa", text: "Lo staff integra Rhinoceros, Blender, 3ds Max, Maya, Unity e Unreal Engine. Consegniamo modelli verificati per web, AR, VR, video, configuratori e produzione." }
+    };
+    let activeStoryTarget = null;
+    let storyExpiresAt = 0;
+    const storyPosition = new THREE.Vector3();
+    const storyBox = new THREE.Box3();
+
+    function positionStoryBubble() {
+      if (!activeStoryTarget || storyBubble.hidden) return;
+      activeStoryTarget.updateMatrixWorld(true);
+      storyBox.setFromObject(activeStoryTarget);
+      if (!storyBox.isEmpty()) storyBox.getCenter(storyPosition);
+      else activeStoryTarget.getWorldPosition(storyPosition);
+      storyPosition.project(camera);
+      const x = (storyPosition.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-storyPosition.y * 0.5 + 0.5) * window.innerHeight;
+      storyBubble.style.left = Math.max(170, Math.min(window.innerWidth - 170, x)) + "px";
+      storyBubble.style.top = Math.max(170, Math.min(window.innerHeight - 70, y)) + "px";
+    }
+
+    function showStoryBubble(chapterKey, target) {
+      const chapter = storyChapters[chapterKey] || storyChapters.delivery;
+      storyCompleted.add(chapterKey);
+      activeStoryTarget = target || null;
+      storyTitle.textContent = chapter.title;
+      storyText.textContent = chapter.text;
+      storyProgressLabel.textContent = "Missione staff: " + storyCompleted.size + " / " + Object.keys(storyChapters).length + " competenze scoperte";
+      storyBubble.hidden = false;
+      storyBubble.classList.remove("active");
+      requestAnimationFrame(function () {
+        if (activeStoryTarget) positionStoryBubble();
+        else {
+          storyBubble.style.left = "50%";
+          storyBubble.style.top = "38%";
+        }
+        storyBubble.classList.add("active");
+      });
+      storyExpiresAt = performance.now() + 7200;
+      document.documentElement.dataset.face1Story = chapterKey;
+      document.documentElement.dataset.face1StoryProgress = String(storyCompleted.size);
+    }
+
+    window.Face1Story = Object.freeze({
+      show: function(chapterKey) { showStoryBubble(chapterKey, null); },
+      state: function() { return { chapter: document.documentElement.dataset.face1Story || null, completed: Array.from(storyCompleted) }; }
+    });
     const face1Audio = window.IlmioMedia ? window.IlmioMedia.createAudioPool([
       { id: "slice", src: "/static/slice.wav" },
       { id: "hit", src: "/static/doh.wav" }
@@ -432,13 +548,13 @@
     ground.name = "ground";
     scene.add(ground);
 
-    // === Ottaedro Rotante ===
-    const octaGeometry = new THREE.OctahedronGeometry(2, 0);
-    const octaMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
+    // === Dodecaedro giallo rotante ===
+    const octaGeometry = new THREE.DodecahedronGeometry(2, 0);
+    const octaMaterial = new THREE.MeshStandardMaterial({ color: 0xffd400, roughness: 0.28, metalness: 0.22 });
     const octahedron = new THREE.Mesh(octaGeometry, octaMaterial);
     octahedron.position.set(-6, 2, 0);
     octahedron.castShadow = true;
-    octahedron.name = "octahedron";
+    octahedron.name = "dodecahedron";
     scene.add(octahedron);
 
     // === Sfera Riflettente ===
@@ -558,12 +674,15 @@
         document.getElementById('message').textContent = "Il minigioco 3D non e disponibile su questo dispositivo.";
         return false;
       }
+      const chapterByGame = { virtual: "scanning", diamond: "materials", coffee: "delivery" };
+      showStoryBubble(chapterByGame[type] || "delivery", null);
       return window.Face1Arcade.start(type, trigger || renderer.domElement);
     }
 
     function registerFacehuggerClick(trigger) {
       if (!facehugger || facehuggerGameStarted) return;
       facehuggerClickCount += 1;
+      showStoryBubble("scanning", facehugger);
       document.documentElement.dataset.facehuggerClicks = String(facehuggerClickCount);
       tintModel(facehugger, new THREE.Color().setHSL((0.48 + facehuggerClickCount * 0.08) % 1, 0.86, 0.55));
       document.getElementById('message').textContent = "Facehugger: " + facehuggerClickCount + " / 5 tocchi per aprire il Portale VR.";
@@ -673,6 +792,7 @@
 
     function changeCharizardColor() {
       if (!charizard) return;
+      showStoryBubble("animation", charizard);
       charizardColorStep += 1;
       const color = new THREE.Color().setHSL((charizardColorStep * 0.17) % 1, 0.92, 0.58);
       tintModel(charizard, color);
@@ -719,7 +839,7 @@
         roughness: 0.42,
         metalness: 0.25
       });
-      const mini = new THREE.Mesh(new THREE.OctahedronGeometry(size, 0), material);
+      const mini = new THREE.Mesh(new THREE.DodecahedronGeometry(size, 0), material);
       mini.name = "miniOctaTarget";
       mini.position.set(
         THREE.MathUtils.randFloat(-12, 12),
@@ -741,8 +861,8 @@
       octaMiniGameActive = true;
       octaMiniGameDestroyed = 0;
       octaMiniGameSpawnTimer = 0;
-      setMiniGameHud("MINIGIOCO OTTAEDRI: taglia 20 ottaedri");
-      document.getElementById('message').textContent = "Minigioco avviato: rompi 20 ottaedri!";
+      setMiniGameHud("MINIGIOCO DODECAEDRI: taglia 20 solidi");
+      document.getElementById('message').textContent = "Minigioco avviato: rompi 20 dodecaedri!";
       for (let i = 0; i < 12; i++) spawnMiniOctahedron();
       if (face1Audio) face1Audio.preload(["slice", "hit"]);
     }
@@ -751,7 +871,7 @@
       octaMiniGameActive = false;
       octaMiniGameSlicing = false;
       octaMiniGameTargets.splice(0).forEach(target => scene.remove(target));
-      setMiniGameHud("MINIGIOCO COMPLETATO: 20 OTTAEDRI DISTRUTTI", true);
+      setMiniGameHud("MINIGIOCO COMPLETATO: 20 DODECAEDRI DISTRUTTI", true);
       document.getElementById('message').textContent = "Minigioco completato! Sei tornato all'esperienza principale.";
       setTimeout(() => {
         setMiniGameHud("", false);
@@ -767,7 +887,7 @@
       scene.remove(target);
       const index = octaMiniGameTargets.indexOf(target);
       if (index >= 0) octaMiniGameTargets.splice(index, 1);
-      setMiniGameHud("OTTAEDRI DISTRUTTI: " + octaMiniGameDestroyed + " / 20");
+      setMiniGameHud("DODECAEDRI DISTRUTTI: " + octaMiniGameDestroyed + " / 20");
       if (octaMiniGameDestroyed >= 20) {
         endOctaMiniGame();
       }
@@ -896,6 +1016,7 @@
     function startCoffeeGame(trigger) {
       if (coffeeGameStarted) return false;
       coffeeGameStarted = true;
+      showStoryBubble("materials", coffeeProjectile || coffeeDiamond || spacedrive);
       document.documentElement.dataset.coffeeGame = "playing";
       document.getElementById('message').textContent = "Barista Orbitale avviato: raccogli i chicchi di caffe!";
       return startFace1Arcade("coffee", trigger || renderer.domElement);
@@ -1066,6 +1187,7 @@
 
     function changeDiamondColor() {
       if (!coffeeDiamond) return;
+      showStoryBubble("materials", coffeeDiamond);
       coffeeDiamond.userData.colorStep++;
       coffeeDiamond.userData.clickCount++;
       diamondClickCount = coffeeDiamond.userData.clickCount;
@@ -1115,6 +1237,7 @@
 
     function changeSpaceDriveColorAndLaunchCoffee() {
       if (!spacedrive) return;
+      showStoryBubble("delivery", spacedrive);
       if (coffeeDiamond) {
         document.getElementById('message').textContent = "Il diamante e' attivo: cliccalo per cambiare colore!";
         return;
@@ -1172,6 +1295,7 @@
       const intersects = raycaster.intersectObjects(scene.children, true);
       const clickedObject = intersects.length > 0 ? intersects[0].object : null;
       if (coffeeProjectile && ((clickedObject && isDescendantOf(clickedObject, coffeeProjectile)) || isProjectedObjectNearPointer(coffeeProjectile, event, isMobileViewport ? 150 : 108))) {
+        showStoryBubble("materials", coffeeProjectile);
         startCoffeeGame(renderer.domElement);
         return;
       }
@@ -1207,11 +1331,13 @@
         // Se il terreno (ground) è cliccato: cambia colore e carica Charizard
         if (clickedObject.name === "ground") {
           clickedObject.material.color.setHex(Math.random() * 0xffffff);
+          showStoryBubble("concept", clickedObject);
           loadCharizard();
           document.getElementById('message').textContent = "Charizard sta volando!";
         }
         // Se la sfera viene cliccata: sostituiscila con il Facehugger
         else if (clickedObject === sphere || (clickedObject.parent && clickedObject.parent === sphere)) {
+          showStoryBubble("scanning", sphere);
           scene.remove(sphere);
           loadFacehugger();
           document.getElementById('message').textContent = "La sfera è stata sostituita dal Facehugger!";
@@ -1228,14 +1354,15 @@
           // Se il clic appartiene all'ottaedro
           else {
             let octaTarget = clickedObject;
-            while (octaTarget.parent && octaTarget.name !== "octahedron") {
+            while (octaTarget.parent && octaTarget.name !== "dodecahedron") {
               octaTarget = octaTarget.parent;
             }
-            if (octaTarget.name === "octahedron") {
+            if (octaTarget.name === "dodecahedron") {
+              showStoryBubble("rhino", octaTarget);
               octaTarget.material.color.setHex(Math.random() * 0xffffff);
               octaClickCount++;
-              console.log("Click sull'ottaedro:", octaClickCount);
-              document.getElementById('message').textContent = "Ottaedro ha cambiato colore (" + octaClickCount + " click)!";
+              console.log("Click sul dodecaedro:", octaClickCount);
+              document.getElementById('message').textContent = "Dodecaedro ha cambiato colore (" + octaClickCount + " click)!";
               if (octaClickCount >= 10 && !character) {
                 createCharacter();
               }
@@ -1243,6 +1370,7 @@
                 startOctaMiniGame();
               }
             } else {
+              showStoryBubble("delivery", clickedObject);
               if (clickedObject.material && clickedObject.material.color) {
                 clickedObject.material.color.setHex(Math.random() * 0xffffff);
               }
@@ -1280,11 +1408,19 @@
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
       if (mixer) mixer.update(delta);
-      // Ruota l'ottaedro
+      // Ruota il dodecaedro
       octahedron.rotation.x += 0.01;
       octahedron.rotation.y += 0.01;
       updateMiniGame(delta);
       updateCoffeeAndDiamond(delta);
+      if (!storyBubble.hidden) {
+        if (activeStoryTarget) positionStoryBubble();
+        if (storyExpiresAt && performance.now() >= storyExpiresAt) {
+          storyExpiresAt = 0;
+          storyBubble.classList.remove("active");
+          window.setTimeout(function () { storyBubble.hidden = true; }, 190);
+        }
+      }
       // Aggiorna l'animazione di Charizard se presente
       if (charizard && charizard.userData.mixer) {
         charizard.userData.mixer.update(delta);
