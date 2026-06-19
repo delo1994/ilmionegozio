@@ -73,7 +73,7 @@
     #meteor-overlay img {
       object-fit: cover;
       object-position: center;
-      filter: drop-shadow(0 0 6px rgba(255,170,72,0.52));
+      filter: drop-shadow(0 0 4px rgba(255,170,72,0.46));
     }
 
     /* Overlay per gli occhi (decorativi) */
@@ -363,8 +363,8 @@
   </div>
   <div id="meteor-overlay" data-meteor-count="38" aria-hidden="true">
     <picture>
-      <source media="(prefers-reduced-motion: reduce)" srcset="/static/meteoriti-spazio-static.png?v=20260619-2">
-      <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-2" alt="" width="640" height="360" decoding="async" fetchpriority="low">
+      <source media="(prefers-reduced-motion: reduce)" srcset="/static/meteoriti-spazio-static.png?v=20260619-3">
+      <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-3" alt="" width="640" height="360" decoding="async" fetchpriority="low">
     </picture>
   </div>
   <div id="cube-topic-tooltip" aria-hidden="true"></div>
@@ -670,6 +670,82 @@
     innerCube.add(innerEdges);
     mainCube.add(innerCube);
 
+    // Scariche elettriche nello spazio tra il cuore bianco e le facce colorate.
+    const electricDischargeGroup = new THREE.Group();
+    const electricBoltColors = [0xffffff, 0x67e8f9, 0x22d3ee, 0xa78bfa];
+    const electricBoltCount = isMobileViewport ? 5 : 9;
+    const electricBoltSegments = isMobileViewport ? 6 : 8;
+
+    function setElectricBoltAnchors(bolt) {
+      const axis = Math.floor(Math.random() * 3);
+      const sign = Math.random() < 0.5 ? -1 : 1;
+      const start = new THREE.Vector3(
+        THREE.MathUtils.randFloat(-0.11, 0.11),
+        THREE.MathUtils.randFloat(-0.11, 0.11),
+        THREE.MathUtils.randFloat(-0.11, 0.11)
+      );
+      const end = new THREE.Vector3(
+        THREE.MathUtils.randFloat(-0.4, 0.4),
+        THREE.MathUtils.randFloat(-0.4, 0.4),
+        THREE.MathUtils.randFloat(-0.4, 0.4)
+      );
+      start.setComponent(axis, sign * 0.17);
+      end.setComponent(axis, sign * 0.48);
+      bolt.userData.start = start;
+      bolt.userData.end = end;
+    }
+
+    function refreshElectricBolt(bolt, timestamp, reposition) {
+      if (reposition || !bolt.userData.start) {
+        setElectricBoltAnchors(bolt);
+        bolt.userData.repositionsAt = timestamp + 500 + Math.random() * 850;
+      }
+      const start = bolt.userData.start;
+      const end = bolt.userData.end;
+      const direction = end.clone().sub(start).normalize();
+      const reference = Math.abs(direction.y) < 0.9
+        ? new THREE.Vector3(0, 1, 0)
+        : new THREE.Vector3(1, 0, 0);
+      const perpendicularA = new THREE.Vector3().crossVectors(direction, reference).normalize();
+      const perpendicularB = new THREE.Vector3().crossVectors(direction, perpendicularA).normalize();
+      const positions = bolt.geometry.attributes.position.array;
+
+      for (let pointIndex = 0; pointIndex <= electricBoltSegments; pointIndex++) {
+        const progress = pointIndex / electricBoltSegments;
+        const point = new THREE.Vector3().lerpVectors(start, end, progress);
+        const envelope = Math.sin(Math.PI * progress);
+        point.addScaledVector(perpendicularA, (Math.random() - 0.5) * 0.07 * envelope);
+        point.addScaledVector(perpendicularB, (Math.random() - 0.5) * 0.07 * envelope);
+        positions[pointIndex * 3] = point.x;
+        positions[pointIndex * 3 + 1] = point.y;
+        positions[pointIndex * 3 + 2] = point.z;
+      }
+      bolt.geometry.attributes.position.needsUpdate = true;
+      bolt.userData.nextRefresh = timestamp + (prefersReducedMotion ? 650 : 45 + Math.random() * 70);
+    }
+
+    for (let boltIndex = 0; boltIndex < electricBoltCount; boltIndex++) {
+      const boltGeometry = new THREE.BufferGeometry();
+      boltGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(new Float32Array((electricBoltSegments + 1) * 3), 3)
+      );
+      const boltMaterial = new THREE.LineBasicMaterial({
+        color: electricBoltColors[boltIndex % electricBoltColors.length],
+        transparent: true,
+        opacity: 0.58,
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false,
+        toneMapped: false
+      });
+      const bolt = new THREE.Line(boltGeometry, boltMaterial);
+      bolt.renderOrder = 4;
+      refreshElectricBolt(bolt, 0, true);
+      electricDischargeGroup.add(bolt);
+    }
+    mainCube.add(electricDischargeGroup);
+
     const navTopics = [
       { label: "AMBIENTI 3D", miniColor: 0xff0000, textColor: "#ffffff", page: '/face1' },
       { label: "MONTAGGIO VIDEO", miniColor: 0x00ff00, textColor: "#00ff00", page: '/face2' },
@@ -887,6 +963,20 @@
     renderer.domElement.addEventListener('pointerleave', hideTopicTooltip, { passive: true });
 
     let lastFrameTime = 0;
+    function updateElectricDischarges(timestamp, linePulse) {
+      let totalIntensity = 0;
+      electricDischargeGroup.children.forEach((bolt, index) => {
+        if (timestamp >= bolt.userData.nextRefresh) {
+          refreshElectricBolt(bolt, timestamp, timestamp >= bolt.userData.repositionsAt);
+        }
+        const flicker = prefersReducedMotion ? 0.46 : 0.34 + Math.random() * 0.28;
+        bolt.material.opacity = Math.min(0.95, flicker + linePulse * 0.8);
+        totalIntensity += bolt.material.opacity;
+      });
+      if (!prefersReducedMotion) electricDischargeGroup.rotation.z += 0.0007;
+      electricDischargeGroup.userData.intensity = totalIntensity / electricBoltCount;
+    }
+
     function updateInnerHeartbeat(timestamp) {
       const cycle = (timestamp % 1450) / 1450;
       const firstBeat = Math.exp(-Math.pow((cycle - 0.14) / 0.055, 2)) * 0.34;
@@ -900,6 +990,7 @@
         material.opacity = 0.06 + linePulse * 1.15;
       });
       hypercubePulse.userData.linePulse = linePulse;
+      updateElectricDischarges(timestamp, linePulse);
     }
 
     function animate(timestamp) {
@@ -948,6 +1039,9 @@
           hypercubeLinePulse: hypercubePulse.userData.linePulse || 0,
           hypercubePulseScale: hypercubePulse.scale.x,
           hypercubePulseOpacity: hypercubePulseMaterials[0].opacity,
+          electricBoltCount: electricDischargeGroup.children.length,
+          electricIntensity: electricDischargeGroup.userData.intensity || 0,
+          electricGeometryVersion: electricDischargeGroup.children[0]?.geometry.attributes.position.version || 0,
           miniCubeCount: miniCubes.length,
           miniCubesFilled: miniCubes.every(child => child.material.wireframe === false),
           miniCubeMaterials3D: miniCubes.every(child => child.material.isMeshStandardMaterial === true),

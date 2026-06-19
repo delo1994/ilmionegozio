@@ -17,10 +17,14 @@ assert.match(index, /id="meteor-overlay"/, "La homepage deve includere lo strato
 assert.match(index, /data-meteor-count="38"/, "Lo sciame deve includere molti meteoriti piccoli");
 assert.match(index, /meteoriti-spazio\.gif/, "La homepage deve caricare la GIF trasparente dei meteoriti");
 assert.match(index, /meteoriti-spazio-static\.png/, "La homepage deve avere il fallback meteoriti a movimento ridotto");
+assert.match(index, /drop-shadow\(0 0 4px/, "L'alone dei meteoriti deve restare piccolo e discreto");
 assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco interno deve essere pieno");
 assert.match(index, /hypercubePulseMaterials[\s\S]*THREE\.AdditiveBlending/, "Le diagonali colorate devono avere un alone pulsante");
 assert.match(index, /hypercubePulse\.scale\.setScalar\(1\.006 \+ linePulse \* 0\.16\)/, "Il battito deve espandere il tracciato colorato");
 assert.match(index, /material\.opacity = 0\.06 \+ linePulse \* 1\.15/, "Il battito deve aumentare la luminosita delle diagonali");
+assert.match(index, /const electricBoltCount = isMobileViewport \? 5 : 9/, "Le scariche devono essere ottimizzate per desktop e mobile");
+assert.match(index, /function refreshElectricBolt/, "Le scariche elettriche devono rigenerare il proprio percorso");
+assert.match(index, /mainCube\.add\(electricDischargeGroup\)/, "Le scariche devono occupare lo spazio interno dell'ipercubo");
 assert.match(index, /miniMat[\s\S]*wireframe:\s*false/, "I mini-cubi della legenda devono essere pieni");
 assert.match(index, /miniMat\s*=\s*new THREE\.MeshStandardMaterial/, "I mini-cubi devono avere materiali illuminati tridimensionali");
 assert.match(index, /new THREE\.EdgesGeometry\(miniGeo\)/, "I mini-cubi devono avere spigoli tridimensionali visibili");
