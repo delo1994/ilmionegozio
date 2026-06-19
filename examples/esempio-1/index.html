@@ -76,6 +76,24 @@
       font-weight: 800;
       letter-spacing: 0.24em;
     }
+    .demo-return {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(10,10,10,0.14);
+      border-radius: 999px;
+      padding: 0 14px;
+      background: rgba(255,255,255,0.72);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .demo-return:hover,
+    .demo-return:focus-visible { background: #fff; transform: translateX(-2px); }
     .nav-links {
       display: flex;
       gap: 26px;
@@ -366,20 +384,6 @@
       from { transform: translateY(0); opacity: 0.66; }
       to { transform: translateY(24px); opacity: 1; }
     }
-    .back {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 60;
-      padding: 12px 16px;
-      border-radius: 999px;
-      color: #fff;
-      background: #0a0a0a;
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
     @keyframes reveal {
       from { opacity: 0; transform: translateY(50px); }
       to { opacity: 1; transform: translateY(0); }
@@ -387,6 +391,8 @@
     @media (max-width: 820px) {
       .navbar { padding: 22px 18px 0; }
       .nav-links { display: none; }
+      .demo-return { width: 42px; justify-content: center; padding: 0; }
+      .demo-return-label { display: none; }
       .hero { padding: 112px 22px 150px; align-items: flex-start; }
       h1 { font-size: clamp(3.6rem, 18vw, 6rem); }
       .stats {
@@ -430,6 +436,7 @@
   <nav class="navbar" aria-label="Navigazione Linea Studio">
     <div class="nav-inner">
       <a class="logo" href="#top">LINEA STUDIO</a>
+      <a class="demo-return" href="/face5" aria-label="Torna a Face5"><span aria-hidden="true">&#8592;</span><span class="demo-return-label">Torna a Face5</span></a>
       <div class="nav-links" aria-label="Sezioni demo">
         <a href="#top">Inizio</a>
         <a href="#about">Chi siamo</a>
@@ -546,7 +553,6 @@
     <span>Studio creativo italiano per esperienze digitali premium</span>
     <a class="primary-btn" href="/face5">Torna al report</a>
   </footer>
-  <a class="back" href="/face5">Torna al report</a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>

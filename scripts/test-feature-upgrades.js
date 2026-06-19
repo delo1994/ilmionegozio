@@ -49,15 +49,18 @@ const demo1 = read("examples/esempio-1/index.html");
 assert.match(demo1, /Dove le idee diventano esperienze digitali\./);
 assert.match(demo1, /id="metodo"/);
 assert.match(demo1, /id="testimonianze"/);
+assert.match(demo1, /class="demo-return" href="\/face5"/, "La demo 1 deve permettere di tornare a Face5");
 
 const demo2 = read("examples/esempio-2/index.html");
 assert.match(demo2, /Costruiamo il futuro digitale della tua azienda\./);
+assert.match(demo2, /class="demo-return" href="\/face5"/, "La demo 2 deve permettere di tornare a Face5");
 for (const phrase of ["Strategie digitali", "Automazioni intelligenti", "Campagne che convertono"]) {
   assert.match(demo2, new RegExp(phrase));
 }
 assert.equal((demo2.match(/class="agency-card"/g) || []).length, 6, "La demo AI deve avere sei servizi");
 
 const demo3 = read("examples/esempio-3/index.html");
+assert.match(demo3, /class="demo-return" href="\/face5"/, "La demo 3 deve permettere di tornare a Face5");
 assert.match(demo3, /Esperienze digitali che lasciano il segno/);
 assert.match(demo3, /id="collaborazioni"/);
 assert.match(demo3, /Parliamo del progetto/);

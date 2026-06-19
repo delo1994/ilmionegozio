@@ -195,6 +195,32 @@
       background: rgba(0,223,143,0.1);
     }
 
+    .demo-return {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      border: 1px solid rgba(0,223,143,0.34);
+      border-radius: 999px;
+      padding: 0 15px;
+      color: var(--accent);
+      background: rgba(0,223,143,0.06);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    .demo-return:hover,
+    .demo-return:focus-visible {
+      border-color: var(--accent);
+      background: rgba(0,223,143,0.12);
+      transform: translateX(-2px);
+    }
+
     .mobile-menu-toggle {
       display: none;
       width: 48px;
@@ -941,6 +967,8 @@
       }
 
       .action-dot { display: none; }
+      .demo-return { width: 44px; justify-content: center; margin-left: auto; padding: 0; }
+      .demo-return-label { display: none; }
       .mobile-menu-toggle { display: grid; }
 
       .section {
@@ -1133,6 +1161,7 @@
       <a href="#services">Servizi</a>
       <a href="#contact">Contatti</a>
     </div>
+    <a class="demo-return" href="/face5" aria-label="Torna a Face5"><span aria-hidden="true">&#8592;</span><span class="demo-return-label">Torna a Face5</span></a>
     <a class="action-dot" href="#contact" aria-label="Contatta Luca Ferri"></a>
     <button class="mobile-menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
   </nav>
@@ -1142,6 +1171,7 @@
     <a href="#collaborazioni">Collaborazioni</a>
     <a href="#services">Servizi</a>
     <a href="#contact">Contatti</a>
+    <a href="/face5">Torna a Face5</a>
   </div>
 
   <main id="main">

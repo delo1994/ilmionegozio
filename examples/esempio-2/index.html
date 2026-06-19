@@ -93,9 +93,27 @@
     }
     .nav-right {
       display: flex;
+      align-items: center;
       justify-content: flex-end;
       gap: 10px;
     }
+    .demo-return {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(10,10,10,0.16);
+      border-radius: 999px;
+      padding: 0 14px;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .demo-return:hover,
+    .demo-return:focus-visible { background: #fff; transform: translateX(-2px); }
     .talk {
       padding: 12px 18px;
       border: 1px solid rgba(10,10,10,0.16);
@@ -548,6 +566,8 @@
     @media (max-width: 820px) {
       .navbar { grid-template-columns: 1fr auto; padding: 18px; }
       .nav-center, .talk { display: none; }
+      .demo-return { width: 42px; justify-content: center; padding: 0; }
+      .demo-return-label { display: none; }
       .hamburger { display: block; }
       .split { grid-template-columns: 1fr; padding: 76px 0; }
       .agency-cards { grid-template-columns: 1fr; margin-top: -34px; }
@@ -570,6 +590,7 @@
       <a href="#contact">Contatti</a>
     </div>
     <div class="nav-right">
+      <a class="demo-return" href="/face5" aria-label="Torna a Face5"><span aria-hidden="true">&#8592;</span><span class="demo-return-label">Torna a Face5</span></a>
       <a class="talk" href="#contact">Prenota una call</a>
       <button class="hamburger" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
     </div>
@@ -579,7 +600,7 @@
       <a href="#services">Servizi</a>
       <a href="#work">Casi studio</a>
       <a href="#contact">Contatti</a>
-      <a href="/face5">Report</a>
+      <a href="/face5">Torna a Face5</a>
     </div>
   </div>
 
