@@ -644,6 +644,21 @@
     const mainCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
     scene.add(mainCube);
 
+    // Secondo tracciato additivo: fa pulsare le diagonali colorate senza alterare i click.
+    const hypercubePulseMaterials = cubeMaterials.map(material => new THREE.MeshBasicMaterial({
+      color: material.color.clone(),
+      wireframe: true,
+      transparent: true,
+      opacity: 0.06,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false
+    }));
+    const hypercubePulse = new THREE.Mesh(cubeGeometry, hypercubePulseMaterials);
+    hypercubePulse.scale.setScalar(1.006);
+    hypercubePulse.renderOrder = 2;
+    mainCube.add(hypercubePulse);
+
     // Cubo bianco interno con battito a doppio impulso
     const innerGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
     const innerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: false, transparent: true, opacity: 0.94 });
@@ -877,8 +892,14 @@
       const firstBeat = Math.exp(-Math.pow((cycle - 0.14) / 0.055, 2)) * 0.34;
       const secondBeat = Math.exp(-Math.pow((cycle - 0.31) / 0.072, 2)) * 0.22;
       const heartbeatScale = prefersReducedMotion ? 1.04 : 1 + firstBeat + secondBeat;
+      const linePulse = prefersReducedMotion ? 0.05 : firstBeat + secondBeat;
       innerCube.scale.setScalar(heartbeatScale);
       innerCube.userData.heartbeatScale = heartbeatScale;
+      hypercubePulse.scale.setScalar(1.006 + linePulse * 0.16);
+      hypercubePulseMaterials.forEach(material => {
+        material.opacity = 0.06 + linePulse * 1.15;
+      });
+      hypercubePulse.userData.linePulse = linePulse;
     }
 
     function animate(timestamp) {
@@ -924,6 +945,9 @@
         return {
           innerScale: innerCube.userData.heartbeatScale || 1,
           innerFilled: innerCube.material.wireframe === false,
+          hypercubeLinePulse: hypercubePulse.userData.linePulse || 0,
+          hypercubePulseScale: hypercubePulse.scale.x,
+          hypercubePulseOpacity: hypercubePulseMaterials[0].opacity,
           miniCubeCount: miniCubes.length,
           miniCubesFilled: miniCubes.every(child => child.material.wireframe === false),
           miniCubeMaterials3D: miniCubes.every(child => child.material.isMeshStandardMaterial === true),

@@ -18,6 +18,9 @@ assert.match(index, /data-meteor-count="38"/, "Lo sciame deve includere molti me
 assert.match(index, /meteoriti-spazio\.gif/, "La homepage deve caricare la GIF trasparente dei meteoriti");
 assert.match(index, /meteoriti-spazio-static\.png/, "La homepage deve avere il fallback meteoriti a movimento ridotto");
 assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco interno deve essere pieno");
+assert.match(index, /hypercubePulseMaterials[\s\S]*THREE\.AdditiveBlending/, "Le diagonali colorate devono avere un alone pulsante");
+assert.match(index, /hypercubePulse\.scale\.setScalar\(1\.006 \+ linePulse \* 0\.16\)/, "Il battito deve espandere il tracciato colorato");
+assert.match(index, /material\.opacity = 0\.06 \+ linePulse \* 1\.15/, "Il battito deve aumentare la luminosita delle diagonali");
 assert.match(index, /miniMat[\s\S]*wireframe:\s*false/, "I mini-cubi della legenda devono essere pieni");
 assert.match(index, /miniMat\s*=\s*new THREE\.MeshStandardMaterial/, "I mini-cubi devono avere materiali illuminati tridimensionali");
 assert.match(index, /new THREE\.EdgesGeometry\(miniGeo\)/, "I mini-cubi devono avere spigoli tridimensionali visibili");
