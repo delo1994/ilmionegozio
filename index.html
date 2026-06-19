@@ -95,6 +95,15 @@
     }
     .eye {
       position: fixed;
+      --eye-anchor: translate3d(0, 0, 0);
+      --eye-float-x: 7px;
+      --eye-float-x-alt: -5px;
+      --eye-float-x-mid: 3px;
+      --eye-float-up: -9px;
+      --eye-float-up-mid: -4px;
+      --eye-float-down: 6px;
+      --eye-float-tilt: 2deg;
+      --eye-float-tilt-alt: -1.5deg;
       background:
         radial-gradient(circle at 36% 28%, rgba(255,255,255,0.98) 0 13%, transparent 14%),
         radial-gradient(circle at 50% 56%, #eefcff 0 48%, #a9c8d6 70%, #516976 100%);
@@ -107,8 +116,10 @@
         inset 7px 8px 10px rgba(255,255,255,0.82),
         inset -8px -10px 13px rgba(20,47,62,0.48);
       filter: drop-shadow(0 5px 5px rgba(0,0,0,0.46));
+      transform: var(--eye-anchor);
       transform-style: preserve-3d;
       will-change: transform;
+      animation: eyeFloat 8.4s ease-in-out infinite;
     }
     .eye::after {
       content: "";
@@ -118,11 +129,17 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));
       pointer-events: none;
     }
-    .eye.eye1 { top: 8%; left: 8%; width: 40px; height: 40px; }
-    .eye.eye2 { top: 3%; right: 2.5%; width: 50px; height: 50px; }
-    .eye.eye3 { bottom: 15%; left: 15%; width: 45px; height: 45px; }
-    .eye.eye4 { bottom: 10%; right: 12%; width: 55px; height: 55px; }
-    .eye.eye5 { top: 5%; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; }
+    .eye.eye1 { top: 8%; left: 8%; width: 40px; height: 40px; animation-duration: 8.6s; animation-delay: -1.2s; }
+    .eye.eye2 { top: 3%; right: 2.5%; width: 50px; height: 50px; --eye-float-x: -8px; --eye-float-x-alt: 5px; animation-duration: 10.2s; animation-delay: -4.8s; }
+    .eye.eye3 { bottom: 15%; left: 15%; width: 45px; height: 45px; --eye-float-up: -7px; --eye-float-down: 9px; animation-duration: 9.3s; animation-delay: -6.1s; }
+    .eye.eye4 { bottom: 10%; right: 12%; width: 55px; height: 55px; --eye-float-x: -6px; --eye-float-x-alt: 8px; animation-duration: 11.1s; animation-delay: -2.7s; }
+    .eye.eye5 { top: 5%; left: 50%; width: 50px; height: 50px; --eye-anchor: translateX(-50%); --eye-float-x: 4px; --eye-float-x-alt: -4px; animation-duration: 9.8s; animation-delay: -7.4s; }
+    @keyframes eyeFloat {
+      0%, 100% { transform: var(--eye-anchor) translate3d(0, 0, 0) rotate(0deg); }
+      27% { transform: var(--eye-anchor) translate3d(var(--eye-float-x), var(--eye-float-up), 0) rotate(var(--eye-float-tilt)); }
+      54% { transform: var(--eye-anchor) translate3d(var(--eye-float-x-alt), var(--eye-float-down), 0) rotate(var(--eye-float-tilt-alt)); }
+      78% { transform: var(--eye-anchor) translate3d(var(--eye-float-x-mid), var(--eye-float-up-mid), 0) rotate(0.5deg); }
+    }
     .pupil {
       position: absolute;
       background:
@@ -213,6 +230,9 @@
         font-size: 11px;
         line-height: 1.35;
       }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .eye { animation: none; }
     }
 
 

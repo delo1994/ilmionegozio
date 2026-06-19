@@ -42,6 +42,9 @@ assert.match(index, /new THREE\.PointsMaterial/, "Le scariche devono avere nodi 
 assert.match(index, /viewport-fit=cover/, "La homepage deve coprire le aree di sicurezza in orizzontale");
 assert.match(index, /viewport\.width > viewport\.height \? 1\.28 : 1/, "Il cubo deve restare leggibile con il telefono in orizzontale");
 assert.match(index, /\.eyes-container\s*\{[\s\S]*?inset:\s*0;[\s\S]*?pointer-events:\s*none;/, "Gli occhi devono restare distribuiti nel viewport senza creare zone bianche in basso");
+assert.match(index, /@keyframes eyeFloat/, "Gli occhi della homepage devono fluttuare nello spazio");
+assert.match(index, /\.eye\.eye5[\s\S]*--eye-anchor:\s*translateX\(-50%\)/, "L'occhio centrale deve restare centrato durante il galleggiamento");
+assert.match(index, /\.eye\.eye[1-5][\s\S]*animation-duration:/, "Gli occhi devono avere tempi di fluttuazione asincroni");
 assert.match(index, /miniMat[\s\S]*wireframe:\s*false/, "I mini-cubi della legenda devono essere pieni");
 assert.match(index, /miniMat\s*=\s*new THREE\.MeshStandardMaterial/, "I mini-cubi devono avere materiali illuminati tridimensionali");
 assert.match(index, /new THREE\.EdgesGeometry\(miniGeo\)/, "I mini-cubi devono avere spigoli tridimensionali visibili");
