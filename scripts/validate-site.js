@@ -46,7 +46,7 @@ function validateHtml(file) {
   if (count(html, /<title>/gi) !== 1) errors.push(`${name}: deve contenere un solo <title>`);
   if (!/<meta name="description" content="[^"]{30,}"/i.test(html)) warnings.push(`${name}: meta description mancante o troppo breve`);
   if (!redirectAliases.has(name) && count(html, /<h1\b/gi) < 1) errors.push(`${name}: H1 mancante`);
-  if (!redirectAliases.has(name) && !html.includes('/static/site-foundation.js')) errors.push(`${name}: fondazione condivisa non collegata`);
+  if (!html.includes('/static/site-foundation.js')) errors.push(`${name}: fondazione condivisa non collegata`);
   validateInlineScripts(file, html);
 }
 

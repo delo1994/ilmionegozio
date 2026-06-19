@@ -165,6 +165,77 @@
     window.addEventListener("blur", function () { cursor.classList.remove("is-visible"); });
   }
 
+  function setupWhatsAppChat() {
+    if (doc.querySelector(".site-whatsapp")) return;
+
+    var phoneNumber = "393347992295";
+    var widget = doc.createElement("aside");
+    widget.className = "site-whatsapp";
+    widget.setAttribute("aria-label", "Assistenza WhatsApp");
+    widget.innerHTML = [
+      '<section class="site-whatsapp__panel" id="site-whatsapp-panel" role="dialog" aria-modal="false" aria-labelledby="site-whatsapp-title" hidden>',
+        '<header class="site-whatsapp__header">',
+          '<span class="site-whatsapp__avatar" aria-hidden="true">',
+            '<svg viewBox="0 0 32 32" focusable="false"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.1 22.1L3.3 28.7l6.8-1.8A12.6 12.6 0 1 0 16 3.2Zm0 22.9c-2 0-3.9-.6-5.5-1.6l-.4-.2-4 .9 1.1-3.9-.3-.4a10.3 10.3 0 1 1 9.1 5.2Zm5.7-7.7c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.7.1-1.8-.9-3-1.7-4.2-3.8-.3-.6.3-.6.9-1.3.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-1-2.5c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1.1-1.1 2.7 0 1.6 1.2 3.1 1.3 3.3.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.6.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4Z"/></svg>',
+          '</span>',
+          '<span class="site-whatsapp__identity"><strong id="site-whatsapp-title">ilmionegozio.com</strong><small>WhatsApp &middot; +39 334 799 2295</small></span>',
+          '<button class="site-whatsapp__close" type="button" aria-label="Chiudi la minichat">&times;</button>',
+        '</header>',
+        '<div class="site-whatsapp__body">',
+          '<p class="site-whatsapp__bubble">Ciao! Scrivi il tuo messaggio: lo apriremo direttamente su WhatsApp.</p>',
+          '<form class="site-whatsapp__form">',
+            '<label class="site-visually-hidden" for="site-whatsapp-message">Messaggio WhatsApp</label>',
+            '<textarea id="site-whatsapp-message" rows="3" maxlength="500" placeholder="Come possiamo aiutarti?"></textarea>',
+            '<button class="site-whatsapp__send" type="submit">Apri WhatsApp <span aria-hidden="true">&#8599;</span></button>',
+          '</form>',
+        '</div>',
+      '</section>',
+      '<button class="site-whatsapp__launcher" type="button" aria-label="Apri la minichat WhatsApp" aria-controls="site-whatsapp-panel" aria-expanded="false">',
+        '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.1 22.1L3.3 28.7l6.8-1.8A12.6 12.6 0 1 0 16 3.2Zm0 22.9c-2 0-3.9-.6-5.5-1.6l-.4-.2-4 .9 1.1-3.9-.3-.4a10.3 10.3 0 1 1 9.1 5.2Zm5.7-7.7c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.7.1-1.8-.9-3-1.7-4.2-3.8-.3-.6.3-.6.9-1.3.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-1-2.5c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1.1-1.1 2.7 0 1.6 1.2 3.1 1.3 3.3.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.6.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4Z"/></svg>',
+        '<span class="site-whatsapp__unread" aria-hidden="true">1</span>',
+      '</button>'
+    ].join("");
+    doc.body.appendChild(widget);
+
+    var panel = widget.querySelector(".site-whatsapp__panel");
+    var launcher = widget.querySelector(".site-whatsapp__launcher");
+    var closeButton = widget.querySelector(".site-whatsapp__close");
+    var form = widget.querySelector(".site-whatsapp__form");
+    var message = widget.querySelector("#site-whatsapp-message");
+
+    function setOpen(open, returnFocus) {
+      panel.hidden = !open;
+      widget.classList.toggle("is-open", open);
+      launcher.setAttribute("aria-expanded", String(open));
+      launcher.setAttribute("aria-label", open ? "Chiudi la minichat WhatsApp" : "Apri la minichat WhatsApp");
+      if (open) window.setTimeout(function () { message.focus(); }, reduceMotion ? 0 : 170);
+      else if (returnFocus) launcher.focus();
+    }
+
+    launcher.addEventListener("click", function () { setOpen(panel.hidden, false); });
+    closeButton.addEventListener("click", function () { setOpen(false, true); });
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var text = message.value.trim() || "Ciao, vorrei ricevere informazioni sui vostri servizi.";
+      var url = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(text);
+      var whatsappWindow = window.open(url, "_blank", "noopener,noreferrer");
+      if (whatsappWindow) whatsappWindow.opener = null;
+    });
+    doc.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !panel.hidden) setOpen(false, true);
+    });
+    doc.addEventListener("pointerdown", function (event) {
+      if (!panel.hidden && !widget.contains(event.target)) setOpen(false, false);
+    });
+
+    window.IlmioWhatsApp = Object.freeze({
+      phone: phoneNumber,
+      open: function () { setOpen(true, false); },
+      close: function () { setOpen(false, false); },
+      state: function () { return { open: !panel.hidden, phone: phoneNumber }; }
+    });
+  }
+
   function init() {
     ensureMainTarget();
     secureExternalLinks();
@@ -172,6 +243,7 @@
     optimizeVideos();
     improveDialogs();
     setupCustomCursor();
+    setupWhatsAppChat();
   }
 
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });

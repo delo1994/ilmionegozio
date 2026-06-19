@@ -7,6 +7,14 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
 
+const foundationJs = read("static/site-foundation.js");
+const foundationCss = read("static/site-foundation.css");
+assert.match(foundationJs, /function setupWhatsAppChat/, "La fondazione deve creare la minichat WhatsApp globale");
+assert.match(foundationJs, /phoneNumber = "393347992295"/, "La minichat deve usare il numero WhatsApp richiesto");
+assert.match(foundationJs, /https:\/\/wa\.me\//, "L'invio deve aprire il collegamento ufficiale WhatsApp");
+assert.match(foundationJs, /window\.IlmioWhatsApp/, "La minichat deve esporre uno stato diagnostico");
+assert.match(foundationCss, /\.site-whatsapp__panel/, "La minichat deve avere un pannello responsive condiviso");
+
 const index = read("index.html");
 for (const voice of [1, 2, 4, 5, 6, 7, 8, 9, 10]) {
   assert.match(index, new RegExp(`Voce${voice}\\.wav`), `Il pool deve includere Voce${voice}.wav`);
