@@ -53,6 +53,29 @@
       height: 100dvh !important;
     }
 
+    #meteor-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      overflow: hidden;
+      opacity: 0.72;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      mask-image: radial-gradient(circle at 50% 50%, transparent 0 17%, rgba(0,0,0,0.16) 25%, #000 38%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 17%, rgba(0,0,0,0.16) 25%, #000 38%);
+    }
+    #meteor-overlay picture,
+    #meteor-overlay img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #meteor-overlay img {
+      object-fit: cover;
+      object-position: center;
+      filter: drop-shadow(0 0 6px rgba(255,170,72,0.52));
+    }
+
     /* Overlay per gli occhi (decorativi) */
     .eyes-container {
       position: fixed;
@@ -87,6 +110,11 @@
       will-change: transform;
     }
     @media (max-width: 600px) {
+      #meteor-overlay {
+        opacity: 0.58;
+        mask-image: radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(0,0,0,0.12) 31%, #000 48%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(0,0,0,0.12) 31%, #000 48%);
+      }
       #info {
         top: 5px;
         left: 5px;
@@ -332,6 +360,12 @@
       <strong>Cubo 3D non disponibile.</strong><br>
       Puoi comunque usare il menu per entrare nelle sezioni del sito.
     </div>
+  </div>
+  <div id="meteor-overlay" aria-hidden="true">
+    <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcset="/static/meteoriti-spazio-static.png?v=20260619-1">
+      <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-1" alt="" width="640" height="360" decoding="async" fetchpriority="low">
+    </picture>
   </div>
   <div id="cube-topic-tooltip" aria-hidden="true"></div>
 
@@ -602,10 +636,15 @@
     const mainCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
     scene.add(mainCube);
 
-    // Mini-cubo interno (opzionale)
+    // Cubo bianco interno con battito a doppio impulso
     const innerGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-    const innerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+    const innerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: false, transparent: true, opacity: 0.94 });
     const innerCube = new THREE.Mesh(innerGeometry, innerMaterial);
+    const innerEdges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(innerGeometry),
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.96 })
+    );
+    innerCube.add(innerEdges);
     mainCube.add(innerCube);
 
     const navTopics = [
@@ -655,11 +694,12 @@
         const miniGeo = new THREE.BoxGeometry(miniCubeSize, miniCubeSize, miniCubeSize);
         const miniMat = new THREE.MeshBasicMaterial({
           color: entry.miniColor,
-          wireframe: true,
+          wireframe: false,
           depthTest: false,
           depthWrite: false
         });
         const miniCube = new THREE.Mesh(miniGeo, miniMat);
+        miniCube.renderOrder = 1200;
         miniCube.isMiniCube = true;
         miniCube.userData.pageUrl = entry.page;
         miniCube.userData.label = entry.label;
@@ -809,6 +849,15 @@
     renderer.domElement.addEventListener('pointerleave', hideTopicTooltip, { passive: true });
 
     let lastFrameTime = 0;
+    function updateInnerHeartbeat(timestamp) {
+      const cycle = (timestamp % 1450) / 1450;
+      const firstBeat = Math.exp(-Math.pow((cycle - 0.14) / 0.055, 2)) * 0.34;
+      const secondBeat = Math.exp(-Math.pow((cycle - 0.31) / 0.072, 2)) * 0.22;
+      const heartbeatScale = prefersReducedMotion ? 1.04 : 1 + firstBeat + secondBeat;
+      innerCube.scale.setScalar(heartbeatScale);
+      innerCube.userData.heartbeatScale = heartbeatScale;
+    }
+
     function animate(timestamp) {
       requestAnimationFrame(animate);
       const delta = Math.min(32, timestamp - (lastFrameTime || timestamp));
@@ -817,6 +866,7 @@
 
       mainCube.rotation.x += 0.01 * frameScale;
       mainCube.rotation.y += 0.01 * frameScale;
+      updateInnerHeartbeat(timestamp);
 
       if (cubeClicked) {
         if (!animationStartTime) animationStartTime = timestamp;
@@ -843,6 +893,21 @@
       renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
+
+    window.IndexCubeEffects = Object.freeze({
+      state: function() {
+        const miniCubes = legendGroup.children.filter(child => child.isMiniCube);
+        const meteorImage = document.getElementById("meteor-gif");
+        return {
+          innerScale: innerCube.userData.heartbeatScale || 1,
+          innerFilled: innerCube.material.wireframe === false,
+          miniCubeCount: miniCubes.length,
+          miniCubesFilled: miniCubes.every(child => child.material.wireframe === false),
+          meteorReady: Boolean(meteorImage && meteorImage.complete && meteorImage.naturalWidth),
+          meteorSource: meteorImage ? meteorImage.currentSrc : ""
+        };
+      }
+    });
 
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;

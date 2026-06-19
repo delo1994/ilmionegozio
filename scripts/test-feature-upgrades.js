@@ -13,6 +13,16 @@ for (const voice of ["Homer Simpson", "Donald Trump", "Gerry Scotti", "Maria De 
 }
 assert.equal((index.match(/weight: 18, favorite: true/g) || []).length, 5, "Devono esserci cinque voci principali con lo stesso peso");
 assert.match(index, /favoriteProbability: 0\.9/, "Le voci principali devono coprire il 90% delle estrazioni");
+assert.match(index, /id="meteor-overlay"/, "La homepage deve includere lo strato meteoriti");
+assert.match(index, /meteoriti-spazio\.gif/, "La homepage deve caricare la GIF trasparente dei meteoriti");
+assert.match(index, /meteoriti-spazio-static\.png/, "La homepage deve avere il fallback meteoriti a movimento ridotto");
+assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco interno deve essere pieno");
+assert.match(index, /miniMat[\s\S]*wireframe:\s*false/, "I mini-cubi della legenda devono essere pieni");
+assert.match(index, /firstBeat[\s\S]*secondBeat/, "Il cubo bianco deve avere un battito doppio");
+assert.match(index, /window\.IndexCubeEffects/, "Gli effetti della homepage devono esporre lo stato diagnostico");
+for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-static.png"]) {
+  assert.ok(fs.statSync(path.join(root, asset)).size > 0, `${asset} deve esistere e non essere vuoto`);
+}
 
 const round1 = read("Face4Round1.html");
 assert.match(round1, /JAILBREAK_CHORD_MS\s*=\s*1200/, "DELO deve accettare un accordo rapido per tastiere con rollover limitato");
