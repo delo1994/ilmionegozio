@@ -39,6 +39,14 @@ assert.match(index, /miniMat\s*=\s*new THREE\.MeshStandardMaterial/, "I mini-cub
 assert.match(index, /new THREE\.EdgesGeometry\(miniGeo\)/, "I mini-cubi devono avere spigoli tridimensionali visibili");
 assert.match(index, /firstBeat[\s\S]*secondBeat/, "Il cubo bianco deve avere un battito doppio");
 assert.match(index, /window\.IndexCubeEffects/, "Gli effetti della homepage devono esporre lo stato diagnostico");
+assert.match(index, /id="face-transition-overlay"/, "La homepage deve includere l'overlay di transizione delle facce");
+for (const effect of ["fracture", "lightning", "data-grid", "pulverize", "analytics", "vortex"]) {
+  assert.match(index, new RegExp(`name: "${effect}"`), `La homepage deve includere l'effetto ${effect}`);
+}
+assert.match(index, /const animationDuration = 1000/, "L'animazione storica del cubo deve conservare la durata originale");
+assert.match(index, /elapsed >= animationDuration && !transitionEffectStarted[\s\S]*startFaceTransition/, "Gli effetti devono partire soltanto al termine dell'animazione originale");
+assert.match(index, /function prefetchFace[\s\S]*rel = "prefetch"/, "La destinazione deve essere precaricata durante l'animazione del cubo");
+assert.match(index, /window\.IndexFaceTransitions/, "Le sei transizioni devono esporre uno stato diagnostico");
 for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-static.png"]) {
   assert.ok(fs.statSync(path.join(root, asset)).size > 0, `${asset} deve esistere e non essere vuoto`);
 }

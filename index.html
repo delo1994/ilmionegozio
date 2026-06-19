@@ -344,10 +344,131 @@
       transform: translate3d(16px, 16px, 0) scale(1);
     }
 
+    #face-transition-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 6000;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(1, 3, 9, 0.2);
+      transition: opacity 90ms linear;
+      contain: strict;
+    }
+    #face-transition-overlay.active { opacity: 1; }
+    .transition-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.94), var(--transition-color) 8%, transparent 52%);
+      mix-blend-mode: screen;
+      animation: transitionFlash 520ms ease-out both;
+    }
+    .transition-piece {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: block;
+      will-change: transform, opacity;
+    }
+    .effect-fracture { background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.82) 100%); }
+    .effect-fracture .transition-piece {
+      width: var(--piece-length);
+      height: 3px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, #fff, var(--transition-color), transparent);
+      box-shadow: 0 0 8px var(--transition-color), 0 0 2px #fff;
+      animation: crackScreen 850ms cubic-bezier(0.12,0.72,0.18,1) var(--piece-delay) both;
+    }
+    .effect-lightning { background: radial-gradient(circle, rgba(0,60,24,0.08), rgba(0,0,0,0.78)); }
+    .effect-lightning .transition-piece {
+      width: 7px;
+      height: var(--piece-length);
+      clip-path: polygon(52% 0, 100% 0, 64% 37%, 96% 37%, 18% 100%, 39% 52%, 0 52%);
+      background: #fff;
+      filter: drop-shadow(0 0 7px var(--transition-color)) drop-shadow(0 0 17px var(--transition-color));
+      animation: lightningStrike 720ms steps(2,end) var(--piece-delay) both;
+    }
+    .effect-data-grid {
+      background:
+        linear-gradient(var(--transition-color-alpha) 1px, transparent 1px),
+        linear-gradient(90deg, var(--transition-color-alpha) 1px, transparent 1px),
+        rgba(0,8,28,0.78);
+      background-size: 42px 42px;
+      animation: gridZoom 1100ms ease-in both;
+    }
+    .effect-data-grid::after {
+      content: "";
+      position: absolute;
+      inset: -20% 0;
+      background: linear-gradient(transparent 42%, rgba(255,255,255,0.9) 49%, var(--transition-color) 50%, transparent 57%);
+      animation: dataScan 900ms ease-in-out both;
+    }
+    .effect-data-grid .transition-piece {
+      width: var(--piece-size);
+      height: var(--piece-size);
+      border: 1px solid var(--transition-color);
+      background: rgba(255,255,255,0.13);
+      animation: dataCell 900ms ease-out var(--piece-delay) both;
+    }
+    .effect-pulverize { background: radial-gradient(circle, transparent 14%, rgba(20,12,0,0.82) 78%); }
+    .effect-pulverize .transition-piece {
+      width: var(--piece-size);
+      height: var(--piece-size);
+      border-radius: var(--piece-radius);
+      background: linear-gradient(135deg, #fff, var(--transition-color) 42%, #9b6100);
+      box-shadow: 0 0 8px var(--transition-color);
+      animation: pulverizeScreen 1050ms cubic-bezier(0.1,0.7,0.1,1) var(--piece-delay) both;
+    }
+    .effect-analytics { background: rgba(0,15,22,0.8); }
+    .effect-analytics .transition-piece {
+      width: var(--piece-length);
+      height: 4px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, #fff, var(--transition-color));
+      box-shadow: 0 0 11px var(--transition-color);
+      animation: graphLine 950ms ease-out var(--piece-delay) both;
+    }
+    .effect-analytics .transition-piece::after {
+      content: "";
+      position: absolute;
+      right: -6px;
+      top: -4px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 14px var(--transition-color);
+    }
+    .effect-vortex { background: radial-gradient(circle, transparent 0 12%, rgba(35,0,45,0.8) 62%, #000 100%); }
+    .effect-vortex .transition-piece {
+      width: var(--piece-size);
+      height: var(--piece-size);
+      border: 3px solid var(--transition-color);
+      border-left-color: transparent;
+      border-radius: 50%;
+      box-shadow: inset 0 0 16px var(--transition-color), 0 0 20px var(--transition-color);
+      animation: vortexRing 1050ms cubic-bezier(0.12,0.72,0.2,1) var(--piece-delay) both;
+    }
+    @keyframes transitionFlash { 0% { opacity: 0; transform: scale(0.1); } 18% { opacity: 1; } 100% { opacity: 0; transform: scale(2.2); } }
+    @keyframes crackScreen { 0% { opacity: 0; transform: rotate(var(--piece-angle)) scaleX(0); } 20% { opacity: 1; } 100% { opacity: 0.9; transform: rotate(var(--piece-angle)) scaleX(1); } }
+    @keyframes lightningStrike { 0%, 16% { opacity: 0; transform: translateY(-82vh) rotate(var(--piece-angle)) scaleY(0.45); } 24%, 72% { opacity: 1; } 44% { opacity: 0.28; } 100% { opacity: 0; transform: translateY(18vh) rotate(var(--piece-angle)) scaleY(1.18); } }
+    @keyframes gridZoom { from { background-size: 16px 16px; opacity: 0; } to { background-size: 72px 72px; opacity: 1; } }
+    @keyframes dataScan { from { transform: translateY(-60%); } to { transform: translateY(60%); } }
+    @keyframes dataCell { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0); } 45% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--piece-x),var(--piece-y)) scale(1.8) rotate(var(--piece-angle)); } }
+    @keyframes pulverizeScreen { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.1); } 18% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--piece-x),var(--piece-y)) rotate(var(--piece-angle)) scale(0.25); } }
+    @keyframes graphLine { 0% { opacity: 0; transform: translate(var(--piece-x),var(--piece-y)) rotate(var(--piece-angle)) scaleX(0); } 30% { opacity: 1; } 100% { opacity: 0.25; transform: translate(var(--piece-x),var(--piece-y)) rotate(var(--piece-angle)) scaleX(1); } }
+    @keyframes vortexRing { 0% { opacity: 0; transform: translate(-50%,-50%) scale(2.4) rotate(0); } 35% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%,-50%) scale(0.05) rotate(540deg); } }
+
     @media (max-width: 600px) {
       #cube-topic-tooltip {
         display: none;
       }
+      .effect-pulverize .transition-piece:nth-child(n+48),
+      .effect-data-grid .transition-piece:nth-child(n+30) { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #face-transition-overlay .transition-piece { display: none; }
+      #face-transition-overlay.active { background: radial-gradient(circle, var(--transition-color), #02030a 70%); }
     }
   </style>
 
@@ -394,6 +515,7 @@
       <img id="meteor-gif" src="/static/meteoriti-spazio.gif?v=20260619-3" alt="" width="640" height="360" decoding="async" fetchpriority="low">
     </picture>
   </div>
+  <div id="face-transition-overlay" aria-hidden="true"></div>
   <div id="cube-topic-tooltip" aria-hidden="true"></div>
 
 
@@ -913,9 +1035,131 @@
     const mouse = new THREE.Vector2();
     let cubeClicked = false;
     let targetURL = null;
+    let clickedFaceIndex = -1;
     let animationStartTime = null;
+    let transitionEffectStarted = false;
+    let transitionNavigationTimer = 0;
     const animationDuration = 1000;
     const topicTooltip = document.getElementById("cube-topic-tooltip");
+    const faceTransitionOverlay = document.getElementById("face-transition-overlay");
+    const faceTransitionEffects = [
+      { name: "fracture", color: "#ff304f", alpha: "rgba(255,48,79,0.24)" },
+      { name: "lightning", color: "#38ff78", alpha: "rgba(56,255,120,0.23)" },
+      { name: "data-grid", color: "#4f87ff", alpha: "rgba(79,135,255,0.22)" },
+      { name: "pulverize", color: "#ffd43b", alpha: "rgba(255,212,59,0.23)" },
+      { name: "analytics", color: "#35efff", alpha: "rgba(53,239,255,0.24)" },
+      { name: "vortex", color: "#ff43ef", alpha: "rgba(255,67,239,0.23)" }
+    ];
+
+    function setPieceProperties(piece, properties) {
+      Object.keys(properties).forEach(function (name) {
+        piece.style.setProperty(name, properties[name]);
+      });
+      return piece;
+    }
+
+    function addTransitionPieces(effectName) {
+      const countByEffect = {
+        fracture: 28,
+        lightning: 13,
+        "data-grid": isMobileViewport ? 30 : 54,
+        pulverize: isMobileViewport ? 48 : 92,
+        analytics: 24,
+        vortex: 10
+      };
+      const count = countByEffect[effectName] || 20;
+      for (let index = 0; index < count; index++) {
+        const piece = document.createElement("i");
+        piece.className = "transition-piece";
+        const angle = effectName === "analytics"
+          ? (-62 + Math.random() * 124) + "deg"
+          : (Math.random() * 360) + "deg";
+        const distance = 22 + Math.random() * 72;
+        const properties = {
+          "--piece-angle": angle,
+          "--piece-delay": (Math.random() * 180) + "ms",
+          "--piece-length": effectName === "lightning" ? (58 + Math.random() * 48) + "vh" : (55 + Math.random() * 230) + "px",
+          "--piece-size": (effectName === "vortex" ? 90 + index * 58 : 4 + Math.random() * 15) + "px",
+          "--piece-radius": Math.random() > 0.52 ? "50%" : "2px",
+          "--piece-x": (Math.cos(index * 2.399 + Math.random()) * distance) + "vw",
+          "--piece-y": (Math.sin(index * 2.399 + Math.random()) * distance) + "vh"
+        };
+        if (effectName === "lightning") {
+          piece.style.left = (6 + Math.random() * 88) + "%";
+          piece.style.top = (-12 + Math.random() * 24) + "%";
+        }
+        if (effectName === "analytics") {
+          piece.style.left = (8 + index * 3.65) + "%";
+          piece.style.top = (66 - Math.sin(index * 0.74) * 28 - index * 0.42) + "%";
+        }
+        setPieceProperties(piece, properties);
+        faceTransitionOverlay.appendChild(piece);
+      }
+    }
+
+    function prefetchFace(url) {
+      if (!url || document.querySelector('link[data-cube-prefetch="' + url + '"]')) return;
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.href = url;
+      link.dataset.cubePrefetch = url;
+      document.head.appendChild(link);
+      fetch(url, { cache: "force-cache", credentials: "same-origin" }).catch(function () {});
+    }
+
+    function startFaceTransition(faceIndex, destination) {
+      if (transitionEffectStarted || !faceTransitionOverlay) return false;
+      const config = faceTransitionEffects[faceIndex] || faceTransitionEffects[0];
+      transitionEffectStarted = true;
+      clickedFaceIndex = faceIndex;
+      faceTransitionOverlay.className = "effect-" + config.name;
+      faceTransitionOverlay.style.setProperty("--transition-color", config.color);
+      faceTransitionOverlay.style.setProperty("--transition-color-alpha", config.alpha);
+      faceTransitionOverlay.replaceChildren();
+      const flash = document.createElement("b");
+      flash.className = "transition-flash";
+      faceTransitionOverlay.appendChild(flash);
+      addTransitionPieces(config.name);
+      faceTransitionOverlay.dataset.effect = config.name;
+      faceTransitionOverlay.setAttribute("aria-hidden", "false");
+      document.documentElement.dataset.cubeTransition = config.name;
+      requestAnimationFrame(function () { faceTransitionOverlay.classList.add("active"); });
+      if (destination) {
+        const effectDuration = prefersReducedMotion ? 420 : 1150;
+        transitionNavigationTimer = window.setTimeout(function () {
+          window.location.href = destination;
+        }, effectDuration);
+      }
+      return true;
+    }
+
+    function resetFaceTransitionPreview() {
+      window.clearTimeout(transitionNavigationTimer);
+      transitionNavigationTimer = 0;
+      transitionEffectStarted = false;
+      faceTransitionOverlay.className = "";
+      faceTransitionOverlay.replaceChildren();
+      faceTransitionOverlay.removeAttribute("data-effect");
+      faceTransitionOverlay.setAttribute("aria-hidden", "true");
+      delete document.documentElement.dataset.cubeTransition;
+    }
+
+    window.IndexFaceTransitions = Object.freeze({
+      effects: faceTransitionEffects.map(function (effect) { return effect.name; }),
+      preview: function (faceIndex) {
+        resetFaceTransitionPreview();
+        return startFaceTransition(Math.max(0, Math.min(5, Number(faceIndex) || 0)), null);
+      },
+      reset: resetFaceTransitionPreview,
+      state: function () {
+        return {
+          active: transitionEffectStarted,
+          faceIndex: clickedFaceIndex,
+          effect: faceTransitionOverlay.dataset.effect || null,
+          pieces: faceTransitionOverlay.querySelectorAll(".transition-piece").length
+        };
+      }
+    });
 
     function getTopicFromObject(object) {
       let selectedObject = object;
@@ -967,6 +1211,8 @@
           case 5: targetURL = '/face6'; break;
           default: console.log("Faccia non riconosciuta");
         }
+        clickedFaceIndex = faceIndex;
+        prefetchFace(targetURL);
         cubeClicked = true;
         renderer.domElement.removeEventListener('click', onClick, false);
       } else if (!window.matchMedia("(max-width: 600px)").matches) {
@@ -1059,18 +1305,20 @@
       lastFrameTime = timestamp;
       const frameScale = prefersReducedMotion ? 0.45 : Math.max(delta / 16.67, 0.5);
 
-      mainCube.rotation.x += 0.01 * frameScale;
-      mainCube.rotation.y += 0.01 * frameScale;
-      updateInnerHeartbeat(timestamp);
+      if (!transitionEffectStarted) {
+        mainCube.rotation.x += 0.01 * frameScale;
+        mainCube.rotation.y += 0.01 * frameScale;
+        updateInnerHeartbeat(timestamp);
+      }
 
       if (cubeClicked) {
         if (!animationStartTime) animationStartTime = timestamp;
         const elapsed = timestamp - animationStartTime;
-        const scaleFactor = baseCubeScale * (1 + (elapsed / animationDuration) * 0.5);
+        const cappedElapsed = Math.min(elapsed, animationDuration);
+        const scaleFactor = baseCubeScale * (1 + (cappedElapsed / animationDuration) * 0.5);
         mainCube.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        if (elapsed >= animationDuration) {
-          window.location.href = targetURL;
-          return;
+        if (elapsed >= animationDuration && !transitionEffectStarted) {
+          startFaceTransition(clickedFaceIndex, targetURL);
         }
       }
 
@@ -1097,6 +1345,9 @@
           innerScale: innerCube.userData.heartbeatScale || 1,
           innerFilled: innerCube.material.wireframe === false,
           baseCubeScale,
+          cubeRotationX: mainCube.rotation.x,
+          cubeRotationY: mainCube.rotation.y,
+          cubeScale: mainCube.scale.x,
           hypercubeLinePulse: hypercubePulse.userData.linePulse || 0,
           hypercubePulseScale: hypercubePulse.scale.x,
           hypercubePulseOpacity: hypercubePulseMaterials[0].opacity,
@@ -1110,7 +1361,10 @@
           miniCubeEdges: miniCubes.every(child => child.children.some(item => item.isLineSegments)),
           meteorCount: Number(document.getElementById("meteor-overlay")?.dataset.meteorCount || 0),
           meteorReady: Boolean(meteorImage && meteorImage.complete && meteorImage.naturalWidth),
-          meteorSource: meteorImage ? meteorImage.currentSrc : ""
+          meteorSource: meteorImage ? meteorImage.currentSrc : "",
+          transitionActive: transitionEffectStarted,
+          transitionFace: clickedFaceIndex,
+          transitionEffect: faceTransitionOverlay.dataset.effect || null
         };
       }
     });
