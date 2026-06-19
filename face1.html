@@ -89,6 +89,128 @@
       28% { opacity: 1; transform: scale(1); }
       100% { opacity: 0; transform: scale(1.18); }
     }
+    .face1-arcade {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      color: #fff;
+    }
+    .face1-arcade.active { display: grid; }
+    .face1-arcade-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(2, 3, 10, 0.86);
+      backdrop-filter: blur(12px);
+    }
+    .face1-arcade-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: min(1040px, 100%);
+      max-height: calc(100dvh - 36px);
+      grid-template-rows: auto auto minmax(280px, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(102, 220, 255, 0.34);
+      border-radius: 8px;
+      background: #070a12;
+      box-shadow: 0 28px 90px rgba(0,0,0,0.72), 0 0 42px rgba(68,221,255,0.12);
+    }
+    .face1-arcade-header,
+    .face1-arcade-hud,
+    .face1-arcade-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .face1-arcade-header h2 { margin: 0; font-size: clamp(1.45rem, 4vw, 2.35rem); }
+    .face1-arcade-header p { max-width: 660px; margin: 5px 0 0; color: rgba(255,255,255,0.66); line-height: 1.45; }
+    .face1-arcade-close {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      font-size: 1.45rem;
+      cursor: pointer;
+    }
+    .face1-arcade-close:hover,
+    .face1-arcade-close:focus-visible { border-color: #66ddff; background: rgba(102,221,255,0.16); }
+    .face1-arcade-hud {
+      border-bottom-color: rgba(255,255,255,0.08);
+      padding-block: 11px;
+      color: #9eeaff;
+      font-family: "Courier New", monospace;
+      font-weight: bold;
+    }
+    .face1-arcade-stage {
+      position: relative;
+      height: min(58vh, 590px);
+      min-height: 300px;
+      overflow: hidden;
+      background: #03050d;
+    }
+    .face1-arcade canvas {
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
+    }
+    .face1-arcade-feedback {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 3;
+      max-width: calc(100% - 28px);
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-family: "Courier New", monospace;
+      font-size: clamp(1rem, 5vw, 2rem);
+      font-weight: bold;
+      text-align: center;
+      text-shadow: 0 0 18px #44ddff;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .face1-arcade-feedback[data-tone="negative"] { color: #ff6b6b; text-shadow: 0 0 18px #ff3131; }
+    .face1-arcade-feedback.active { animation: arcadeFeedback 0.75s ease-out both; }
+    .face1-arcade-footer {
+      position: static;
+      left: auto;
+      bottom: auto;
+      z-index: auto;
+      width: auto;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 0;
+      background: #070a12;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .face1-arcade-footer p { margin: 0; color: rgba(255,255,255,0.72); line-height: 1.45; }
+    .face1-arcade-restart {
+      min-height: 46px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 22px;
+      color: #041016;
+      background: #66ddff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    body.face1-arcade-open > canvas { filter: blur(3px) brightness(0.65); }
+    @keyframes arcadeFeedback {
+      0% { opacity: 0; transform: translate(-50%, -42%) scale(0.82); }
+      24% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -62%) scale(1.05); }
+    }
     #back-link {
       margin-top: 10px;
       display: inline-block;
@@ -123,6 +245,15 @@
         padding: 5px 0;
         font-size: 0.8rem;
       }
+      .face1-arcade { padding: 0; }
+      .face1-arcade-shell { width: 100%; max-height: 100dvh; height: 100dvh; border: 0; border-radius: 0; }
+      .face1-arcade-header { padding: 12px 14px; }
+      .face1-arcade-header p { font-size: 0.78rem; }
+      .face1-arcade-hud { padding: 9px 14px; font-size: 0.82rem; }
+      .face1-arcade-stage { min-height: 260px; height: auto; }
+      .face1-arcade-footer { align-items: flex-start; flex-direction: column; padding: 12px 14px; }
+      .face1-arcade-footer p { font-size: 0.82rem; }
+      .face1-arcade-restart { width: 100%; min-height: 42px; }
     }
   </style>
   <!-- Includi fflate per FBXLoader se necessario -->
@@ -163,11 +294,30 @@
   <div id="miniGameHud" aria-live="polite"></div>
   <div id="coffeeFlash" aria-hidden="true"></div>
 
+  <section class="face1-arcade" id="face1Arcade" role="dialog" aria-modal="true" aria-labelledby="face1ArcadeTitle" aria-hidden="true">
+    <button class="face1-arcade-backdrop" type="button" aria-label="Chiudi il minigioco"></button>
+    <div class="face1-arcade-shell">
+      <header class="face1-arcade-header">
+        <div><h2 id="face1ArcadeTitle">Arcade 3D</h2><p id="face1ArcadeDescription"></p></div>
+        <button class="face1-arcade-close" id="face1ArcadeClose" type="button" aria-label="Chiudi il minigioco">&times;</button>
+      </header>
+      <div class="face1-arcade-hud" aria-live="polite"><span id="face1ArcadeScore">Punteggio 0</span><span id="face1ArcadeTime">Tempo 0s</span></div>
+      <div class="face1-arcade-stage">
+        <canvas id="face1ArcadeCanvas" aria-label="Area di gioco tridimensionale interattiva"></canvas>
+        <div class="face1-arcade-feedback" id="face1ArcadeFeedback" aria-live="assertive"></div>
+      </div>
+      <footer class="face1-arcade-footer"><p id="face1ArcadeInstructions"></p><button class="face1-arcade-restart" id="face1ArcadeRestart" type="button" hidden>Rigioca</button></footer>
+    </div>
+  </section>
+
+  <script src="/static/face1-games.js?v=20260619-1"></script>
+
   <script src="/static/media-optimizer.js"></script>
   <script>
     // === Variabili Globali ===
     let spacedrive = null;    // Modello spacedrive (Overdrive)
     let charizard = null;     // Modello Charizard
+    let facehugger = null;    // Modello Facehugger interattivo
     let character = null;     // Personaggio controllabile (modello 3D)
     let octaClickCount = 0;   // Contatore click sull'ottaedro
     let mixer;                // AnimationMixer globale
@@ -182,6 +332,11 @@
     let coffeeDiamond = null;
     let coffeeExploded = false;
     let coffeeExplosionTimer = null;
+    let facehuggerClickCount = 0;
+    let diamondClickCount = 0;
+    let facehuggerGameStarted = false;
+    let diamondGameStarted = false;
+    let coffeeGameStarted = false;
     const coffeeDiamondPalette = [
       new THREE.Color(0x33ccff),
       new THREE.Color(0x9b5cff),
@@ -369,9 +524,11 @@
 
     // === Funzione per Caricare il Facehugger (clic sulla sfera) ===
     function loadFacehugger() {
+      if (facehugger) return;
       gltfLoader.load('/static/surprise_facehugger_animated.glb', function(gltf) {
         console.log("Facehugger animazioni:", gltf.animations);
-        const facehugger = gltf.scene;
+        facehugger = gltf.scene;
+        facehugger.name = "facehugger";
         facehugger.scale.set(2, 2, 2);
         facehugger.position.copy(sphere.position);
         facehugger.traverse(child => {
@@ -394,6 +551,27 @@
       }, undefined, function(error) {
         console.error('Errore nel caricamento del modello GLB Facehugger:', error);
       });
+    }
+
+    function startFace1Arcade(type, trigger) {
+      if (!window.Face1Arcade) {
+        document.getElementById('message').textContent = "Il minigioco 3D non e disponibile su questo dispositivo.";
+        return false;
+      }
+      return window.Face1Arcade.start(type, trigger || renderer.domElement);
+    }
+
+    function registerFacehuggerClick(trigger) {
+      if (!facehugger || facehuggerGameStarted) return;
+      facehuggerClickCount += 1;
+      document.documentElement.dataset.facehuggerClicks = String(facehuggerClickCount);
+      tintModel(facehugger, new THREE.Color().setHSL((0.48 + facehuggerClickCount * 0.08) % 1, 0.86, 0.55));
+      document.getElementById('message').textContent = "Facehugger: " + facehuggerClickCount + " / 5 tocchi per aprire il Portale VR.";
+      if (facehuggerClickCount >= 5) {
+        facehuggerGameStarted = true;
+        document.documentElement.dataset.facehuggerGame = "unlocked";
+        startFace1Arcade("virtual", trigger);
+      }
     }
 
     // === Funzione per Creare il Personaggio (dopo 10 click sull'ottaedro) con modello glTF ===
@@ -715,9 +893,18 @@
       return group;
     }
 
+    function startCoffeeGame(trigger) {
+      if (coffeeGameStarted) return false;
+      coffeeGameStarted = true;
+      document.documentElement.dataset.coffeeGame = "playing";
+      document.getElementById('message').textContent = "Barista Orbitale avviato: raccogli i chicchi di caffe!";
+      return startFace1Arcade("coffee", trigger || renderer.domElement);
+    }
+
     function launchCoffeeFromSpaceDrive() {
       if (!spacedrive || coffeeProjectile || coffeeDiamond) return false;
       coffeeExploded = false;
+      coffeeGameStarted = false;
       delete document.documentElement.dataset.coffeeTrigger;
       coffeeProjectile = createCoffeeObject();
       coffeeProjectile.position.copy(spacedrive.position).add(new THREE.Vector3(-2.8, 1.9, -0.2));
@@ -736,7 +923,11 @@
         }
       }, isMobileViewport ? 900 : 1050);
       document.documentElement.dataset.coffeeState = "launched";
+      document.documentElement.dataset.coffeeGame = "scheduled";
       document.getElementById('message').textContent = "Un caffe' e' uscito dalla SpaceDrive!";
+      window.setTimeout(function () {
+        startCoffeeGame(renderer.domElement);
+      }, 420);
       return true;
     }
 
@@ -836,6 +1027,7 @@
       coffeeDiamond.name = "coffeeDiamond";
       coffeeDiamond.position.copy(position);
       coffeeDiamond.userData.colorStep = 0;
+      coffeeDiamond.userData.clickCount = 0;
       coffeeDiamond.userData.spawnTime = performance.now();
       scene.add(coffeeDiamond);
       document.documentElement.dataset.coffeeState = "diamond";
@@ -875,12 +1067,20 @@
     function changeDiamondColor() {
       if (!coffeeDiamond) return;
       coffeeDiamond.userData.colorStep++;
+      coffeeDiamond.userData.clickCount++;
+      diamondClickCount = coffeeDiamond.userData.clickCount;
       const color = coffeeDiamondPalette[coffeeDiamond.userData.colorStep % coffeeDiamondPalette.length];
       coffeeDiamond.material.color.copy(color);
       coffeeDiamond.material.emissive.copy(color).multiplyScalar(0.28);
       createBurst(coffeeDiamond.position, color, 10, 6);
       document.documentElement.dataset.coffeeDiamondColor = ["blue", "purple", "green", "gold", "red"][coffeeDiamond.userData.colorStep % coffeeDiamondPalette.length];
-      document.getElementById('message').textContent = "Il diamante ha cambiato colore!";
+      document.documentElement.dataset.diamondClicks = String(diamondClickCount);
+      document.getElementById('message').textContent = "Il diamante ha cambiato colore: " + diamondClickCount + " / 5 tocchi per il Prisma Quantico.";
+      if (diamondClickCount >= 5 && !diamondGameStarted) {
+        diamondGameStarted = true;
+        document.documentElement.dataset.diamondGame = "unlocked";
+        startFace1Arcade("diamond", renderer.domElement);
+      }
     }
 
     window.Face1CoffeeDebug = Object.freeze({
@@ -896,6 +1096,21 @@
         };
       },
       changeDiamondColor: changeDiamondColor
+    });
+
+    window.Face1GameTriggers = Object.freeze({
+      facehugger: function() { registerFacehuggerClick(renderer.domElement); },
+      diamond: function() { changeDiamondColor(); },
+      coffee: function() { return startCoffeeGame(renderer.domElement); },
+      state: function() {
+        return {
+          facehuggerClicks: facehuggerClickCount,
+          diamondClicks: diamondClickCount,
+          facehuggerGameStarted: facehuggerGameStarted,
+          diamondGameStarted: diamondGameStarted,
+          coffeeGameStarted: coffeeGameStarted
+        };
+      }
     });
 
     function changeSpaceDriveColorAndLaunchCoffee() {
@@ -945,6 +1160,8 @@
     const mouse = new THREE.Vector2();
     document.addEventListener('click', onDocumentClick, false);
     function onDocumentClick(event) {
+      if (event.target instanceof Element && event.target.closest('#info, footer, #face1Arcade')) return;
+      if (document.getElementById('face1Arcade').classList.contains('active')) return;
       if (octaMiniGameActive) {
         handleMiniGamePointer(event);
         return;
@@ -954,12 +1171,20 @@
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children, true);
       const clickedObject = intersects.length > 0 ? intersects[0].object : null;
+      if (coffeeProjectile && ((clickedObject && isDescendantOf(clickedObject, coffeeProjectile)) || isProjectedObjectNearPointer(coffeeProjectile, event, isMobileViewport ? 150 : 108))) {
+        startCoffeeGame(renderer.domElement);
+        return;
+      }
       if (coffeeDiamond && ((clickedObject && (clickedObject === coffeeDiamond || isDescendantOf(clickedObject, coffeeDiamond))) || isProjectedObjectNearPointer(coffeeDiamond, event, isMobileViewport ? 168 : 136))) {
         changeDiamondColor();
         return;
       }
       if (charizard && ((clickedObject && isDescendantOf(clickedObject, charizard)) || isProjectedObjectNearPointer(charizard, event, 96))) {
         changeCharizardColor();
+        return;
+      }
+      if (facehugger && ((clickedObject && isDescendantOf(clickedObject, facehugger)) || isProjectedObjectNearPointer(facehugger, event, isMobileViewport ? 150 : 112))) {
+        registerFacehuggerClick(renderer.domElement);
         return;
       }
       if (spacedrive && isProjectedObjectNearPointer(spacedrive, event, isMobileViewport ? 142 : 112)) {
@@ -973,6 +1198,10 @@
         }
         if (charizard && isDescendantOf(clickedObject, charizard)) {
           changeCharizardColor();
+          return;
+        }
+        if (facehugger && isDescendantOf(clickedObject, facehugger)) {
+          registerFacehuggerClick(renderer.domElement);
           return;
         }
         // Se il terreno (ground) è cliccato: cambia colore e carica Charizard

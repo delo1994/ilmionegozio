@@ -50,10 +50,12 @@ assert.match(demo1, /Dove le idee diventano esperienze digitali\./);
 assert.match(demo1, /id="metodo"/);
 assert.match(demo1, /id="testimonianze"/);
 assert.match(demo1, /class="demo-return" href="\/face5"/, "La demo 1 deve permettere di tornare a Face5");
+assert.match(demo1, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 1 deve essere chiaro su mobile");
 
 const demo2 = read("examples/esempio-2/index.html");
 assert.match(demo2, /Costruiamo il futuro digitale della tua azienda\./);
 assert.match(demo2, /class="demo-return" href="\/face5"/, "La demo 2 deve permettere di tornare a Face5");
+assert.match(demo2, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 2 deve essere chiaro su mobile");
 for (const phrase of ["Strategie digitali", "Automazioni intelligenti", "Campagne che convertono"]) {
   assert.match(demo2, new RegExp(phrase));
 }
@@ -61,6 +63,7 @@ assert.equal((demo2.match(/class="agency-card"/g) || []).length, 6, "La demo AI 
 
 const demo3 = read("examples/esempio-3/index.html");
 assert.match(demo3, /class="demo-return" href="\/face5"/, "La demo 3 deve permettere di tornare a Face5");
+assert.match(demo3, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 3 deve essere chiaro su mobile");
 assert.match(demo3, /Esperienze digitali che lasciano il segno/);
 assert.match(demo3, /id="collaborazioni"/);
 assert.match(demo3, /Parliamo del progetto/);
@@ -70,6 +73,16 @@ for (const condition of ["crossedBoundary", "touchedDrive", "passedDriveLimit", 
   assert.match(face1, new RegExp(condition), `Face1 deve controllare ${condition}`);
 }
 assert.match(face1, /Face1CoffeeDebug/);
+assert.match(face1, /id="face1Arcade"/, "Face1 deve includere l'arcade 3D");
+assert.match(face1, /facehuggerClickCount\s*>=\s*5/, "Il Facehugger deve aprire il gioco dopo cinque tocchi");
+assert.match(face1, /diamondClickCount\s*>=\s*5/, "Il diamante deve aprire il gioco dopo cinque tocchi");
+assert.match(face1, /startFace1Arcade\("coffee"/, "Il caffe deve avviare il gioco tematico");
+
+const face1Games = read("static/face1-games.js");
+for (const title of ["Portale VR", "Prisma Quantico", "Barista Orbitale"]) {
+  assert.match(face1Games, new RegExp(title), `L'arcade Face1 deve includere ${title}`);
+}
+assert.match(face1Games, /window\.Face1Arcade/, "L'arcade Face1 deve esporre lo stato diagnostico");
 
 for (const face of ["face1", "face2", "face5"]) {
   assert.equal(read(`${face}.html`), read(`${face}/index.html`), `${face}.html e ${face}/index.html devono restare sincronizzati`);

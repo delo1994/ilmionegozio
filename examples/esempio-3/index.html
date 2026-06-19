@@ -220,6 +220,7 @@
       background: rgba(0,223,143,0.12);
       transform: translateX(-2px);
     }
+    .demo-return-mobile { display: none; }
 
     .mobile-menu-toggle {
       display: none;
@@ -967,8 +968,9 @@
       }
 
       .action-dot { display: none; }
-      .demo-return { width: 44px; justify-content: center; margin-left: auto; padding: 0; }
+      .demo-return { min-width: 88px; justify-content: center; margin-left: auto; padding: 0 10px; }
       .demo-return-label { display: none; }
+      .demo-return-mobile { display: inline; }
       .mobile-menu-toggle { display: grid; }
 
       .section {
@@ -1056,9 +1058,22 @@
     }
 
     @media (max-width: 520px) {
+      html,
+      body { max-width: 100%; overflow-x: hidden; }
+
       .logo {
-        font-size: 1.2rem;
+        font-size: 1.05rem;
       }
+
+      .navbar { padding-inline: 12px; }
+
+      .hero > *,
+      .two-col > *,
+      .work-grid > *,
+      .collaboration-grid > *,
+      .footer-grid > * { min-width: 0; max-width: 100%; }
+
+      .eyebrow { max-width: 100%; flex-wrap: wrap; font-size: 0.68rem; }
 
       .hero-title {
         font-size: 3.15rem;
@@ -1083,11 +1098,12 @@
       }
 
       .id-card {
-        width: min(320px, 92vw);
+        width: min(280px, calc(100vw - 40px));
         min-height: 458px;
       }
 
       .portrait {
+        width: calc(100% - 36px);
         height: 315px;
       }
 
@@ -1161,7 +1177,7 @@
       <a href="#services">Servizi</a>
       <a href="#contact">Contatti</a>
     </div>
-    <a class="demo-return" href="/face5" aria-label="Torna a Face5"><span aria-hidden="true">&#8592;</span><span class="demo-return-label">Torna a Face5</span></a>
+    <a class="demo-return" href="/face5" aria-label="Torna a Face5"><span aria-hidden="true">&#8592;</span><span class="demo-return-label">Torna a Face5</span><span class="demo-return-mobile">Indietro</span></a>
     <a class="action-dot" href="#contact" aria-label="Contatta Luca Ferri"></a>
     <button class="mobile-menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
   </nav>
