@@ -2,634 +2,170 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Analisi di Mercato - ilmionegozio.com</title>
-  <meta name="description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Rete neurale e analisi digitale - ilmionegozio.com</title>
+  <meta name="description" content="Strategia digitale, campagne, tracking e analisi dati attraverso una rete neurale 3D interattiva.">
   <link rel="canonical" href="https://www.ilmionegozio.com/face5">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* Stile per il link per saltare il contenuto (skip link) */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: #004080;
-      color: #fff;
-      padding: 8px;
-      z-index: 100;
-      transition: top 0.3s;
-      text-decoration: none;
-    }
-    .skip-link:focus {
-      top: 0;
-    }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eef3f8;
-      color: #333;
-      padding: 0;
-    }
-    header {
-      background: #004080;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-    }
-    .content {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px 30px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .analysis-layout {
-      width: min(1380px, calc(100% - 32px));
-      margin: 24px auto;
-      display: grid;
-      grid-template-columns: minmax(170px, 220px) minmax(0, 920px) minmax(170px, 220px);
-      gap: 18px;
-      align-items: start;
-    }
-    .example-rail {
-      position: sticky;
-      top: 18px;
-      background: #fff;
-      border: 1px solid #dbe6f3;
-      border-radius: 5px;
-      padding: 14px;
-      box-shadow: 0 8px 22px rgba(0, 48, 96, 0.08);
-    }
-    .example-rail h2 {
-      margin-top: 0;
-      font-size: 1rem;
-      color: #004080;
-    }
-    .site-preview {
-      display: block;
-      margin: 14px 0 18px;
-      color: #004080;
-      text-decoration: none;
-      padding: 10px;
-      border: 1px solid #e1ebf6;
-      border-radius: 6px;
-      background: #fbfdff;
-      box-shadow: 0 8px 18px rgba(0, 48, 96, 0.05);
-      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-    }
-    .site-preview:hover {
-      transform: translateY(-4px);
-      border-color: #aac5df;
-      box-shadow: 0 14px 28px rgba(0, 48, 96, 0.1);
-    }
-    .preview-main {
-      display: block;
-      color: inherit;
-      text-decoration: none;
-    }
-    .preview-screen {
-      position: relative;
-      height: 118px;
-      overflow: hidden;
-      border: 2px solid #004080;
-      border-radius: 5px;
-      background: linear-gradient(180deg, #f9fbff, #dfeeff);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8);
-      transform: perspective(520px) rotateX(0) rotateY(0);
-      transition: transform 260ms ease, box-shadow 260ms ease;
-    }
-    .preview-screen::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(90deg, rgba(0,64,128,0.08), transparent 40%),
-        repeating-linear-gradient(0deg, transparent 0 20px, rgba(0,64,128,0.08) 20px 21px);
-      transform: translateY(-30%);
-      animation: previewScroll 5.5s linear infinite;
-    }
-    .preview-screen::after {
-      position: absolute;
-      left: 8px;
-      top: 7px;
-      width: 5px;
-      height: 5px;
-      content: "";
-      border-radius: 50%;
-      background: #ff6b6b;
-      box-shadow: 9px 0 #ffd166, 18px 0 #4bc0c0;
-    }
-    .preview-main:hover .preview-screen,
-    .preview-main:focus-visible .preview-screen {
-      transform: perspective(520px) rotateX(2deg) rotateY(-3deg) translateY(-3px);
-      box-shadow: 0 14px 26px rgba(0,48,96,0.16), inset 0 0 0 1px rgba(255,255,255,0.8);
-    }
-    .preview-screen span {
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      height: 10px;
-      border-radius: 99px;
-      background: #004080;
-      opacity: 0.8;
-      animation: previewPulse 2.4s ease-in-out infinite alternate;
-    }
-    .preview-screen span:nth-child(1) { top: 27px; width: 70%; }
-    .preview-screen span:nth-child(2) { top: 54px; width: 48%; background: #36A2EB; animation-delay: 0.25s; }
-    .preview-screen span:nth-child(3) { top: 82px; width: 84%; background: #4BC0C0; animation-delay: 0.5s; }
-    .site-preview strong {
-      display: block;
-      margin-top: 8px;
-      color: #004080;
-      text-align: center;
-    }
-    .site-preview em {
-      display: block;
-      margin-top: 2px;
-      color: #53708e;
-      font-size: 0.78rem;
-      font-style: normal;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-    .preview-copy {
-      margin: 8px 0 10px;
-      color: #405b75;
-      font-size: 0.82rem;
-      line-height: 1.45;
-    }
-    .preview-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-    .preview-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 34px;
-      padding: 8px 10px;
-      border: 1px solid #b8cde2;
-      border-radius: 5px;
-      background: #fff;
-      color: #004080;
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-decoration: none;
-    }
-    .preview-button.primary {
-      border-color: #004080;
-      background: #004080;
-      color: #fff;
-    }
-    .preview-button:hover,
-    .preview-button:focus-visible {
-      filter: brightness(1.06);
-      transform: translateY(-1px);
-    }
-    .preview-gridline .preview-screen {
-      background: linear-gradient(135deg, #ffffff, #e7e7e7);
-      border-color: #111827;
-    }
-    .preview-gridline .preview-screen span { background: #111827; }
-    .preview-pixzen .preview-screen {
-      background: linear-gradient(135deg, #f5f3ef, #d8d4cb);
-      border-color: #0a0a0a;
-    }
-    .preview-pixzen .preview-screen span { background: #0a0a0a; }
-    .preview-zedian .preview-screen {
-      background: linear-gradient(135deg, #0d1116, #14181f);
-      border-color: #00df8f;
-    }
-    .preview-zedian .preview-screen span { background: #00df8f; }
-    @keyframes previewScroll {
-      to { transform: translateY(18%); }
-    }
-    @keyframes previewPulse {
-      from { transform: translateX(0); opacity: 0.55; }
-      to { transform: translateX(12px); opacity: 0.95; }
-    }
-    .report-kicker {
-      margin: 0 0 8px;
-      color: #53708e;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-    .executive-panel {
-      padding: 18px;
-      border-left: 5px solid #004080;
-      background: #f6faff;
-      margin-bottom: 18px;
-    }
-    .report-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-    .report-section {
-      padding: 16px;
-      border: 1px solid #d8e4f2;
-      border-radius: 5px;
-      background: #fff;
-    }
-    .report-section h3 {
-      margin: 0 0 8px;
-      color: #004080;
-      font-size: 1.05rem;
-    }
-    .icon-tools {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin: 18px 0;
-    }
-    .insight-toggle {
-      border: 1px solid #c8d8ea;
-      background: #f7fbff;
-      color: #004080;
-      border-radius: 5px;
-      padding: 12px 8px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-    .insight-toggle span {
-      display: block;
-      font-size: 1.6rem;
-      margin-bottom: 4px;
-    }
-    .insight-toggle[aria-expanded="true"] {
-      background: #004080;
-      color: #fff;
-    }
-    #insight-detail {
-      min-height: 44px;
-      padding: 12px 14px;
-      border: 1px solid #c8d8ea;
-      background: #f7fbff;
-      border-radius: 5px;
-      color: #24384d;
-    }
-    h2 {
-      color: #004080;
-      margin-top: 30px;
-    }
-    p, ul {
-      line-height: 1.6;
-      font-size: 16px;
-    }
-    ul {
-      list-style: disc inside;
-      margin: 10px 0;
-    }
-    .chart-container {
-      margin: 20px 0;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      max-width: 600px;
-      height: 300px;
-      position: relative;
-    }
-    .chart-container canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-    a {
-      display: inline-block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #004080;
-      font-weight: bold;
-    }
-    main {
-      padding-bottom: 34px;
-    }
-    .footer {
-      position: relative;
-      width: 100%;
-      box-sizing: border-box;
-      text-align: center;
-      padding: 20px 15px;
-      background-color: #fff;
-      font-size: 0.85rem;
-      color: #52677d;
-      border-top: 1px solid #004080;
-      z-index: 2;
-      overflow-wrap: anywhere;
-    }
-    .footer a {
-      color: #004080;
-      text-decoration: none;
-    }
-    .footer a:hover {
-      text-decoration: underline;
-    }
-    @media (max-width: 1040px) {
-      .analysis-layout {
-        grid-template-columns: 1fr;
-      }
-      .example-rail {
-        position: static;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(170px, 1fr));
-        gap: 12px;
-      }
-      .example-rail h2 {
-        grid-column: 1 / -1;
-      }
-      .site-preview {
-        margin: 0;
-      }
-    }
-    @media (max-width: 640px) {
-      body {
-        padding: 0;
-      }
-      header {
-        padding: 16px 12px;
-      }
-      .analysis-layout {
-        width: calc(100% - 18px);
-        margin: 12px auto;
-      }
-      .content {
-        padding: 16px;
-      }
-      .report-grid,
-      .icon-tools,
-      .example-rail {
-        grid-template-columns: 1fr;
-      }
-      .chart-container {
-        height: 260px;
-      }
-    }
-  </style>
-  <!-- Include Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="theme-color" content="#050508">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Analisi di Mercato - ilmionegozio.com">
-  <meta property="og:description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Rete neurale e analisi digitale - ilmionegozio.com">
+  <meta property="og:description" content="Strategia, advertising, tracking e dati in un'esperienza neurale 3D interattiva.">
   <meta property="og:url" content="https://www.ilmionegozio.com/face5">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Analisi di Mercato - ilmionegozio.com">
-  <meta name="twitter:description" content="Analisi di mercato, grafici e contenuti business della versione originale.">
+  <meta name="twitter:title" content="Rete neurale e analisi digitale - ilmionegozio.com">
+  <meta name="twitter:description" content="Strategia digitale e analisi dati attraverso una rete neurale 3D interattiva.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/site-foundation.css">
+  <link rel="stylesheet" href="/static/face5-quantum.css">
   <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="/static/face5-quantum.js"></script>
 </head>
 <body>
-  <!-- Skip link per utenti che navigano da tastiera -->
-  <a href="#main-content" class="skip-link">Salta al contenuto</a>
+  <canvas id="quantum-network" aria-hidden="true"></canvas>
+  <div class="network-fallback" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="hero-overlay" aria-hidden="true"></div>
 
-  <header role="banner">
-    <h1>Analisi di Mercato ed Esperienze</h1>
+  <header class="quantum-nav">
+    <nav class="nav-glass" aria-label="Navigazione analisi digitale">
+      <a class="quantum-brand" href="/" aria-label="ilmionegozio.com - torna al cubo">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span>ILMIONEGOZIO</span>
+      </a>
+      <div class="desktop-links">
+        <button type="button" data-panel-open="report-panel">Report</button>
+        <button type="button" data-panel-open="report-panel">Strategia</button>
+        <button type="button" data-panel-open="demos-panel">Demo</button>
+        <a href="/privacy-policy">Risorse</a>
+      </div>
+      <a class="nav-cta" href="/">Torna al cubo</a>
+      <button class="menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
+    </nav>
+    <div class="mobile-menu" aria-hidden="true">
+      <button type="button" data-panel-open="report-panel">Apri il report</button>
+      <button type="button" data-panel-open="demos-panel">Esplora le demo</button>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/">Torna al cubo</a>
+    </div>
   </header>
 
-  <main id="main-content" role="main">
-    <div class="analysis-layout">
-      <aside class="example-rail" aria-label="Esempi siti animati">
-        <h2>Demo professionali</h2>
-        <article class="site-preview preview-gridline">
-          <a class="preview-main" href="/examples/esempio-1/" aria-label="Apri Esempio 1 Studio Creativo Premium">
-            <div class="preview-screen"><span></span><span></span><span></span></div>
-            <strong>Esempio 1</strong>
-            <em>Studio Creativo Premium</em>
-          </a>
-          <p class="preview-copy">Studio italiano minimalista con scultura 3D, portfolio, metodo e richiesta preventivo.</p>
-          <div class="preview-actions">
-            <a class="preview-button primary" href="/examples/esempio-1/">Apri demo</a>
-            <a class="preview-button" href="/examples/esempio-1/#about">Maggiori informazioni</a>
-          </div>
-        </article>
-        <article class="site-preview preview-pixzen">
-          <a class="preview-main" href="/examples/esempio-2/" aria-label="Apri Esempio 2 Agenzia AI e Marketing">
-            <div class="preview-screen"><span></span><span></span><span></span></div>
-            <strong>Esempio 2</strong>
-            <em>Agenzia AI &amp; Marketing</em>
-          </a>
-          <p class="preview-copy">Agenzia italiana con strategie AI, Google Ads, Meta Ads, automazioni e case study.</p>
-          <div class="preview-actions">
-            <a class="preview-button primary" href="/examples/esempio-2/">Apri demo</a>
-            <a class="preview-button" href="/examples/esempio-2/#services">Maggiori informazioni</a>
-          </div>
-        </article>
-      </aside>
-
-      <div class="content">
-      <p class="report-kicker">Report aziendale - marketing strategico, PPC e tracking</p>
-      <section class="executive-panel" aria-labelledby="executive-summary">
-        <h2 id="executive-summary">1. Executive summary</h2>
-        <p>
-          Il report trasforma i dati raccolti in una roadmap operativa: posizionamento, pubblico, campagne Google Ads e Meta Ads, tracciamento pixel, contenuti social e KPI. L'approccio combina esperienza commerciale, studio ecommerce/database e logica da agenzia pay per click.
-        </p>
-      </section>
-
-      <section aria-labelledby="chi-siamo">
-        <h2 id="chi-siamo">Chi Siamo</h2>
-        <p>
-          Siamo un team con esperienze diversificate. Ho maturato anni di esperienza nella vendita porta a porta e nel network marketing, frequentando corsi di ecommerce e programmazione database con specializzazione in sistemi di archiviazione e blockchain, oltre ad aver svolto uno stage presso un adblocker specializzato in Google Ads con partnership Google. L'altro membro del team ha completato un corso in marketing e comunicazione digitale. Queste esperienze ci consentono di analizzare il mercato e di utilizzare i dati per ottimizzare l'interazione utente all'interno dei siti web.
-        </p>
-      </section>
-
-      <div class="icon-tools" aria-label="Ideogrammi interattivi del report">
-        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Il pixel registra eventi come visualizzazioni, click, lead e acquisti. Serve a misurare conversioni, creare pubblici personalizzati e alimentare campagne di remarketing."><span>◉</span>Pixel</button>
-        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Le campagne PPC vengono separate per intento: ricerca consapevole su Google, domanda latente su Meta, remarketing su utenti caldi."><span>▲</span>PPC</button>
-        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="Il funnel ordina le azioni: awareness, traffico qualificato, lead, preventivo, vendita e fidelizzazione."><span>◆</span>Funnel</button>
-        <button class="insight-toggle" type="button" aria-expanded="false" data-detail="I contenuti social traducono il valore in prove: casi studio, backstage, prima/dopo, domande frequenti e offerte chiare."><span>●</span>Social</button>
+  <main class="quantum-hero" id="contenuto-principale">
+    <div class="hero-content">
+      <span class="version-pill">Analisi digitale 3.0</span>
+      <h1>Strategie guidate dai dati.</h1>
+      <p>Trasformiamo segnali, campagne e comportamento degli utenti in decisioni chiare, automazioni misurabili e crescita sostenibile.</p>
+      <div class="hero-actions">
+        <button class="primary-action" type="button" data-panel-open="report-panel">Esplora il report</button>
+        <button class="secondary-action" type="button" data-panel-open="demos-panel">Scopri le demo</button>
       </div>
-      <div id="insight-detail" role="status" aria-live="polite">Seleziona un ideogramma per leggere il dettaglio operativo.</div>
-
-      <section class="report-grid" aria-label="Sezioni professionali del report">
-        <article class="report-section">
-          <h3>2. Obiettivi aziendali</h3>
-          <p>Definire richieste preventivo, prenotazioni consulenza, vendite ecommerce, traffico qualificato e crescita del database contatti.</p>
-        </article>
-        <article class="report-section">
-          <h3>3. Analisi pubblico</h3>
-          <p>Segmentare per area geografica, livello di consapevolezza, urgenza, capacità di spesa, device e interessi digitali.</p>
-        </article>
-        <article class="report-section">
-          <h3>4. Analisi competitor</h3>
-          <p>Studiare offerta, messaggi, pagine di atterraggio, promesse, prezzo percepito, recensioni e creatività pubblicitarie.</p>
-        </article>
-        <article class="report-section">
-          <h3>5. Strategia Google Ads</h3>
-          <p>Campagne Search per intento alto, estensioni, keyword negative, landing coerenti e ottimizzazione su conversioni reali.</p>
-        </article>
-        <article class="report-section">
-          <h3>6. Strategia Meta/Facebook Ads</h3>
-          <p>Creatività visuali, pubblici lookalike, retargeting video/engagement e test A/B su headline, offerta e formato.</p>
-        </article>
-        <article class="report-section">
-          <h3>7. Pixel, tracking e conversioni</h3>
-          <p>Eventi consigliati: PageView, ViewContent, Lead, Contact, Schedule, Purchase. Ogni evento deve avere origine, valore e consenso corretti.</p>
-        </article>
-        <article class="report-section">
-          <h3>8. Funnel marketing</h3>
-          <p>Contenuto utile per traffico freddo, prova sociale per traffico tiepido, CTA diretta per utenti caldi e follow-up per lead non chiusi.</p>
-        </article>
-        <article class="report-section">
-          <h3>9. Piano contenuti social</h3>
-          <p>Calendario con educational, dietro le quinte, portfolio, confronto problemi/soluzioni, recensioni e inviti a demo o consulenza.</p>
-        </article>
-        <article class="report-section">
-          <h3>10. KPI da monitorare</h3>
-          <p>CTR, CPC, CPM, CPA, tasso conversione landing, ROAS, frequenza, qualità lead, costo per appuntamento e tempo medio alla vendita.</p>
-        </article>
-        <article class="report-section">
-          <h3>11. Fonti e motivazioni</h3>
-          <p>Fonti operative da usare: documentazione Google Ads, Meta Business Help, Google Analytics, Search Console, ISTAT, Unioncamere, Osservatorio eCommerce B2C Politecnico di Milano, survey proprietarie e benchmark di settore.</p>
-        </article>
-        <article class="report-section">
-          <h3>12. Prossime azioni operative</h3>
-          <p>Audit tracking, revisione landing, mappa keyword, piano creatività, installazione eventi, dashboard KPI e ciclo test settimanale.</p>
-        </article>
-      </section>
-
-      <section aria-labelledby="le-nostre-analisi">
-        <h2 id="le-nostre-analisi">Le Nostre Analisi</h2>
-        <p>
-          Abbiamo condotto una ricerca di mercato approfondita sull'upcycling in Toscana. I dati raccolti ci hanno permesso di capire la distribuzione geografica degli intervistati, le interazioni per area del sito e il profilo demografico degli utenti.
-        </p>
-
-        <div class="chart-container" role="img" aria-label="Grafico a torta: Distribuzione Geografica degli intervistati - Firenze 45%, Pisa 20%, Siena 15%, Lucca 10%, Altri 10%">
-          <canvas id="geoChart"></canvas>
-        </div>
-
-        <div class="chart-container" role="img" aria-label="Grafico a barre: Interazioni sul sito per sezione - Inizio 180, Prodotti 130, Dettagli 90, Contatti 70, Domande frequenti 40">
-          <canvas id="clickChart"></canvas>
-        </div>
-
-        <div class="chart-container" role="img" aria-label="Grafico a ciambella: Profilo Demografico - Maschi 50%, Femmine 45%, Non Specificato 5%">
-          <canvas id="demoChart"></canvas>
-        </div>
-      </section>
-
-      <section aria-labelledby="esperienze-e-formazione">
-        <h2 id="esperienze-e-formazione">Esperienze e Formazione</h2>
-        <ul>
-          <li>Vendita porta a porta e network marketing</li>
-          <li>Corsi di ecommerce e programmazione database</li>
-          <li>Specializzazione in sistemi di archiviazione e blockchain</li>
-          <li>Stage presso un adblocker specializzato in Google Ads (con partnership Google)</li>
-          <li>Corso di marketing e comunicazione digitale</li>
-        </ul>
-      </section>
-
-      <nav role="navigation" aria-label="Navigazione di ritorno">
-        <a href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
-      </nav>
-      </div>
-
-      <aside class="example-rail" aria-label="Esempio sito animato aggiuntivo">
-        <h2>Portfolio professionale</h2>
-        <article class="site-preview preview-zedian">
-          <a class="preview-main" href="/examples/esempio-3/" aria-label="Apri Esempio 3 Portfolio Professionale Tech">
-            <div class="preview-screen"><span></span><span></span><span></span></div>
-            <strong>Esempio 3</strong>
-            <em>Portfolio Professionale Tech</em>
-          </a>
-          <p class="preview-copy">Portfolio italiano scuro con card trascinabile, progetti 3D, tecnologie e collaborazioni.</p>
-          <div class="preview-actions">
-            <a class="preview-button primary" href="/examples/esempio-3/">Apri demo</a>
-            <a class="preview-button" href="/examples/esempio-3/#about">Maggiori informazioni</a>
-          </div>
-        </article>
-        <p>Anteprime leggere in CSS: movimento continuo senza video aggiuntivi.</p>
-      </aside>
     </div>
   </main>
 
-  <script>
-    document.querySelectorAll('.insight-toggle').forEach(button => {
-      button.addEventListener('click', () => {
-        document.querySelectorAll('.insight-toggle').forEach(item => item.setAttribute('aria-expanded', 'false'));
-        button.setAttribute('aria-expanded', 'true');
-        document.getElementById('insight-detail').textContent = button.dataset.detail;
-      });
-    });
+  <div class="network-status" aria-hidden="true"><span></span> Rete neurale interattiva</div>
+  <p class="interaction-hint">Tocca lo spazio per generare un impulso</p>
 
-    // Grafico: Distribuzione Geografica (Pie Chart)
-    const ctxGeo = document.getElementById('geoChart').getContext('2d');
-    const geoChart = new Chart(ctxGeo, {
-      type: 'pie',
-      data: {
-        labels: ['Firenze', 'Pisa', 'Siena', 'Lucca', 'Altri'],
-        datasets: [{
-          label: 'Intervistati (%)',
-          data: [45, 20, 15, 10, 10],
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'right' },
-          title: { display: true, text: 'Distribuzione Geografica' }
-        }
-      }
-    });
-
-    // Grafico: Interazioni per Area del Sito (Bar Chart)
-    const ctxClick = document.getElementById('clickChart').getContext('2d');
-    const clickChart = new Chart(ctxClick, {
-      type: 'bar',
-      data: {
-        labels: ['Inizio', 'Prodotti', 'Dettagli', 'Contatti', 'Domande frequenti'],
-        datasets: [{
-          label: 'Clic per Sezione',
-          data: [180, 130, 90, 70, 40],
-          backgroundColor: 'rgba(54, 162, 235, 0.7)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true, ticks: { stepSize: 20 } }
-        },
-        plugins: {
-          title: { display: true, text: 'Interazioni sul Sito' }
-        }
-      }
-    });
-
-    // Grafico: Profilo Demografico (Doughnut Chart)
-    const ctxDemo = document.getElementById('demoChart').getContext('2d');
-    const demoChart = new Chart(ctxDemo, {
-      type: 'doughnut',
-      data: {
-        labels: ['Maschi', 'Femmine', 'Non Specificato'],
-        datasets: [{
-          label: 'Percentuale',
-          data: [50, 45, 5],
-          backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom' },
-          title: { display: true, text: 'Profilo Demografico' }
-        }
-      }
-    });
-  </script>
-
-  <footer class="footer" role="contentinfo">
-    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
-    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
-    <a href="/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a> |
-    <a href="/Accessibilita" target="_blank" rel="noopener noreferrer">Accessibilità</a> |
-    <a href="/Termini_Condizioni" target="_blank" rel="noopener noreferrer">Termini&Condizioni</a>
+  <footer class="hero-legal">
+    <span>&copy; 2026 Emanuele Delogu</span>
+    <nav aria-label="Link legali">
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/cookie-policy">Cookie</a>
+      <a href="/Accessibilita">Accessibilit&agrave;</a>
+      <a href="/Termini_Condizioni">Termini</a>
+    </nav>
   </footer>
+
+  <section class="overlay-panel" id="report-panel" role="dialog" aria-modal="true" aria-labelledby="report-title" aria-hidden="true">
+    <div class="panel-backdrop" data-panel-close></div>
+    <div class="panel-shell">
+      <header class="panel-header">
+        <div><span class="panel-kicker">Analisi operativa</span><h2 id="report-title">Report strategico</h2></div>
+        <button class="panel-close" type="button" data-panel-close aria-label="Chiudi il report">&times;</button>
+      </header>
+      <div class="panel-content">
+        <section class="executive-summary" aria-labelledby="summary-title">
+          <div><span class="section-number">01</span><h3 id="summary-title">Sintesi esecutiva</h3></div>
+          <p>Il report collega posizionamento, pubblico, Google Ads, Meta Ads, tracking, contenuti e KPI in una roadmap unica. L'obiettivo &egrave; passare da attivit&agrave; isolate a un sistema misurabile che genera contatti, appuntamenti e opportunit&agrave; commerciali.</p>
+        </section>
+
+        <section class="scenario-metrics" aria-label="Indicatori esemplificativi di scenario">
+          <article><span>Obiettivo CPA</span><strong>-28%</strong><small>Scenario di ottimizzazione</small></article>
+          <article><span>ROAS obiettivo</span><strong>4,2x</strong><small>Ricavi su investimento</small></article>
+          <article><span>Lead qualificati</span><strong>+36%</strong><small>Scenario trimestrale</small></article>
+          <article><span>Copertura eventi</span><strong>95%</strong><small>Tracking previsto</small></article>
+        </section>
+
+        <section class="report-grid" aria-label="Sezioni del report aziendale">
+          <article><span>02</span><h3>Obiettivi aziendali</h3><p>Richieste preventivo, appuntamenti, vendite, traffico qualificato e crescita del database contatti.</p></article>
+          <article><span>03</span><h3>Analisi del pubblico</h3><p>Segmentazione per area, consapevolezza, urgenza, capacit&agrave; di spesa, dispositivo e interessi.</p></article>
+          <article><span>04</span><h3>Analisi competitor</h3><p>Offerta, messaggi, pagine di atterraggio, prezzo percepito, recensioni e creativit&agrave; pubblicitarie.</p></article>
+          <article><span>05</span><h3>Strategia Google Ads</h3><p>Campagne Search ad alto intento, keyword negative, annunci coerenti e conversioni reali.</p></article>
+          <article><span>06</span><h3>Strategia Meta Ads</h3><p>Creativit&agrave;, pubblici simili, retargeting e test su messaggio, offerta e formato.</p></article>
+          <article><span>07</span><h3>Pixel e conversioni</h3><p>PageView, ViewContent, Lead, Contact, Schedule e Purchase con valore e consenso corretti.</p></article>
+          <article><span>08</span><h3>Funnel marketing</h3><p>Contenuti per traffico freddo, prova sociale, invito all'azione e ricontatto dei lead.</p></article>
+          <article><span>09</span><h3>Piano contenuti</h3><p>Contenuti educativi, dietro le quinte, portfolio, recensioni, casi studio e offerte.</p></article>
+          <article><span>10</span><h3>KPI da monitorare</h3><p>CTR, CPC, CPM, CPA, conversione, ROAS, frequenza, qualit&agrave; lead e costo appuntamento.</p></article>
+          <article><span>11</span><h3>Fonti e metodo</h3><p>Google Ads, Meta Business, Analytics, Search Console, ISTAT, Unioncamere e benchmark di settore.</p></article>
+          <article><span>12</span><h3>Azioni operative</h3><p>Audit tracking, revisione landing, mappa keyword, piano creativit&agrave; e dashboard KPI.</p></article>
+          <article><span>13</span><h3>Ciclo di crescita</h3><p>Test settimanali, lettura dati, priorit&agrave; degli interventi e documentazione delle conoscenze acquisite.</p></article>
+        </section>
+
+        <section class="neural-flow" aria-labelledby="flow-title">
+          <div><span class="panel-kicker">Sistema operativo</span><h3 id="flow-title">Dal segnale alla crescita</h3></div>
+          <ol>
+            <li><span>01</span><strong>Acquisizione</strong><small>Campagne e contenuti</small></li>
+            <li><span>02</span><strong>Misurazione</strong><small>Pixel ed eventi</small></li>
+            <li><span>03</span><strong>Interpretazione</strong><small>Dashboard e insight</small></li>
+            <li><span>04</span><strong>Ottimizzazione</strong><small>Test e automazioni</small></li>
+          </ol>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay-panel" id="demos-panel" role="dialog" aria-modal="true" aria-labelledby="demos-title" aria-hidden="true">
+    <div class="panel-backdrop" data-panel-close></div>
+    <div class="panel-shell demos-shell">
+      <header class="panel-header">
+        <div><span class="panel-kicker">Esperienze live</span><h2 id="demos-title">Tre demo professionali</h2></div>
+        <button class="panel-close" type="button" data-panel-close aria-label="Chiudi le demo">&times;</button>
+      </header>
+      <div class="demo-grid">
+        <article class="demo-card demo-light">
+          <a class="demo-preview" href="/examples/esempio-1/" aria-label="Apri Studio Creativo Premium"><span></span><span></span><span></span><i></i></a>
+          <span class="demo-index">Esempio 01 / Creativit&agrave;</span>
+          <h3>Studio Creativo Premium</h3>
+          <p>Studio italiano minimalista con scultura 3D, portfolio, metodo e richiesta preventivo.</p>
+          <div><a class="demo-open" href="/examples/esempio-1/">Apri demo</a><a href="/examples/esempio-1/#about">Dettagli</a></div>
+        </article>
+        <article class="demo-card demo-editorial">
+          <a class="demo-preview" href="/examples/esempio-2/" aria-label="Apri Agenzia AI e Marketing"><span></span><span></span><span></span><i></i></a>
+          <span class="demo-index">Esempio 02 / Performance</span>
+          <h3>Agenzia AI &amp; Marketing</h3>
+          <p>Strategia AI, Google Ads, Meta Ads, automazioni, funnel e casi studio misurabili.</p>
+          <div><a class="demo-open" href="/examples/esempio-2/">Apri demo</a><a href="/examples/esempio-2/#services">Dettagli</a></div>
+        </article>
+        <article class="demo-card demo-dark">
+          <a class="demo-preview" href="/examples/esempio-3/" aria-label="Apri Portfolio Professionale Tech"><span></span><span></span><span></span><i></i></a>
+          <span class="demo-index">Esempio 03 / Tecnologia</span>
+          <h3>Portfolio Professionale Tech</h3>
+          <p>Portfolio italiano scuro con card trascinabile, progetti 3D, tecnologie e collaborazioni.</p>
+          <div><a class="demo-open" href="/examples/esempio-3/">Apri demo</a><a href="/examples/esempio-3/#about">Dettagli</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
 </body>
 </html>

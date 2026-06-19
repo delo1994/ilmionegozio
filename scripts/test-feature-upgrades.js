@@ -18,7 +18,16 @@ const face5 = read("face5.html");
 for (const title of ["Studio Creativo Premium", "Agenzia AI &amp; Marketing", "Portfolio Professionale Tech"]) {
   assert.match(face5, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `Face5 deve mostrare ${title}`);
 }
-assert.equal((face5.match(/Maggiori informazioni/g) || []).length, 3, "Face5 deve avere tre collegamenti di approfondimento");
+assert.equal((face5.match(/>Dettagli</g) || []).length, 3, "Face5 deve avere tre collegamenti di approfondimento");
+assert.match(face5, /id="quantum-network"/);
+assert.match(face5, /id="report-panel"/);
+assert.match(face5, /id="demos-panel"/);
+assert.equal((face5.match(/<h1\b/g) || []).length, 1, "Face5 deve avere un solo H1");
+
+const quantum = read("static/face5-quantum.js");
+for (const feature of ["ShaderMaterial", "UnrealBloomPass", "OrbitControls", "uPulsePositions", "Raycaster"]) {
+  assert.match(quantum, new RegExp(feature), `Face5 Quantum deve includere ${feature}`);
+}
 
 const demo1 = read("examples/esempio-1/index.html");
 assert.match(demo1, /Dove le idee diventano esperienze digitali\./);

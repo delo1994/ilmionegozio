@@ -30,7 +30,7 @@ function validateInlineScripts(file, html) {
   for (const match of html.matchAll(scriptPattern)) {
     const attributes = match[1];
     const code = match[2];
-    if (/\bsrc=/.test(attributes) || /application\/ld\+json|text\/plain/.test(attributes)) continue;
+    if (/\bsrc=/.test(attributes) || /application\/ld\+json|text\/plain|importmap/.test(attributes)) continue;
     try {
       new vm.Script(code, { filename: relative(file) });
     } catch (error) {

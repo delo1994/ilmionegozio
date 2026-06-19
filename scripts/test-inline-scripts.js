@@ -24,7 +24,7 @@ for (const relativePath of targets) {
     const attributes = match[1];
     const source = match[2].trim();
     index += 1;
-    if (!source || /\bsrc\s*=/.test(attributes) || /application\/ld\+json/i.test(attributes)) continue;
+    if (!source || /\bsrc\s*=/.test(attributes) || /application\/ld\+json|importmap/i.test(attributes)) continue;
     try {
       Function(source);
       checked += 1;
