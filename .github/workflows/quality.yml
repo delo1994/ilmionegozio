@@ -21,3 +21,5 @@ jobs:
           node-version: 20
       - name: Verifica struttura e script
         run: npm run check
+      - name: Testa API appuntamenti
+        run: npm test

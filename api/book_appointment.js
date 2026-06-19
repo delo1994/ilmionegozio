@@ -91,7 +91,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const raw = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    let raw;
+    try {
+      raw = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    } catch (error) {
+      return res.status(400).json({ status: 'error', error: 'JSON non valido.' });
+    }
     if (JSON.stringify(raw).length > MAX_BODY_SIZE) {
       return res.status(413).json({ status: 'error', error: 'Richiesta troppo grande.' });
     }
