@@ -32,7 +32,7 @@ const cases = [
   ["/face3.html", "appuntamenti"],
   ["/face4.html", "giochi"],
   ["/face4round1.html", "round"],
-  ["/face5.html", "analisi"],
+  ["/face5.html", "analisi-linee"],
   ["/face6.html", "scanner"],
   ["/pages/esempio-1.html", "gridline"],
   ["/pages/esempio-2.html", "pixzen"],
@@ -51,6 +51,9 @@ for (const [pathname, expectedName, expectedDirectional = false] of cases) {
   assert.equal(Boolean(theme.directional), expectedDirectional, `${pathname} ha una direzione errata`);
   assert.match(theme.html, /^(&#\d+;|&[a-z]+;)$/i, `${pathname} deve usare un'entita HTML valida`);
 }
+
+windowMock.location.pathname = "/face5";
+assert.equal(windowMock.IlmioCursor.themeForPath().html, "&#128200;", "Face5 deve usare un grafico a linee come puntatore");
 
 const css = fs.readFileSync(path.join(__dirname, "..", "static", "site-foundation.css"), "utf8");
 assert.match(css, /\(hover:\s*hover\)\s*and\s*\(pointer:\s*fine\)/, "Il cursore deve essere limitato ai puntatori precisi");

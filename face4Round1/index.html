@@ -158,7 +158,7 @@
   </button>
 
   <!-- Video di background, marcato come decorativo -->
-  <video id="bgVideo" autoplay loop muted preload="metadata" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
+  <video id="bgVideo" loop muted preload="metadata" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
     <source src="/static/BackgroundRound1.mp4" type="video/mp4">
     Il tuo browser non supporta il tag video.
   </video>
@@ -193,7 +193,7 @@
       });
       window.IlmioMedia.whenIdle(function () {
         roundAudio.preload(["hit", "extra"]);
-        window.IlmioMedia.warmVideo(bgVideo, { preload: "metadata", tryMutedPlay: true });
+        window.IlmioMedia.warmVideo(bgVideo, { preload: "metadata", tryMutedPlay: false });
       }, 800);
       window.IlmioMedia.onFirstInteraction(function () {
         roundAudio.unlock();
@@ -201,9 +201,6 @@
         if (bgMusic) {
           bgMusic.volume = 0.55;
           bgMusic.play().catch(function () {});
-        }
-        if (bgVideo) {
-          bgVideo.play().catch(function () {});
         }
       });
     }
@@ -213,6 +210,7 @@
 
     const END_URL = "https://nzp.gay/";
     let score = 0, level = 1, lives = 3;
+    let scoreVideoStarted = false;
     let gameEnded = false; // per controllare il termine del 6° round
     const player = { x: canvas.width / 2, y: canvas.height - 50, size: 20, speed: 5 };
     const bullets = [], enemies = [], enemyBullets = [], hearts = [], keys = {};
@@ -222,6 +220,33 @@
     const JAILBREAK_CHORD_MS = 1200;
     let spaceFireInterval = null;
     let jailbreakTriggered = false;
+
+    function startScoreVideoAtThreshold() {
+      if (!bgVideo || score < 20 || scoreVideoStarted) return false;
+      scoreVideoStarted = true;
+      bgVideo.muted = true;
+      bgVideo.preload = "auto";
+      document.documentElement.dataset.roundVideo = "starting";
+      const playback = bgVideo.play();
+      if (playback && typeof playback.then === "function") {
+        playback.then(function () {
+          document.documentElement.dataset.roundVideo = "playing";
+        }).catch(function () {
+          scoreVideoStarted = false;
+          document.documentElement.dataset.roundVideo = "blocked";
+        });
+      }
+      return true;
+    }
+
+    function showRoundWin() {
+      const overlay = document.getElementById("jailbreakOverlay");
+      overlay.querySelector("span").textContent = "YOU WIN";
+      overlay.classList.add("active");
+      overlay.setAttribute("aria-hidden", "false");
+      document.getElementById("info").innerText = "YOU WIN";
+      document.documentElement.dataset.roundResult = "win";
+    }
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
@@ -508,6 +533,12 @@
       enemyBullets.length = 0;
       hearts.length = 0;
       gameEnded = false;
+      scoreVideoStarted = false;
+      if (bgVideo) {
+        bgVideo.pause();
+        try { bgVideo.currentTime = 0; } catch (error) {}
+      }
+      document.documentElement.dataset.roundVideo = "waiting-score-20";
     }
 
     function update() {
@@ -616,6 +647,7 @@
                 enemies.splice(ei, 1);
                 score++;
               }
+              startScoreVideoAtThreshold();
               if(score % 10 === 0) level++;
           }
         });
@@ -665,6 +697,7 @@
       if(level > 6 && !gameEnded) {
         gameEnded = true;
         stopSpaceFire();
+        showRoundWin();
         const redirectToEnd = () => {
           window.location.href = END_URL;
         };
@@ -686,6 +719,24 @@
     }
 
     update();
+
+    window.Round1GameDebug = Object.freeze({
+      setScore: function(value) {
+        score = Math.max(0, Number(value) || 0);
+        startScoreVideoAtThreshold();
+      },
+      showWin: showRoundWin,
+      state: function() {
+        return {
+          score,
+          level,
+          lives,
+          videoStarted: scoreVideoStarted,
+          videoState: document.documentElement.dataset.roundVideo || "waiting-score-20",
+          result: document.documentElement.dataset.roundResult || null
+        };
+      }
+    });
   </script>
 
   <footer class="footer" role="contentinfo">
@@ -696,4 +747,3 @@
   </footer>
 </body>
 </html>
-

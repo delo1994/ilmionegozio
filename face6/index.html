@@ -136,7 +136,7 @@
 
   <div class="video-container" id="main-content">
     <!-- Il video è marcato come decorativo per le tecnologie assistive -->
-    <video id="experienceVideo" autoplay muted loop preload="metadata" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
+    <video id="experienceVideo" autoplay muted loop preload="auto" playsinline webkit-playsinline poster="/static/background.webp" aria-hidden="true">
       <source src="/static/real_to_3d_experience.mp4" type="video/mp4">
       Il tuo browser non supporta il tag video.
     </video>
@@ -160,28 +160,55 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const experienceVideo = document.getElementById("experienceVideo");
-      if (!window.IlmioMedia || !experienceVideo) return;
+      if (!experienceVideo) return;
+
+      experienceVideo.muted = true;
+      experienceVideo.defaultMuted = true;
+      experienceVideo.autoplay = true;
+      experienceVideo.preload = "auto";
+
+      function startExperienceVideo() {
+        const playback = experienceVideo.play();
+        document.documentElement.dataset.face6Video = "starting";
+        if (playback && typeof playback.then === "function") {
+          playback.then(function () {
+            document.documentElement.dataset.face6Video = "playing";
+          }).catch(function () {
+            document.documentElement.dataset.face6Video = "blocked";
+          });
+        }
+      }
+
+      experienceVideo.addEventListener("canplay", startExperienceVideo, { once: true });
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden && experienceVideo.paused) startExperienceVideo();
+      });
+
+      if (!window.IlmioMedia) {
+        startExperienceVideo();
+        document.addEventListener("pointerdown", startExperienceVideo, { once: true, passive: true });
+        return;
+      }
 
       window.IlmioMedia.prepareVideo(experienceVideo, {
-        preload: "metadata",
+        preload: "auto",
         poster: "/static/background.webp"
       });
+      startExperienceVideo();
       window.IlmioMedia.whenIdle(function () {
         window.IlmioMedia.warmVideo(experienceVideo, {
-          preload: "metadata",
-          tryMutedPlay: true
-        });
+          preload: "auto",
+          tryMutedPlay: false
+        }).then(startExperienceVideo);
       }, 900);
       window.IlmioMedia.onFirstInteraction(function () {
         window.IlmioMedia.warmVideo(experienceVideo, {
           forceAuto: true,
           tryMutedPlay: false
         });
-        experienceVideo.play().catch(function () {});
+        startExperienceVideo();
       });
     });
   </script>
 </body>
 </html>
-
-

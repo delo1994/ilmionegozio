@@ -89,7 +89,7 @@
     if (pathname.indexOf("face2") !== -1) return { name: "video", html: "&#127916;" };
     if (pathname.indexOf("face3") !== -1) return { name: "appuntamenti", html: "&#128197;" };
     if (pathname.indexOf("face4") !== -1) return { name: "giochi", html: "&#127918;" };
-    if (pathname.indexOf("face5") !== -1) return { name: "analisi", html: "&#128202;" };
+    if (pathname.indexOf("face5") !== -1) return { name: "analisi-linee", html: "&#128200;" };
     if (pathname.indexOf("face6") !== -1) return { name: "scanner", html: "&#9672;" };
     if (pathname.indexOf("esempio-1") !== -1 || pathname.indexOf("example1") !== -1) return { name: "gridline", html: "&#128208;" };
     if (pathname.indexOf("esempio-2") !== -1 || pathname.indexOf("example2") !== -1) return { name: "pixzen", html: "&#129302;" };

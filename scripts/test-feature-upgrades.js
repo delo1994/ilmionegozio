@@ -48,6 +48,10 @@ assert.match(round1, /JAILBREAK_CHORD_MS\s*=\s*1200/, "DELO deve accettare un ac
 assert.match(round1, /getJailbreakLetter/, "DELO deve usare KeyboardEvent.code e key");
 assert.match(round1, /window\.Round1Jailbreak/, "Il Round1 deve esporre lo stato diagnostico dell'easter egg");
 assert.match(round1, /overlay\.setAttribute\("aria-hidden", "false"\)/, "L'overlay DELO deve diventare accessibile quando attivo");
+assert.doesNotMatch(round1, /<video[^>]*\bautoplay\b/, "Il video Round1 non deve partire prima del punteggio 20");
+assert.match(round1, /score < 20 \|\| scoreVideoStarted/, "Il video Round1 deve avviarsi dal punteggio 20");
+assert.match(round1, /function showRoundWin[\s\S]*textContent = "YOU WIN"/, "La vittoria Round1 deve mostrare YOU WIN");
+assert.match(round1, /window\.Round1GameDebug/, "Round1 deve esporre lo stato diagnostico di video e vittoria");
 
 const face2 = read("face2.html");
 for (const role of ["cameraman", "steadycam", "regista", "assistente", "audio", "luci"]) {
@@ -93,20 +97,21 @@ assert.match(demo1, /Dove le idee diventano esperienze digitali\./);
 assert.match(demo1, /id="metodo"/);
 assert.match(demo1, /id="testimonianze"/);
 assert.match(demo1, /class="demo-return" href="\/face5"/, "La demo 1 deve permettere di tornare a Face5");
-assert.match(demo1, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 1 deve essere chiaro su mobile");
+assert.match(demo1, /class="demo-return-mobile">Torna a Strategie</, "Il ritorno della demo 1 deve essere chiaro su mobile");
 
 const demo2 = read("examples/esempio-2/index.html");
 assert.match(demo2, /Costruiamo il futuro digitale della tua azienda\./);
 assert.match(demo2, /class="demo-return" href="\/face5"/, "La demo 2 deve permettere di tornare a Face5");
-assert.match(demo2, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 2 deve essere chiaro su mobile");
+assert.match(demo2, /class="demo-return-mobile">Torna a Strategie</, "Il ritorno della demo 2 deve essere chiaro su mobile");
 for (const phrase of ["Strategie digitali", "Automazioni intelligenti", "Campagne che convertono"]) {
   assert.match(demo2, new RegExp(phrase));
 }
 assert.equal((demo2.match(/class="agency-card"/g) || []).length, 6, "La demo AI deve avere sei servizi");
+assert.equal((demo2.match(/href="\/face3">Prenota una call</g) || []).length, 2, "Le call della demo AI devono aprire Face3");
 
 const demo3 = read("examples/esempio-3/index.html");
 assert.match(demo3, /class="demo-return" href="\/face5"/, "La demo 3 deve permettere di tornare a Face5");
-assert.match(demo3, /class="demo-return-mobile">Indietro</, "Il ritorno della demo 3 deve essere chiaro su mobile");
+assert.match(demo3, /class="demo-return-mobile">Torna a Strategie</, "Il ritorno della demo 3 deve essere chiaro su mobile");
 assert.match(demo3, /Esperienze digitali che lasciano il segno/);
 assert.match(demo3, /id="collaborazioni"/);
 assert.match(demo3, /Parliamo del progetto/);
@@ -134,8 +139,15 @@ for (const title of ["Portale VR", "Prisma Quantico", "Barista Orbitale"]) {
 }
 assert.match(face1Games, /window\.Face1Arcade/, "L'arcade Face1 deve esporre lo stato diagnostico");
 
+const face6 = read("face6.html");
+assert.match(face6, /<video id="experienceVideo" autoplay muted loop preload="auto"/, "Face6 deve richiedere autoplay immediato");
+assert.match(face6, /function startExperienceVideo[\s\S]*experienceVideo\.play\(\)/, "Face6 deve avere un avvio video immediato");
+assert.match(face6, /prepareVideo\(experienceVideo[\s\S]*startExperienceVideo\(\)/, "Face6 deve avviare il video dopo la preparazione senza attendere un click");
+
 for (const face of ["face1", "face2", "face5"]) {
   assert.equal(read(`${face}.html`), read(`${face}/index.html`), `${face}.html e ${face}/index.html devono restare sincronizzati`);
 }
+assert.equal(round1, read("face4Round1/index.html"), "Face4Round1 e la route devono restare sincronizzati");
+assert.equal(face6, read("face6/index.html"), "face6.html e face6/index.html devono restare sincronizzati");
 
 console.log("Funzioni Face1, Face2, Face5 e demo verificate.");
