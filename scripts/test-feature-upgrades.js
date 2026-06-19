@@ -29,12 +29,21 @@ assert.equal((face5.match(/>Dettagli</g) || []).length, 3, "Face5 deve avere tre
 assert.match(face5, /id="quantum-network"/);
 assert.match(face5, /id="report-panel"/);
 assert.match(face5, /id="demos-panel"/);
+assert.match(face5, /data-panel-open="resources-panel">Risorse</, "Risorse deve aprire il pannello interno");
+assert.match(face5, /id="resources-panel"/, "Face5 deve conservare il pannello delle risorse storiche");
+assert.doesNotMatch(face5, /href="\/privacy-policy">Risorse</, "Risorse non deve rimandare alla privacy policy");
+assert.equal((face5.match(/class="demo-card /g) || []).length, 4, "Face5 deve mostrare quattro esperienze web");
+for (const chart of ["geoChart", "clickChart", "demoChart"]) {
+  assert.match(face5, new RegExp(`id="${chart}"`), `Face5 deve ripristinare il grafico ${chart}`);
+}
 assert.equal((face5.match(/<h1\b/g) || []).length, 1, "Face5 deve avere un solo H1");
 
 const quantum = read("static/face5-quantum.js");
 for (const feature of ["ShaderMaterial", "UnrealBloomPass", "OrbitControls", "uPulsePositions", "Raycaster"]) {
   assert.match(quantum, new RegExp(feature), `Face5 Quantum deve includere ${feature}`);
 }
+assert.match(quantum, /initializeResources/, "Face5 deve inizializzare le risorse su richiesta");
+assert.match(quantum, /chart\.js@4\.4\.7/, "I grafici devono essere caricati in modo differito");
 
 const demo1 = read("examples/esempio-1/index.html");
 assert.match(demo1, /Dove le idee diventano esperienze digitali\./);

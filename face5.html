@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/site-foundation.css">
-  <link rel="stylesheet" href="/static/face5-quantum.css">
+  <link rel="stylesheet" href="/static/face5-quantum.css?v=20260619-2">
   <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
   <script type="importmap">
   {
@@ -32,7 +32,7 @@
     }
   }
   </script>
-  <script type="module" src="/static/face5-quantum.js"></script>
+  <script type="module" src="/static/face5-quantum.js?v=20260619-2"></script>
 </head>
 <body>
   <canvas id="quantum-network" aria-hidden="true"></canvas>
@@ -49,7 +49,7 @@
         <button type="button" data-panel-open="report-panel">Report</button>
         <button type="button" data-panel-open="report-panel">Strategia</button>
         <button type="button" data-panel-open="demos-panel">Demo</button>
-        <a href="/privacy-policy">Risorse</a>
+        <button type="button" data-panel-open="resources-panel">Risorse</button>
       </div>
       <a class="nav-cta" href="/">Torna al cubo</a>
       <button class="menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span></button>
@@ -57,6 +57,7 @@
     <div class="mobile-menu" aria-hidden="true">
       <button type="button" data-panel-open="report-panel">Apri il report</button>
       <button type="button" data-panel-open="demos-panel">Esplora le demo</button>
+      <button type="button" data-panel-open="resources-panel">Risorse e analisi storiche</button>
       <a href="/privacy-policy">Privacy</a>
       <a href="/">Torna al cubo</a>
     </div>
@@ -139,7 +140,7 @@
     <div class="panel-backdrop" data-panel-close></div>
     <div class="panel-shell demos-shell">
       <header class="panel-header">
-        <div><span class="panel-kicker">Esperienze live</span><h2 id="demos-title">Tre demo professionali</h2></div>
+        <div><span class="panel-kicker">Esperienze live</span><h2 id="demos-title">Quattro siti da esplorare</h2></div>
         <button class="panel-close" type="button" data-panel-close aria-label="Chiudi le demo">&times;</button>
       </header>
       <div class="demo-grid">
@@ -164,6 +165,78 @@
           <p>Portfolio italiano scuro con card trascinabile, progetti 3D, tecnologie e collaborazioni.</p>
           <div><a class="demo-open" href="/examples/esempio-3/">Apri demo</a><a href="/examples/esempio-3/#about">Dettagli</a></div>
         </article>
+        <article class="demo-card demo-cube">
+          <a class="demo-preview" href="/" aria-label="Apri il sito principale con il cubo 3D"><span></span><span></span><span></span><i></i></a>
+          <span class="demo-index">Sito 04 / Esperienza 3D</span>
+          <h3>ILMIONEGOZIO</h3>
+          <p>Il sito principale: cubo interattivo, occhi animati, suoni e accesso alle sei esperienze digitali.</p>
+          <div><a class="demo-open" href="/">Apri il sito</a><a href="/#cube-container">Vai al cubo</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay-panel" id="resources-panel" role="dialog" aria-modal="true" aria-labelledby="resources-title" aria-hidden="true">
+    <div class="panel-backdrop" data-panel-close></div>
+    <div class="panel-shell resources-shell">
+      <header class="panel-header">
+        <div><span class="panel-kicker">Contenuti originali ripristinati</span><h2 id="resources-title">Risorse, esperienza e analisi</h2></div>
+        <button class="panel-close" type="button" data-panel-close aria-label="Chiudi le risorse">&times;</button>
+      </header>
+      <div class="panel-content resources-content">
+        <section class="resource-intro" aria-labelledby="chi-siamo-title">
+          <div><span class="section-number">01</span><h3 id="chi-siamo-title">Chi siamo</h3></div>
+          <p>Siamo un team con esperienze diversificate. Ho maturato anni di esperienza nella vendita porta a porta e nel network marketing, frequentando corsi di e-commerce e programmazione database con specializzazione in sistemi di archiviazione e blockchain, oltre ad aver svolto uno stage presso un adblocker specializzato in Google Ads con partnership Google. L'altro membro del team ha completato un corso in marketing e comunicazione digitale. Queste esperienze ci consentono di analizzare il mercato e utilizzare i dati per ottimizzare l'interazione degli utenti nei siti web.</p>
+        </section>
+
+        <section class="resources-block" aria-labelledby="analysis-title">
+          <div class="resource-heading"><span class="section-number">02</span><h3 id="analysis-title">Le nostre analisi</h3></div>
+          <p class="resource-lead">Abbiamo condotto una ricerca di mercato approfondita sull'upcycling in Toscana. I dati raccolti mostrano la distribuzione geografica degli intervistati, le interazioni per area del sito e il profilo demografico degli utenti.</p>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <div><span>Ricerca territoriale</span><h4>Distribuzione geografica</h4></div>
+              <div class="chart-frame"><canvas id="geoChart" role="img" aria-label="Distribuzione geografica: Firenze 45%, Pisa 20%, Siena 15%, Lucca 10%, altri 10%"></canvas></div>
+              <p>Firenze 45%, Pisa 20%, Siena 15%, Lucca 10%, altri territori 10%.</p>
+            </article>
+            <article class="chart-card">
+              <div><span>Comportamento</span><h4>Interazioni sul sito</h4></div>
+              <div class="chart-frame"><canvas id="clickChart" role="img" aria-label="Interazioni: Inizio 180, prodotti 130, dettagli 90, contatti 70, domande frequenti 40"></canvas></div>
+              <p>Le aree iniziali e di prodotto concentrano la maggior parte delle interazioni.</p>
+            </article>
+            <article class="chart-card">
+              <div><span>Pubblico</span><h4>Profilo demografico</h4></div>
+              <div class="chart-frame"><canvas id="demoChart" role="img" aria-label="Profilo demografico: uomini 50%, donne 45%, non specificato 5%"></canvas></div>
+              <p>Distribuzione equilibrata: uomini 50%, donne 45%, non specificato 5%.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="resources-block" aria-labelledby="experience-title">
+          <div class="resource-heading"><span class="section-number">03</span><h3 id="experience-title">Esperienze e formazione</h3></div>
+          <div class="experience-grid">
+            <article><span>01</span><h4>Vendita e relazione</h4><p>Vendita porta a porta e network marketing, con esperienza diretta nella comprensione delle esigenze del cliente.</p></article>
+            <article><span>02</span><h4>E-commerce e database</h4><p>Formazione su commercio elettronico, progettazione e programmazione di basi dati.</p></article>
+            <article><span>03</span><h4>Archiviazione e blockchain</h4><p>Specializzazione nei sistemi di archiviazione e studio delle tecnologie blockchain.</p></article>
+            <article><span>04</span><h4>Google Ads</h4><p>Stage presso un adblocker specializzato in Google Ads con partnership Google.</p></article>
+            <article><span>05</span><h4>Marketing digitale</h4><p>Corso dedicato a marketing, comunicazione digitale, contenuti e strategia.</p></article>
+            <article><span>06</span><h4>Analisi applicata</h4><p>Uso dei dati per migliorare navigazione, campagne, conversioni e interazione utente.</p></article>
+          </div>
+        </section>
+
+        <section class="resources-block sources-block" aria-labelledby="sources-title">
+          <div class="resource-heading"><span class="section-number">04</span><h3 id="sources-title">Strumenti e fonti</h3></div>
+          <div class="source-list">
+            <article><strong>Misurazione</strong><span>Google Analytics, Search Console, Meta Business Suite e sistemi di tracking delle conversioni.</span></article>
+            <article><strong>Advertising</strong><span>Google Ads, Meta Ads, analisi delle parole chiave, creativit&agrave; e rendimento delle campagne.</span></article>
+            <article><strong>Ricerca</strong><span>ISTAT, Unioncamere, dati territoriali, questionari diretti e benchmark di settore.</span></article>
+            <article><strong>Metodo</strong><span>Raccolta, pulizia, confronto, interpretazione e trasformazione dei dati in azioni operative.</span></article>
+          </div>
+        </section>
+
+        <section class="resources-actions" aria-label="Azioni successive">
+          <div><span class="panel-kicker">Approfondisci</span><h3>Tutto il materiale resta dentro Face5.</h3></div>
+          <div><button class="primary-action" type="button" data-panel-open="report-panel">Apri il report strategico</button><button class="secondary-action" type="button" data-panel-open="demos-panel">Vedi i quattro siti</button></div>
+        </section>
       </div>
     </div>
   </section>

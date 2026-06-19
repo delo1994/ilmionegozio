@@ -9,6 +9,74 @@ function setupInterface() {
   const panels = Array.from(document.querySelectorAll(".overlay-panel"));
   let activePanel = null;
   let lastTrigger = null;
+  let resourcesInitialized = false;
+
+  function loadChartLibrary() {
+    if (window.Chart) return Promise.resolve(window.Chart);
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-face5-charts]");
+      if (existing) {
+        existing.addEventListener("load", () => resolve(window.Chart), { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
+      script.async = true;
+      script.dataset.face5Charts = "true";
+      script.addEventListener("load", () => resolve(window.Chart), { once: true });
+      script.addEventListener("error", reject, { once: true });
+      document.head.append(script);
+    });
+  }
+
+  function chartOptions(title) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: reduceMotion ? false : { duration: 700 },
+      plugins: {
+        title: { display: false, text: title },
+        legend: { labels: { color: "rgba(255,255,255,.76)", boxWidth: 11, usePointStyle: true } }
+      },
+      scales: {
+        x: { ticks: { color: "rgba(255,255,255,.62)" }, grid: { color: "rgba(255,255,255,.06)" } },
+        y: { ticks: { color: "rgba(255,255,255,.62)" }, grid: { color: "rgba(255,255,255,.06)" }, beginAtZero: true }
+      }
+    };
+  }
+
+  async function initializeResources() {
+    if (resourcesInitialized) return;
+    resourcesInitialized = true;
+    try {
+      const Chart = await loadChartLibrary();
+      const palette = ["#ff6f91", "#55d8ff", "#ffd166", "#00df8f", "#a78bfa"];
+      const geo = document.getElementById("geoChart");
+      const clicks = document.getElementById("clickChart");
+      const demo = document.getElementById("demoChart");
+      if (geo) new Chart(geo, {
+        type: "pie",
+        data: { labels: ["Firenze", "Pisa", "Siena", "Lucca", "Altri"], datasets: [{ data: [45,20,15,10,10], backgroundColor: palette, borderColor: "#0d0e18", borderWidth: 2 }] },
+        options: { ...chartOptions("Distribuzione geografica"), scales: {} }
+      });
+      if (clicks) new Chart(clicks, {
+        type: "bar",
+        data: { labels: ["Inizio", "Prodotti", "Dettagli", "Contatti", "FAQ"], datasets: [{ label: "Clic", data: [180,130,90,70,40], backgroundColor: "rgba(85,216,255,.72)", borderColor: "#55d8ff", borderWidth: 1 }] },
+        options: chartOptions("Interazioni sul sito")
+      });
+      if (demo) new Chart(demo, {
+        type: "doughnut",
+        data: { labels: ["Uomini", "Donne", "Non specificato"], datasets: [{ data: [50,45,5], backgroundColor: ["#55d8ff", "#ff6f91", "#ffd166"], borderColor: "#0d0e18", borderWidth: 2 }] },
+        options: { ...chartOptions("Profilo demografico"), scales: {} }
+      });
+      root.dataset.resourcesState = "ready";
+    } catch (error) {
+      resourcesInitialized = false;
+      root.dataset.resourcesState = "fallback";
+      console.warn("Grafici Face5 non disponibili; i dati testuali restano visibili.", error);
+    }
+  }
 
   panels.forEach(panel => { panel.inert = true; });
 
@@ -30,6 +98,7 @@ function setupInterface() {
     panel.setAttribute("aria-hidden", "false");
     body.classList.add("panel-open");
     setMenu(false);
+    if (id === "resources-panel") initializeResources();
     window.setTimeout(() => panel.querySelector(".panel-close")?.focus(), 40);
   }
 
