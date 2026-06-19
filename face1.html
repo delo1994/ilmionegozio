@@ -6,14 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ambienti 3D - ilmionegozio.com</title>
   <meta name="description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
+  <link rel="canonical" href="https://www.ilmionegozio.com/face1">
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
     }
-    body { 
-      margin: 0; 
-      overflow: hidden; 
-      font-family: Arial, sans-serif; 
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
     }
     /* Istruzioni per screen reader, visibili solo agli assistive tech */
     .sr-only {
@@ -135,13 +136,15 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Ambienti 3D - ilmionegozio.com">
   <meta property="og:description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
-  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:url" content="https://www.ilmionegozio.com/face1">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ambienti 3D - ilmionegozio.com">
   <meta name="twitter:description" content="Esperienza originale per ambienti 3D, modelli animati e scenari interattivi.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/site-foundation.css">
+  <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
 </head>
 <body>
   <!-- Istruzioni accessibili (visibili solo ai lettori di schermo) -->
@@ -206,7 +209,7 @@
     fallbackTextureLoader.load('/static/backgroundFace1.webp', function(texture) {
       scene.background = texture;
     });
-    
+
     // Background video
     const video = document.createElement('video');
     video.src = '/static/Backgroundvideoface1.mp4';
@@ -248,7 +251,7 @@
       camera.position.set(0, 5, 20);
     }
     scene.add(camera);
-    
+
     const renderer = new THREE.WebGLRenderer({ antialias: !isMobileViewport, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -1042,10 +1045,10 @@
   <!-- Footer posizionato in fondo alla pagina con sfondo trasparente -->
   <footer class="footer" role="contentinfo">
     <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
-    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
-    <a href="/cookie-policy" target="_blank">Cookie Policy</a> | 
-    <a href="/Accessibilita" target="_blank">Accessibilità</a> | 
-    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+    <a href="/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a> |
+    <a href="/Accessibilita" target="_blank" rel="noopener noreferrer">Accessibilità</a> |
+    <a href="/Termini_Condizioni" target="_blank" rel="noopener noreferrer">Termini&Condizioni</a>
   </footer>
 </body>
 </html>

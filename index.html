@@ -10,46 +10,7 @@
   <link rel="preload" as="audio" href="/static/Voce1.mp3" type="audio/mpeg">
   <link rel="preload" as="audio" href="/static/Voce2.mp3" type="audio/mpeg">
   <script src="/static/media-optimizer.js" type="text/javascript" data-cookieconsent="ignore"></script>
-  
-  <!-- Cookiebot Script -->
-  <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="30fa94b6-62b7-4cd3-88b2-2ab9dd70fe00" data-blockingmode="auto" type="text/javascript"></script>
-  
-  <!-- Google Analytics -->
-  <script type="text/plain" data-cookieconsent="statistics" async src="https://www.googletagmanager.com/gtag/js?id=G-DB5WNNCFH5"></script>
-  <script type="text/plain" data-cookieconsent="statistics">
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-DB5WNNCFH5');
-  </script>
 
-  <!-- Facebook Pixel con Cookie Consent -->
-  <script type="text/plain" data-cookieconsent="marketing">
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', 'TUO_PIXEL_ID');
-    fbq('track', 'PageView');
-  </script>
-
-  <!-- Open Graph e Twitter Cards -->
-  <meta property="og:title" content="Prenota una consulenza digitale con Emanuele Delogu">
-  <meta property="og:description" content="Scopri come migliorare la tua attività con una consulenza digitale personalizzata. Prenota ora!">
-  <meta property="og:image" content="https://www.ilmionegozio.com/images/copertina.jpg">
-  <meta property="og:url" content="https://www.ilmionegozio.com">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="it_IT">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Prenota una consulenza digitale con Emanuele Delogu">
-  <meta name="twitter:description" content="Scopri come migliorare la tua attività con una consulenza digitale personalizzata. Prenota ora!">
-  <meta name="twitter:image" content="https://www.ilmionegozio.com/images/copertina.jpg">
-  <meta name="twitter:site" content="@tuotwitter">
-  
   <style>
     /* Classe per elementi visibili solo ai lettori di schermo */
     .sr-only {
@@ -63,7 +24,7 @@
       clip: rect(0 0 0 0);
       white-space: nowrap;
     }
-    
+
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -88,7 +49,7 @@
       height: 100vh !important;
       height: 100dvh !important;
     }
-    
+
     /* Overlay per gli occhi (decorativi) */
     .eyes-container {
       position: fixed;
@@ -195,7 +156,7 @@
         line-height: 1.35;
       }
     }
-    
+
 
     #webgl-fallback {
       position: fixed;
@@ -272,7 +233,7 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    
+
     /* Stili per il footer con sfondo trasparente */
     .footer {
       position: fixed;
@@ -331,17 +292,33 @@
       }
     }
   </style>
-  
+
   <!-- Includi Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <meta property="og:title" content="ilmionegozio.com - Cubo 3D interattivo">
   <meta property="og:description" content="Il sito originale di ilmionegozio.com con cubo 3D, occhi animati, maschera universo e sezioni digitali interattive.">
   <meta property="og:url" content="https://www.ilmionegozio.com/">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="it_IT">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ilmionegozio.com - Cubo 3D interattivo">
   <meta name="twitter:description" content="Il sito originale di ilmionegozio.com con cubo 3D, occhi animati, maschera universo e sezioni digitali interattive.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ilmionegozio.com",
+    "url": "https://www.ilmionegozio.com/",
+    "inLanguage": "it-IT",
+    "description": "Esperienze digitali interattive dedicate a 3D, video, applicazioni, giochi e analisi di mercato.",
+    "publisher": { "@type": "Person", "name": "Emanuele Delogu" }
+  }
+  </script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/site-foundation.css">
+  <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
 </head>
 <body>
   <h1 class="sr-only">ilmionegozio.com - Cubo 3D interattivo</h1>
@@ -388,12 +365,12 @@
       </ul>
     </div>
   </div>
-  
+
   <!-- Istruzioni per utenti con screen reader -->
   <div id="scene-instructions" class="sr-only">
     Utilizza il mouse per interagire con la scena 3D. Clicca sul cubo per navigare alle pagine indicate o seleziona una voce dal menu a tendina per accedere alle sezioni del sito.
   </div>
-  
+
   <!-- Navigazione accessibile per la scena 3D (versione desktop) -->
   <nav aria-label="Navigazione 3D" class="sr-only">
     <ul>
@@ -405,7 +382,7 @@
       <li><a href="/face6">REAL TO 3D EXPERIENCE</a></li>
     </ul>
   </nav>
-  
+
   <!-- Overlay per gli occhi (decorativi) -->
   <div class="eyes-container" aria-hidden="true">
     <div class="eye eye1"><div class="pupil" style="width:10px; height:10px;"></div></div>
@@ -444,7 +421,7 @@
     <br>
     <button class="cookie-settings-btn" onclick="saveSettings()">Salva Preferenze</button>
   </div>
-  
+
   <!-- Script per il menu a tendina mobile -->
   <script>
     function toggleDropdown() {
@@ -461,41 +438,80 @@
       });
     });
   </script>
-  
+
   <script>
-    // Funzioni per il Cookie Banner
+    const analyticsId = "G-DB5WNNCFH5";
+
+    function loadGoogleAnalytics() {
+      if (window.__ilmioAnalyticsLoaded) return;
+      window.__ilmioAnalyticsLoaded = true;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", analyticsId, { anonymize_ip: true });
+
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(analyticsId);
+      document.head.appendChild(script);
+    }
+
+    function readConsent(key) {
+      try { return localStorage.getItem(key); } catch (error) { return null; }
+    }
+
+    function writeConsent(key, value) {
+      try { localStorage.setItem(key, value); } catch (error) {}
+    }
+
+    function closeCookieUi() {
+      document.getElementById("cookie-banner").style.display = "none";
+      document.getElementById("cookie-settings").style.display = "none";
+    }
+
+    // Il banner interno è l'unico gestore del consenso.
     function checkCookieConsent() {
-      if (!localStorage.getItem("cookieConsent")) {
+      const consent = readConsent("cookieConsent");
+      if (!consent) {
         document.getElementById("cookie-banner").style.display = "block";
+      } else if (consent === "accepted" || readConsent("analyticsCookies") === "true") {
+        loadGoogleAnalytics();
       }
     }
-    
+
     function acceptCookies() {
-      localStorage.setItem("cookieConsent", "accepted");
-      document.getElementById("cookie-banner").style.display = "none";
+      writeConsent("cookieConsent", "accepted");
+      writeConsent("analyticsCookies", "true");
+      writeConsent("marketingCookies", "false");
+      closeCookieUi();
+      loadGoogleAnalytics();
     }
-    
+
     function rejectCookies() {
-      localStorage.setItem("cookieConsent", "rejected");
-      document.getElementById("cookie-banner").style.display = "none";
+      writeConsent("cookieConsent", "rejected");
+      writeConsent("analyticsCookies", "false");
+      writeConsent("marketingCookies", "false");
+      closeCookieUi();
     }
-    
+
     function openSettings() {
       document.getElementById("cookie-settings").style.display = "block";
+      document.getElementById("analytics-cookies").checked = readConsent("analyticsCookies") === "true";
+      document.getElementById("marketing-cookies").checked = readConsent("marketingCookies") === "true";
+      document.getElementById("analytics-cookies").focus();
     }
-    
+
     function saveSettings() {
       let analytics = document.getElementById("analytics-cookies").checked ? "true" : "false";
       let marketing = document.getElementById("marketing-cookies").checked ? "true" : "false";
-      
-      localStorage.setItem("analyticsCookies", analytics);
-      localStorage.setItem("marketingCookies", marketing);
-      localStorage.setItem("cookieConsent", "custom");
-  
-      document.getElementById("cookie-settings").style.display = "none";
-      document.getElementById("cookie-banner").style.display = "none";
+
+      writeConsent("analyticsCookies", analytics);
+      writeConsent("marketingCookies", marketing);
+      writeConsent("cookieConsent", "custom");
+      closeCookieUi();
+      if (analytics === "true") loadGoogleAnalytics();
     }
-    
+
     function syncMobileLegend() {
       const legend = document.getElementById("mobile-legend");
       if (!legend) return;
@@ -529,7 +545,7 @@
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 5);
     scene.add(camera);
-    
+
     const renderer = new THREE.WebGLRenderer({
       antialias: !isMobileViewport,
       powerPreference: "high-performance"
@@ -540,7 +556,7 @@
     renderer.domElement.setAttribute("aria-label", "Scena 3D interattiva: cubo rotante e sistema di particelle.");
     renderer.domElement.style.cursor = "grab";
     document.body.appendChild(renderer.domElement);
-    
+
     // Carica lo sfondo
     const textureLoader = new THREE.TextureLoader();
     let backgroundTexture = null;
@@ -582,13 +598,13 @@
     ];
     const mainCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
     scene.add(mainCube);
-    
+
     // Mini-cubo interno (opzionale)
     const innerGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
     const innerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
     const innerCube = new THREE.Mesh(innerGeometry, innerMaterial);
     mainCube.add(innerCube);
-    
+
     const navTopics = [
       { label: "AMBIENTI 3D", miniColor: 0xff0000, textColor: "#ffffff", page: '/face1' },
       { label: "MONTAGGIO VIDEO", miniColor: 0x00ff00, textColor: "#00ff00", page: '/face2' },
@@ -605,7 +621,7 @@
       legendGroup.position.set(8, 4, -3);
       legendGroup.scale.set(5, 5, 5);
       scene.add(legendGroup);
-      
+
       function createTextSprite(message, fontsize = 16, textColor = "white") {
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -629,7 +645,7 @@
         sprite.scale.set(canvas.width / 300, canvas.height / 300, 1);
         return sprite;
       }
-      
+
       const miniCubeSize = 0.1;
       const spacing = 0.3;
       navTopics.forEach((entry, index) => {
@@ -647,7 +663,7 @@
         miniCube.name = entry.label;
         miniCube.position.set(0, -index * spacing, 0);
         legendGroup.add(miniCube);
-        
+
         const sprite = createTextSprite(entry.label, 16, entry.textColor);
         sprite.position.set(0.7, -index * spacing, 0);
         sprite.userData.pageUrl = entry.page;
@@ -657,7 +673,7 @@
         legendGroup.add(sprite);
       });
     }
-    
+
     // Maschera Universo (Sistema di Particelle)
     const particleCount = isMobileViewport ? 1200 : 2000;
     const particlesGeometry = new THREE.BufferGeometry();
@@ -677,7 +693,7 @@
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     particleSystem.renderOrder = 1000;
     scene.add(particleSystem);
-    
+
     // Raycaster per interazione con cubo e legenda
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -788,17 +804,17 @@
     }
     renderer.domElement.addEventListener('pointermove', updateCursor, { passive: true });
     renderer.domElement.addEventListener('pointerleave', hideTopicTooltip, { passive: true });
-    
+
     let lastFrameTime = 0;
     function animate(timestamp) {
       requestAnimationFrame(animate);
       const delta = Math.min(32, timestamp - (lastFrameTime || timestamp));
       lastFrameTime = timestamp;
       const frameScale = prefersReducedMotion ? 0.45 : Math.max(delta / 16.67, 0.5);
-      
+
       mainCube.rotation.x += 0.01 * frameScale;
       mainCube.rotation.y += 0.01 * frameScale;
-      
+
       if (cubeClicked) {
         if (!animationStartTime) animationStartTime = timestamp;
         const elapsed = timestamp - animationStartTime;
@@ -809,7 +825,7 @@
           return;
         }
       }
-      
+
       if (legendGroup.children) {
         legendGroup.children.forEach(child => {
           if (child.isMiniCube) {
@@ -818,13 +834,13 @@
           }
         });
       }
-      
+
       particleSystem.rotation.y += 0.0005 * frameScale;
-      
+
       renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
-    
+
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -832,7 +848,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight, false);
       fitBackgroundTexture(backgroundTexture);
     });
-    
+
     // Occhi che seguono il mouse
     const eyes = document.querySelectorAll('.eye');
     function moveEyes(clientX, clientY) {
@@ -863,7 +879,7 @@
       }
     }
   </script>
-  
+
   <script data-cookieconsent="ignore">
     // Audio iniziale: usa file MP3 leggeri e Web Audio dopo il primo gesto valido.
     (function () {
@@ -881,8 +897,9 @@
 
       audioFiles.forEach(file => {
         const audio = new Audio(file.src);
-        audio.preload = "auto";
-        audio.load();
+        const essential = file.id === "voce1" || file.id === "voce2";
+        audio.preload = essential ? "auto" : "none";
+        if (essential) audio.load();
         fallbackAudio.set(file.id, audio);
       });
 
@@ -975,14 +992,14 @@
       }
     })();
   </script>
-  
+
   <!-- Footer -->
   <footer class="footer" role="contentinfo">
     <strong>Emanuele Delogu</strong> - Partita IVA: <strong>02300160518</strong> - San Zeno 22/B, Arezzo<br>
-    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
-    <a href="/cookie-policy" target="_blank">Cookie Policy</a> |
-    <a href="/Termini_Condizioni" target="_blank">Termini e Condizioni</a> |
-    <a href="/Accessibilita" target="_blank">chiaro per tutti</a>
+    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+    <a href="/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a> |
+    <a href="/Termini_Condizioni" target="_blank" rel="noopener noreferrer">Termini e Condizioni</a> |
+    <a href="/Accessibilita" target="_blank" rel="noopener noreferrer">chiaro per tutti</a>
   </footer>
 </body>
 </html>

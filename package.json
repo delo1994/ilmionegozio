@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "static": "python -m http.server 8080"
+    "static": "python -m http.server 8080",
+    "check": "node scripts/validate-site.js"
   }
 }

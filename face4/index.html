@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <title>Apps & Giochi - ilmionegozio.com</title>
   <meta name="description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
+  <link rel="canonical" href="https://www.ilmionegozio.com/face4">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* Stili generali */
-    body { 
-      margin: 0; 
-      overflow: hidden; 
+    body {
+      margin: 0;
+      overflow: hidden;
       background: #000;
       font-family: Arial, sans-serif;
     }
@@ -94,8 +95,8 @@
       display: none;
       object-fit: cover;
     }
-    canvas { 
-      display: block; 
+    canvas {
+      display: block;
     }
     /* Footer visibile in fondo alla pagina */
     .footer {
@@ -143,36 +144,38 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Apps & Giochi - ilmionegozio.com">
   <meta property="og:description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
-  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:url" content="https://www.ilmionegozio.com/face4">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Apps & Giochi - ilmionegozio.com">
   <meta name="twitter:description" content="Sezione originale Apps & Giochi con animazioni e interazione 3D.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/site-foundation.css">
+  <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
 </head>
 <body>
   <h1 class="sr-only">Apps & Giochi - ilmionegozio.com</h1>
   <!-- Skip link per utenti che navigano da tastiera -->
   <a href="#game" class="skip-link">Salta al gioco</a>
-  
+
   <!-- Istruzioni per utenti con screen reader -->
   <div id="gameInstructions" class="sr-only">
     Gioco 3D Slicing. Usa il mouse per muovere il puntatore e clicca per attivare la modalità slicing. Su dispositivi touch, tocca lo schermo per attivare.
   </div>
-  
+
   <!-- Visualizzazione dinamica del punteggio -->
   <div id="score" role="status" aria-live="polite">Punteggio: 0 - Vite: 3</div>
   <div id="hazardFeedback" aria-hidden="true"></div>
-  
+
   <!-- Pulsante di ritorno con etichetta accessibile -->
   <button id="backBtn" onclick="window.location.href='/'" aria-label="Torna al Cubo Interattivo">
     Torna al Cubo Interattivo
   </button>
-  
+
   <!-- Video per il round, marcato come decorativo -->
   <video id="roundVideo" src="/static/Round1.mp4" type="video/mp4" preload="metadata" playsinline webkit-playsinline poster="/static/backgroundFace4.webp" aria-hidden="true"></video>
-  
+
   <script src="/static/media-optimizer.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
@@ -514,7 +517,7 @@
         spawnTimer = 0;
       }
       updateObjects(dt);
-      
+
       // Aggiorna l'effetto di disintegrazione sugli oggetti
       for(let obj of objects) {
         if(obj.userData.disintegrating) {
@@ -533,7 +536,7 @@
           }
         }
       }
-      
+
       if(slicingActive) {
         checkCollisions();
       }
@@ -545,10 +548,10 @@
   <!-- Footer posizionato in fondo alla pagina -->
   <footer class="footer" role="contentinfo">
     <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
-    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
-    <a href="/cookie-policy" target="_blank">Cookie Policy</a> |
-    <a href="/Accessibilita" target="_blank">Accessibilità</a> |  
-    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+    <a href="/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a> |
+    <a href="/Accessibilita" target="_blank" rel="noopener noreferrer">Accessibilità</a> |
+    <a href="/Termini_Condizioni" target="_blank" rel="noopener noreferrer">Termini&Condizioni</a>
   </footer>
 </body>
 </html>

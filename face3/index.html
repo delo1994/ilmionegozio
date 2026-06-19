@@ -2,210 +2,680 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestionale e Appuntamenti - ilmionegozio.com</title>
-  <meta name="description" content="Modulo appuntamenti e gestionale del sito originale, preparato per endpoint Vercel.">
-  <style>
-    /* Stile per contenuti nascosti ma accessibili agli screen reader */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-    /* Skip link: visibile al focus */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: #007bff;
-      color: #fff;
-      padding: 8px;
-      z-index: 100;
-      text-decoration: none;
-      transition: top 0.3s;
-    }
-    .skip-link:focus {
-      top: 0;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      padding-bottom: 120px; /* spazio per footer fisso */
-    }
-    .container {
-      max-width: 500px;
-      background: #fff;
-      padding: 20px;
-      margin: 0 auto;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 { text-align: center; }
-    form { display: flex; flex-direction: column; }
-    input, select, button { padding: 10px; margin: 10px 0; font-size: 1rem; }
-    button { background: #007bff; color: #fff; border: none; cursor: pointer; border-radius: 3px; }
-    button:hover { background: #0056b3; }
-    .footer {
-      text-align: center;
-      padding: 15px;
-      background-color: #f0f0f0;
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      font-size: 0.85rem;
-      color: #555;
-      border-top: 1px solid #ddd;
-    }
-    .footer a { color: #007bff; text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
-  
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { max-width: 100%; }
-    body > canvas { max-width: 100%; }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Prenota una consulenza digitale - ilmionegozio.com</title>
+  <meta name="description" content="Prenota una consulenza digitale su ambienti 3D, montaggio video, applicazioni, giochi, analisi di mercato e trasformazione Real to 3D.">
+  <link rel="canonical" href="https://www.ilmionegozio.com/face3">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#071016">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Gestionale e Appuntamenti - ilmionegozio.com">
-  <meta property="og:description" content="Modulo appuntamenti e gestionale del sito originale, preparato per endpoint Vercel.">
-  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Prenota una consulenza digitale - ilmionegozio.com">
+  <meta property="og:description" content="Scegli data, fascia oraria e argomento per richiedere una consulenza digitale con Emanuele Delogu.">
+  <meta property="og:url" content="https://www.ilmionegozio.com/face3">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Gestionale e Appuntamenti - ilmionegozio.com">
-  <meta name="twitter:description" content="Modulo appuntamenti e gestionale del sito originale, preparato per endpoint Vercel.">
+  <meta name="twitter:title" content="Prenota una consulenza digitale - ilmionegozio.com">
+  <meta name="twitter:description" content="Richiedi un appuntamento per il tuo prossimo progetto digitale.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="stylesheet" href="/static/site-foundation.css">
+  <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "ilmionegozio.com - Consulenza digitale",
+    "url": "https://www.ilmionegozio.com/face3",
+    "founder": { "@type": "Person", "name": "Emanuele Delogu" },
+    "areaServed": "Italia",
+    "serviceType": ["Ambienti 3D", "Montaggio video", "Applicazioni e giochi", "Analisi di mercato", "Real to 3D"]
+  }
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071016;
+      --panel: rgba(12, 25, 34, 0.92);
+      --panel-solid: #0c1922;
+      --text: #f4f7f9;
+      --muted: #aab8c2;
+      --line: rgba(255, 255, 255, 0.14);
+      --cyan: #42d9ff;
+      --cyan-dark: #0f95bc;
+      --coral: #ff6577;
+      --success: #54e39e;
+      --error: #ff8090;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; min-height: 100%; background: var(--bg); }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(66, 217, 255, 0.12), transparent 32%),
+        radial-gradient(circle at 90% 82%, rgba(255, 101, 119, 0.09), transparent 30%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.58;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      min-height: 100vh;
+      min-height: 100dvh;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .topbar {
+      display: flex;
+      width: min(1120px, calc(100% - 32px));
+      min-height: 76px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand span { color: var(--cyan); }
+
+    .back-link {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 16px;
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .back-link:hover {
+      border-color: rgba(66,217,255,0.7);
+      background: rgba(66,217,255,0.08);
+      transform: translateY(-2px);
+    }
+
+    main {
+      display: grid;
+      width: min(1120px, calc(100% - 32px));
+      grid-template-columns: minmax(0, 0.8fr) minmax(420px, 1fr);
+      gap: 56px;
+      align-items: center;
+      margin: 0 auto;
+      padding: 58px 0 72px;
+    }
+
+    .intro { max-width: 510px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      content: "";
+      background: var(--cyan);
+      box-shadow: 0 0 18px rgba(66,217,255,0.7);
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 4.5rem;
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+    .intro p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    .benefits {
+      display: grid;
+      gap: 12px;
+      margin: 30px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .benefits li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #dce6eb;
+    }
+    .benefits li::before {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+      place-items: center;
+      border: 1px solid rgba(84,227,158,0.45);
+      border-radius: 50%;
+      color: var(--success);
+      content: "✓";
+      font-size: 0.75rem;
+    }
+
+    .form-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 30px;
+      background: var(--panel);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.38);
+      backdrop-filter: blur(18px);
+    }
+    .form-panel h2 { margin: 0; font-size: 1.5rem; }
+    .form-panel > p { margin: 8px 0 24px; color: var(--muted); }
+    form { display: grid; gap: 18px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field { min-width: 0; }
+    label {
+      display: inline-block;
+      margin-bottom: 7px;
+      color: #dce6eb;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+    .required { color: var(--coral); }
+    input,
+    select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 6px;
+      padding: 0 13px;
+      color: var(--text);
+      background: rgba(4,12,17,0.72);
+      font: inherit;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+    select { cursor: pointer; }
+    input::placeholder { color: #748894; }
+    input:hover,
+    select:hover { border-color: rgba(66,217,255,0.45); }
+    input:focus,
+    select:focus {
+      border-color: var(--cyan);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(66,217,255,0.13);
+      background: rgba(4,12,17,0.96);
+    }
+    .field-feedback {
+      min-height: 18px;
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+    .field.invalid input,
+    .field.invalid select {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(255,128,144,0.1);
+    }
+    .field.invalid .field-feedback { color: var(--error); }
+    .field.valid input,
+    .field.valid select { border-color: rgba(84,227,158,0.72); }
+
+    .privacy-check {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .privacy-check input {
+      width: 20px;
+      min-height: 20px;
+      margin: 1px 0 0;
+      accent-color: var(--cyan);
+    }
+    .privacy-check a { color: var(--cyan); }
+    .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+    .submit-button {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 20px;
+      color: #041218;
+      background: linear-gradient(135deg, var(--cyan), #79f0cf);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 34px rgba(66,217,255,0.18);
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    }
+    .submit-button:hover { transform: translateY(-2px); box-shadow: 0 20px 42px rgba(66,217,255,0.28); }
+    .submit-button:active { transform: translateY(0); }
+    .submit-button:disabled { cursor: wait; filter: saturate(0.3); opacity: 0.72; }
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(4,18,24,0.28);
+      border-top-color: #041218;
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
+    }
+    .submit-button.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .form-status {
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 13px 14px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .form-status.visible { display: block; }
+    .form-status.success { border-color: rgba(84,227,158,0.5); color: #bff8dc; background: rgba(84,227,158,0.08); }
+    .form-status.error { border-color: rgba(255,128,144,0.5); color: #ffd2d8; background: rgba(255,128,144,0.08); }
+    .whatsapp-link {
+      display: inline-flex;
+      margin-top: 9px;
+      color: var(--success);
+      font-weight: 800;
+      text-underline-offset: 3px;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(4,12,17,0.68);
+      font-size: 0.78rem;
+      backdrop-filter: blur(12px);
+    }
+    .footer-inner {
+      display: flex;
+      width: min(1120px, calc(100% - 32px));
+      min-height: 72px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 auto;
+    }
+    .legal-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .legal-links a { color: #d6e1e7; text-decoration: none; }
+    .legal-links a:hover { color: var(--cyan); }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; gap: 36px; padding-top: 42px; }
+      .intro { max-width: 680px; }
+      h1 { font-size: 3.5rem; }
+    }
+    @media (max-width: 580px) {
+      .topbar { min-height: 66px; }
+      .brand { max-width: 160px; }
+      .back-link { padding: 0 12px; font-size: 0.78rem; }
+      main { width: min(100% - 22px, 520px); padding: 34px 0 50px; }
+      h1 { font-size: 2.6rem; }
+      .intro p { font-size: 0.98rem; }
+      .form-panel { padding: 20px 16px; }
+      .field-row { grid-template-columns: 1fr; gap: 18px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; padding: 18px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .spinner { animation-duration: 1.4s; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Skip link per saltare al contenuto principale -->
-  <a href="#main-content" class="skip-link">Salta al contenuto</a>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/">ILMIONEGOZIO<span>.COM</span></a>
+      <a class="back-link" href="/" aria-label="Torna al cubo interattivo">Torna al cubo</a>
+    </header>
 
-  <!-- Contenuto principale -->
-  <main id="main-content" role="main">
-    <div class="container">
-      <h1>Prenota un Appuntamento</h1>
-      <form id="appointmentForm">
-        <!-- Etichette nascoste per accessibilità -->
-        <label for="nome" class="sr-only">Nome</label>
-        <input type="text" id="nome" placeholder="Nome" required aria-required="true">
-        
-        <label for="email" class="sr-only">Email</label>
-        <input type="email" id="email" placeholder="Email" required aria-required="true">
-        
-        <label for="telefono" class="sr-only">Telefono</label>
-        <input type="tel" id="telefono" placeholder="Telefono" required aria-required="true">
-        
-        <label for="dataAppuntamento">Data Appuntamento</label>
-        <input type="date" id="dataAppuntamento" required aria-required="true">
-        
-        <label for="slotAppuntamento">Slot Appuntamento</label>
-        <select id="slotAppuntamento" required aria-required="true">
-          <option value="">-- Seleziona --</option>
-          <option value="Mattina">Mattina</option>
-          <option value="Pomeriggio">Pomeriggio</option>
-        </select>
-        
-        <label for="argomento">Scegli l'argomento:</label>
-        <select id="argomento" required aria-required="true">
-          <option value="">-- Seleziona --</option>
-          <option value="Ambienti 3D">Ambienti 3D (Faccia 1)</option>
-          <option value="Montaggio Video">Montaggio Video (Faccia 2)</option>
-          <option value="Gestionale">Gestionale (Faccia 3)</option>
-          <option value="Apps&Giochi">Apps&Giochi (Faccia 4)</option>
-          <option value="Analisi Di Mercato">Analisi di Mercato (Faccia 5)</option>
-          <option value="Real to 3D Experience">Real to 3D Experience (Faccia 6)</option>
-        </select>
-        <button type="submit">Prenota Appuntamento</button>
-      </form>
-      <div style="text-align: center; margin-top: 20px;">
-        <button onclick="goToMenu()" style="padding: 10px 20px; font-size: 1rem; background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;" aria-label="Torna al Cubo Interattivo">Torna al cubo interattivo</button>
+    <main id="contenuto-principale">
+      <section class="intro" aria-labelledby="page-title">
+        <span class="eyebrow">Consulenza digitale</span>
+        <h1 id="page-title">Trasformiamo l'idea in un progetto concreto.</h1>
+        <p>Racconta l'obiettivo e scegli l'area di interesse. Riceverai un primo confronto orientativo per definire priorità, tempi e prossimi passi.</p>
+        <ul class="benefits">
+          <li>Richiesta gratuita e senza impegno</li>
+          <li>Risposta tramite WhatsApp o email</li>
+          <li>Approccio personalizzato sul progetto</li>
+        </ul>
+      </section>
+
+      <section class="form-panel" aria-labelledby="form-title">
+        <h2 id="form-title">Richiedi un appuntamento</h2>
+        <p>I campi contrassegnati con <span class="required">*</span> sono obbligatori.</p>
+
+        <form id="appointmentForm" novalidate>
+          <input type="hidden" id="submittedAt" name="submittedAt">
+          <div class="honeypot" aria-hidden="true">
+            <label for="website">Non compilare questo campo</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="field-row">
+            <div class="field" data-field="nome">
+              <label for="nome">Nome e cognome <span class="required">*</span></label>
+              <input type="text" id="nome" name="nome" autocomplete="name" minlength="2" maxlength="80" placeholder="Mario Rossi" required aria-describedby="nome-feedback">
+              <p class="field-feedback" id="nome-feedback">Inserisci almeno 2 caratteri.</p>
+            </div>
+            <div class="field" data-field="email">
+              <label for="email">Email <span class="required">*</span></label>
+              <input type="email" id="email" name="email" autocomplete="email" maxlength="120" placeholder="nome@esempio.it" required aria-describedby="email-feedback">
+              <p class="field-feedback" id="email-feedback">Usa un indirizzo email valido.</p>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field" data-field="telefono">
+              <label for="telefono">Telefono <span class="required">*</span></label>
+              <input type="tel" id="telefono" name="telefono" autocomplete="tel" inputmode="tel" maxlength="24" placeholder="+39 333 123 4567" required aria-describedby="telefono-feedback">
+              <p class="field-feedback" id="telefono-feedback">Inserisci da 7 a 20 cifre.</p>
+            </div>
+            <div class="field" data-field="dataAppuntamento">
+              <label for="dataAppuntamento">Data preferita <span class="required">*</span></label>
+              <input type="date" id="dataAppuntamento" name="data" required aria-describedby="data-feedback">
+              <p class="field-feedback" id="data-feedback">Seleziona una data futura.</p>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field" data-field="slotAppuntamento">
+              <label for="slotAppuntamento">Fascia oraria <span class="required">*</span></label>
+              <select id="slotAppuntamento" name="slot" required aria-describedby="slot-feedback">
+                <option value="">Seleziona una fascia</option>
+                <option value="Mattina">Mattina, 09:00-13:00</option>
+                <option value="Pomeriggio">Pomeriggio, 14:00-18:00</option>
+              </select>
+              <p class="field-feedback" id="slot-feedback">Scegli la fascia che preferisci.</p>
+            </div>
+            <div class="field" data-field="argomento">
+              <label for="argomento">Area del progetto <span class="required">*</span></label>
+              <select id="argomento" name="argomento" required aria-describedby="argomento-feedback">
+                <option value="">Seleziona un argomento</option>
+                <option value="Ambienti 3D">Ambienti 3D</option>
+                <option value="Montaggio Video">Montaggio video</option>
+                <option value="Gestionale">Gestionale e appuntamenti</option>
+                <option value="Apps&Giochi">Applicazioni e giochi</option>
+                <option value="Analisi Di Mercato">Analisi di mercato</option>
+                <option value="Real to 3D Experience">Real to 3D</option>
+              </select>
+              <p class="field-feedback" id="argomento-feedback">Indica l'area più vicina al progetto.</p>
+            </div>
+          </div>
+
+          <label class="privacy-check" for="privacyConsent">
+            <input type="checkbox" id="privacyConsent" required>
+            <span>Ho letto l'<a href="/privacy-policy">informativa privacy</a> e autorizzo il trattamento dei dati necessario a rispondere alla richiesta. <span class="required">*</span></span>
+          </label>
+
+          <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
+
+          <button id="submitButton" class="submit-button" type="submit">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="button-label">Invia richiesta</span>
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <span><strong>Emanuele Delogu</strong> - P. IVA 02300160518 - Arezzo</span>
+        <nav class="legal-links" aria-label="Informazioni legali">
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/cookie-policy">Cookie</a>
+          <a href="/Accessibilita">Accessibilità</a>
+          <a href="/Termini_Condizioni">Termini e condizioni</a>
+        </nav>
       </div>
-    </div>
-  </main>
+    </footer>
+  </div>
 
-  <footer class="footer" role="contentinfo">
-    <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
-    <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
-    <a href="/cookie-policy" target="_blank">Cookie Policy</a> | 
-    <a href="/Accessibilita" target="_blank">Accessibilità</a> | 
-    <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
-  </footer>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
   <script>
-    function goToMenu() { window.location.href = "/"; }
+    (function () {
+      "use strict";
 
-    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const appointmentData = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefono: document.getElementById('telefono').value,
-        data: document.getElementById('dataAppuntamento').value,
-        slot: document.getElementById('slotAppuntamento').value,
-        argomento: document.getElementById('argomento').value
-      };
-      fetch('/book_appointment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(appointmentData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.status === 'success'){
-          if (data.whatsappUrl) {
-            window.open(data.whatsappUrl, '_blank', 'noopener');
-            alert('Prenotazione pronta: completa l\'invio su WhatsApp.');
-          } else {
-            alert('Prenotazione inviata con successo!');
-          }
-          document.getElementById('appointmentForm').reset();
-        } else { 
-          alert('Errore: ' + data.error); 
+      const form = document.getElementById("appointmentForm");
+      const statusBox = document.getElementById("formStatus");
+      const submitButton = document.getElementById("submitButton");
+      const buttonLabel = submitButton.querySelector(".button-label");
+      const dateInput = document.getElementById("dataAppuntamento");
+      const submittedAt = document.getElementById("submittedAt");
+      const controls = Array.from(form.querySelectorAll("input:not([type='hidden']):not(#website), select"));
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phonePattern = /^\+?[0-9 ()-]{7,24}$/;
+
+      function localIsoDate(date) {
+        const offset = date.getTimezoneOffset();
+        return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
+      }
+
+      const today = localIsoDate(new Date());
+      dateInput.min = today;
+      submittedAt.value = String(Date.now());
+
+      function getField(control) {
+        return control.closest(".field");
+      }
+
+      function validationMessage(control) {
+        const value = control.value.trim();
+        if (control.id === "nome") {
+          if (value.length < 2) return "Inserisci nome e cognome (almeno 2 caratteri).";
+        } else if (control.id === "email") {
+          if (!emailPattern.test(value)) return "Inserisci un indirizzo email valido.";
+        } else if (control.id === "telefono") {
+          if (!phonePattern.test(value)) return "Inserisci un numero valido da 7 a 20 cifre.";
+        } else if (control.id === "dataAppuntamento") {
+          if (!value || value < today) return "Seleziona una data di oggi o successiva.";
+        } else if (!value) {
+          return "Seleziona un'opzione.";
         }
-      })
-      .catch(err => { 
-        console.error('Errore:', err); 
-        alert('Si è verificato un errore.');
-      });
-    });
+        return "";
+      }
 
-    // Esempio di setup Three.js per la parte interattiva (opzionale)
-    const scene = new THREE.Scene();
-    const camera3D = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera3D.position.set(0, 0, 5);
-    scene.add(camera3D);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    // Il canvas viene considerato decorativo e ignorato dagli screen reader
-    renderer.domElement.setAttribute("aria-hidden", "true");
-    document.body.appendChild(renderer.domElement);
-    const legendGroup = new THREE.Group();
-    legendGroup.renderOrder = 999;
-    if (window.matchMedia("(max-width: 600px)").matches) {
-      camera3D.add(legendGroup);
-      legendGroup.position.set(-0.43, 1, -2);
-      legendGroup.scale.set(6, 6, 6);
-    } else {
-      legendGroup.position.set(8, 4, -3);
-      legendGroup.scale.set(5, 5, 5);
-      scene.add(legendGroup);
-    }
-    function animate() { 
-      requestAnimationFrame(animate); 
-      renderer.render(scene, camera3D); 
-    }
-    animate();
+      function validateControl(control, showState) {
+        const message = validationMessage(control);
+        const field = getField(control);
+        if (!field) return !message;
+        const feedback = field.querySelector(".field-feedback");
+        if (showState) {
+          field.classList.toggle("invalid", Boolean(message));
+          field.classList.toggle("valid", !message);
+          control.setAttribute("aria-invalid", message ? "true" : "false");
+          if (message) feedback.textContent = message;
+        }
+        return !message;
+      }
+
+      controls.forEach((control) => {
+        control.addEventListener("blur", () => validateControl(control, true));
+        control.addEventListener("input", () => {
+          if (getField(control)?.classList.contains("invalid")) validateControl(control, true);
+        });
+        control.addEventListener("change", () => validateControl(control, true));
+      });
+
+      function showStatus(type, message, whatsappUrl) {
+        statusBox.className = "form-status visible " + type;
+        statusBox.replaceChildren(document.createTextNode(message));
+        if (whatsappUrl) {
+          const link = document.createElement("a");
+          link.className = "whatsapp-link";
+          link.href = whatsappUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Completa l'invio su WhatsApp";
+          statusBox.appendChild(document.createElement("br"));
+          statusBox.appendChild(link);
+        }
+      }
+
+      function setSubmitting(active) {
+        submitButton.disabled = active;
+        submitButton.classList.toggle("loading", active);
+        buttonLabel.textContent = active ? "Invio in corso..." : "Invia richiesta";
+      }
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        statusBox.className = "form-status";
+
+        const invalidControl = controls.find((control) => !validateControl(control, true));
+        if (!document.getElementById("privacyConsent").checked) {
+          showStatus("error", "Per inviare la richiesta devi accettare l'informativa privacy.");
+          document.getElementById("privacyConsent").focus();
+          return;
+        }
+        if (invalidControl) {
+          showStatus("error", "Controlla i campi evidenziati e riprova.");
+          invalidControl.focus();
+          return;
+        }
+
+        const payload = {
+          nome: document.getElementById("nome").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          telefono: document.getElementById("telefono").value.trim(),
+          data: dateInput.value,
+          slot: document.getElementById("slotAppuntamento").value,
+          argomento: document.getElementById("argomento").value,
+          website: document.getElementById("website").value,
+          submittedAt: Number(submittedAt.value)
+        };
+
+        setSubmitting(true);
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 12000);
+
+        try {
+          const response = await fetch("/book_appointment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.status !== "success") throw new Error(data.error || "Invio non riuscito");
+
+          showStatus("success", data.manual ? "Richiesta preparata correttamente." : "Richiesta inviata con successo.", data.whatsappUrl);
+          form.reset();
+          controls.forEach((control) => getField(control)?.classList.remove("valid", "invalid"));
+          submittedAt.value = String(Date.now());
+        } catch (error) {
+          const message = error.name === "AbortError"
+            ? "Il server sta impiegando troppo tempo. Controlla la connessione e riprova."
+            : "Non è stato possibile inviare la richiesta. Riprova tra poco.";
+          showStatus("error", message);
+        } finally {
+          window.clearTimeout(timeout);
+          setSubmitting(false);
+        }
+      });
+
+      function startScene() {
+        if (!window.THREE) {
+          window.setTimeout(startScene, 60);
+          return;
+        }
+        const canvas = document.getElementById("scene");
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 12;
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: window.innerWidth > 600 });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth <= 600 ? 1.25 : 1.8));
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+
+        const group = new THREE.Group();
+        scene.add(group);
+        const cyanMaterial = new THREE.MeshBasicMaterial({ color: 0x42d9ff, wireframe: true, transparent: true, opacity: 0.28 });
+        const coralMaterial = new THREE.MeshBasicMaterial({ color: 0xff6577, wireframe: true, transparent: true, opacity: 0.16 });
+        const mainShape = new THREE.Mesh(new THREE.IcosahedronGeometry(3.2, 1), cyanMaterial);
+        mainShape.position.set(-5.4, 1.1, -3);
+        group.add(mainShape);
+        const secondaryShape = new THREE.Mesh(new THREE.TorusKnotGeometry(1.7, 0.38, 84, 10), coralMaterial);
+        secondaryShape.position.set(5.2, -2.2, -5);
+        group.add(secondaryShape);
+
+        const pointsGeometry = new THREE.BufferGeometry();
+        const pointCount = window.innerWidth <= 600 ? 150 : 320;
+        const positions = new Float32Array(pointCount * 3);
+        for (let index = 0; index < positions.length; index += 3) {
+          positions[index] = THREE.MathUtils.randFloatSpread(28);
+          positions[index + 1] = THREE.MathUtils.randFloatSpread(18);
+          positions[index + 2] = THREE.MathUtils.randFloatSpread(16) - 5;
+        }
+        pointsGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const points = new THREE.Points(pointsGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.035, transparent: true, opacity: 0.55 }));
+        scene.add(points);
+
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let running = true;
+        document.addEventListener("visibilitychange", () => { running = !document.hidden; });
+        function animate() {
+          window.requestAnimationFrame(animate);
+          if (!running) return;
+          if (!reduceMotion) {
+            mainShape.rotation.x += 0.0018;
+            mainShape.rotation.y += 0.0025;
+            secondaryShape.rotation.x -= 0.0015;
+            secondaryShape.rotation.y += 0.002;
+            points.rotation.y += 0.0003;
+          }
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight, false);
+        }, { passive: true });
+      }
+
+      startScene();
+    })();
   </script>
 </body>
 </html>
-
-

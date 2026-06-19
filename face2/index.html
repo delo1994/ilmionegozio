@@ -1,9 +1,10 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <title>Montaggio Video - ilmionegozio.com</title>
   <meta name="description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
+  <link rel="canonical" href="https://www.ilmionegozio.com/face2">
   <style>
     /* Stili generali */
     body {
@@ -356,17 +357,53 @@
       background: rgba(0,0,0,0.55);
       font-size: 0.9rem;
     }
+    .deferred-video {
+      position: relative;
+      min-height: 180px;
+      overflow: hidden;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background: #000;
+    }
+    .deferred-video video {
+      display: block;
+      min-height: 180px;
+      border: 0;
+      border-radius: 0;
+      object-fit: contain;
+    }
+    .load-video {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      gap: 8px;
+      border: 0;
+      padding: 20px;
+      color: #fff;
+      background: rgba(0, 18, 0, 0.76);
+      font: 700 1rem/1.3 "Courier New", monospace;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 180ms ease;
+    }
+    .load-video:hover,
+    .load-video:focus-visible { background: rgba(0, 45, 0, 0.88); }
+    .load-video span { color: #aaffaa; font-size: 0.78rem; font-weight: 400; }
+    .deferred-video.loaded .load-video { display: none; }
   </style>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Montaggio Video - ilmionegozio.com">
   <meta property="og:description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
-  <meta property="og:url" content="https://www.ilmionegozio.com/">
+  <meta property="og:url" content="https://www.ilmionegozio.com/face2">
   <meta property="og:image" content="https://www.ilmionegozio.com/static/background.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Montaggio Video - ilmionegozio.com">
   <meta name="twitter:description" content="Sezione Montaggio Video con atmosfera cinema, strumenti creativi e raccolte demo.">
   <meta name="twitter:image" content="https://www.ilmionegozio.com/static/background.webp">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/site-foundation.css">
+  <script src="/static/site-foundation.js" defer data-cookieconsent="ignore"></script>
 </head>
 <body>
   <!-- Contenuto principale -->
@@ -375,7 +412,7 @@
       <!-- Tende Cinepresa -->
       <div class="curtain left"></div>
       <div class="curtain right"></div>
-      
+
       <div class="cinema-screen">
         <div class="film-crew" aria-hidden="true">
           <div class="crew-member crew-cameraman">
@@ -402,23 +439,23 @@
           </p>
           <div class="programs">
             <div class="program">
-              <img src="/static/adobe_illustrator.png" alt="Logo Adobe Illustrator">
+              <img src="/static/adobe_illustrator.png" alt="Logo Adobe Illustrator" loading="lazy" decoding="async">
               <p>Adobe Illustrator</p>
             </div>
             <div class="program">
-              <img src="/static/adobe_photoshop.png" alt="Logo Adobe Photoshop">
+              <img src="/static/adobe_photoshop.png" alt="Logo Adobe Photoshop" loading="lazy" decoding="async">
               <p>Adobe Photoshop</p>
             </div>
             <div class="program">
-              <img src="/static/da_vinci.png" alt="Logo Da Vinci Resolve">
+              <img src="/static/da_vinci.png" alt="Logo Da Vinci Resolve" loading="lazy" decoding="async">
               <p>Da Vinci Resolve</p>
             </div>
             <div class="program">
-              <img src="/static/capcut.png" alt="Logo Capcut">
+              <img src="/static/capcut.png" alt="Logo Capcut" loading="lazy" decoding="async">
               <p>Capcut</p>
             </div>
           </div>
-          
+
           <!-- Sezione Video Collections -->
           <div class="video-collections">
             <!-- Video per Adobe Illustrator -->
@@ -452,10 +489,13 @@
             <div class="video-collection">
               <h2>Capcut</h2>
               <div class="videos-container">
-                <video controls preload="metadata" playsinline webkit-playsinline poster="/static/capcut.png">
-                  <source src="/static/capcut1.mp4" type="video/mp4">
-                  Il tuo browser non supporta il tag video.
-                </video>
+                <div class="deferred-video" id="capcut-demo">
+                  <video controls preload="none" playsinline webkit-playsinline poster="/static/capcut.png" aria-label="Video dimostrativo CapCut">
+                    <source data-src="/static/capcut1.mp4" type="video/mp4">
+                    Il tuo browser non supporta il tag video.
+                  </video>
+                  <button class="load-video" type="button">Carica il video dimostrativo<span>File completo: circa 90 MB</span></button>
+                </div>
                 <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
                 <div class="video-placeholder" role="note">Video demo non presente nel pacchetto originale.</div>
               </div>
@@ -469,10 +509,10 @@
   <footer class="footer" role="contentinfo">
     <div class="footer-left">
       <strong>Emanuele Delogu</strong> – Partita IVA: <strong>02300160518</strong> – San Zeno 22/B, Arezzo<br>
-      <a href="/privacy-policy" target="_blank">Privacy Policy</a> | 
-      <a href="/cookie-policy" target="_blank">Cookie Policy</a> |
-      <a href="/Accessibilita" target="_blank">Accessibilità</a> |  
-      <a href="/Termini_Condizioni" target="_blank">Termini&Condizioni</a>
+      <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+      <a href="/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a> |
+      <a href="/Accessibilita" target="_blank" rel="noopener noreferrer">Accessibilità</a> |
+      <a href="/Termini_Condizioni" target="_blank" rel="noopener noreferrer">Termini&Condizioni</a>
     </div>
     <div class="footer-right">
       <a class="back-link" href="/" aria-label="Torna al Cubo Interattivo">Torna al Cubo Interattivo</a>
@@ -484,12 +524,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const capcutVideo = document.querySelector('video[src], video source[src="/static/capcut1.mp4"]')?.closest("video") || document.querySelector("video");
+      const capcutShell = document.getElementById("capcut-demo");
+      const capcutVideo = capcutShell ? capcutShell.querySelector("video") : null;
+      const loadButton = capcutShell ? capcutShell.querySelector(".load-video") : null;
       if (window.IlmioMedia && capcutVideo) {
         window.IlmioMedia.prepareVideo(capcutVideo, {
-          preload: "metadata",
+          preload: "none",
           poster: "/static/capcut.png"
         });
+      }
+      if (loadButton && capcutVideo) {
+        loadButton.addEventListener("click", function () {
+          const source = capcutVideo.querySelector("source[data-src]");
+          if (source && !source.src) source.src = source.dataset.src;
+          capcutShell.classList.add("loaded");
+          capcutVideo.preload = "metadata";
+          capcutVideo.load();
+          capcutVideo.play().catch(function () {});
+        }, { once: true });
       }
     });
   </script>
@@ -508,7 +560,7 @@
     // Il canvas del greenRenderer è marcato come decorativo
     greenRenderer.domElement.setAttribute("aria-hidden", "true");
     document.body.insertBefore(greenRenderer.domElement, document.body.firstChild);
-    
+
     const greenParticleCount = 500;
     const greenParticlesGeometry = new THREE.BufferGeometry();
     const greenPositions = new Float32Array(greenParticleCount * 3);
@@ -526,7 +578,7 @@
     });
     const greenParticleSystem = new THREE.Points(greenParticlesGeometry, greenParticlesMaterial);
     greenScene.add(greenParticleSystem);
-    
+
     function animateGreen() {
       requestAnimationFrame(animateGreen);
       greenParticleSystem.rotation.y += 0.0005;
