@@ -7,6 +7,8 @@
   <link rel="canonical" href="https://www.ilmionegozio.com/face4">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; max-width: 100%; }
     /* Stili generali */
     body {
       margin: 0;
@@ -97,6 +99,9 @@
     }
     canvas {
       display: block;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
     }
     /* Footer visibile in fondo alla pagina */
     .footer {
@@ -111,19 +116,52 @@
       color: #ccc;
       border-top: 1px solid #004d00;
       z-index: 100;
+      pointer-events: none;
     }
     .footer a {
       color: #aaffaa;
       text-decoration: none;
+      pointer-events: auto;
     }
     .footer a:hover {
       text-decoration: underline;
     }
     /* Media query per versioni mobile: rimpicciolisce il footer */
-    @media (max-width: 600px) {
+    @media (max-width: 700px), (hover: none) and (pointer: coarse) {
+      #score {
+        top: max(6px, env(safe-area-inset-top));
+        left: max(6px, env(safe-area-inset-left));
+        max-width: calc(100vw - 190px);
+        font-size: 1rem;
+        line-height: 1.2;
+      }
+      #backBtn {
+        top: max(6px, env(safe-area-inset-top));
+        right: max(6px, env(safe-area-inset-right));
+        min-height: 36px;
+        padding: 7px 10px;
+        font-size: 0.76rem;
+      }
       .footer {
-        padding: 8px;
-        font-size: 0.75rem;
+        width: 100%;
+        max-height: 40px;
+        overflow: hidden;
+        padding: 3px 70px 3px 6px;
+        font-size: 0.58rem;
+        line-height: 1.12;
+        background: rgba(0,34,0,0.88);
+      }
+    }
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+      #score { top: 5px; left: 6px; font-size: 0.86rem; }
+      #backBtn { top: 5px; right: 6px; min-height: 31px; padding: 5px 9px; font-size: 0.68rem; }
+      .footer {
+        min-height: 28px;
+        max-height: 31px;
+        overflow: hidden;
+        padding: 3px 72px 3px 6px;
+        font-size: 0.53rem;
+        line-height: 1.08;
       }
     }
 
@@ -555,4 +593,3 @@
   </footer>
 </body>
 </html>
-

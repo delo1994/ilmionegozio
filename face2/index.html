@@ -14,6 +14,7 @@
       color: #fff;
       font-family: 'Courier New', Courier, monospace;
       overflow: hidden; /* La pagina principale non è scrollabile */
+      min-height: 100dvh;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -752,6 +753,7 @@
       color: #ccc;
       border-top: 1px solid #004d00;
       z-index: 10;
+      pointer-events: none;
     }
     .footer .footer-left {
       /* Contenuto a sinistra */
@@ -763,14 +765,15 @@
       color: #aaffaa;
       text-decoration: none;
       margin-left: 10px;
+      pointer-events: auto;
     }
     .footer a:hover {
       text-decoration: underline;
     }
     /* Mobile: rendi il menu dei programmi orizzontalmente scorrevole */
-    @media (max-width: 600px) {
+    @media (max-width: 700px), (hover: none) and (pointer: coarse) {
       .cinema-frame {
-        height: 100svh;
+        height: 100dvh;
         border-width: 12px;
       }
       .cinema-screen {
@@ -779,11 +782,11 @@
       }
       .content {
         width: calc(100% - 12px);
-        max-height: calc(100svh - 96px);
-        padding: 14px 10px 90px;
+        max-height: calc(100dvh - 108px);
+        padding: 12px 9px 58px;
       }
-      h1 { font-size: 1.85rem; }
-      p { font-size: 0.98rem; }
+      h1 { font-size: 1.35rem; }
+      p { font-size: 0.82rem; }
       .programs {
         overflow-x: auto;
         white-space: nowrap;
@@ -797,6 +800,8 @@
       .crew-skills-grid { grid-template-columns: 1fr; }
       .crew-skill { min-height: 0; }
       .curtain-valance { height: 54px; }
+      .curtain,
+      .curtain-valance { animation-duration: 2.2s; }
       .crew-member {
         bottom: 3%;
         width: 62px;
@@ -814,13 +819,75 @@
       .footer {
         align-items: flex-end;
         gap: 8px;
-        padding: 8px;
-        font-size: 0.62rem;
-        line-height: 1.35;
+        min-height: 48px;
+        max-height: 58px;
+        overflow: hidden;
+        padding: 6px 76px 6px 7px;
+        font-size: 0.58rem;
+        line-height: 1.22;
       }
-      .footer-left { max-width: 76%; }
-      .footer-right { margin-right: 0; text-align: right; }
-      .footer a { margin-left: 4px; }
+      .footer-left { max-width: calc(100% - 160px); max-height: 46px; overflow: hidden; }
+      .footer-right {
+        position: fixed;
+        right: max(76px, calc(env(safe-area-inset-right) + 70px));
+        bottom: max(7px, env(safe-area-inset-bottom));
+        z-index: 12;
+        margin-right: 0;
+        text-align: right;
+        pointer-events: auto;
+      }
+      .footer-right .back-link {
+        min-height: 32px;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 9px;
+        border: 1px solid rgba(170,255,170,0.46);
+        border-radius: 5px;
+        background: rgba(0,45,24,0.94);
+        white-space: nowrap;
+      }
+      .footer a { margin-left: 3px; }
+    }
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+      .cinema-frame { height: 100dvh; border-width: 6px 10px; }
+      .cinema-screen { padding-top: 4px; }
+      .content {
+        width: calc(100% - 10px);
+        max-width: 760px;
+        max-height: calc(100dvh - 44px);
+        padding: 8px 9px 36px;
+        border-width: 1px;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      h1 { margin: 0 0 4px; font-size: 1.2rem; }
+      p { margin-block: 5px; font-size: 0.72rem; line-height: 1.3; }
+      .programs { gap: 8px; margin-top: 8px; }
+      .program { width: 118px; padding: 7px; font-size: 0.7rem; }
+      .crew-skills { margin-top: 10px; }
+      .crew-skills h2 { font-size: 1rem; }
+      .crew-skills-grid { grid-template-columns: repeat(3, minmax(160px, 1fr)); overflow-x: auto; }
+      .crew-skill { min-height: 94px; padding: 8px; }
+      .video-collections { margin-top: 12px; }
+      .footer {
+        min-height: 30px;
+        max-height: 34px;
+        overflow: hidden;
+        padding: 3px 230px 3px 6px;
+        align-items: center;
+        font-size: 0.52rem;
+        line-height: 1.1;
+      }
+      .footer-left {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .footer-left br { display: none; }
+      .footer-right { bottom: max(3px, env(safe-area-inset-bottom)); }
+      .footer-right .back-link { min-height: 27px; padding: 4px 8px; font-size: 0.58rem; }
     }
 
     .video-placeholder {

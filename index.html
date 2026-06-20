@@ -184,11 +184,15 @@
         width: 80%;
       }
       .dropdown-header {
+        width: 100%;
+        border: 0;
         background: #333;
+        color: #fff;
         padding: 15px;
         border-radius: 5px;
         cursor: pointer;
         user-select: none;
+        font-family: inherit;
         font-size: 18px;
         box-shadow: 0 0 14px rgba(255,255,255,0.12);
       }
@@ -205,6 +209,7 @@
         left: 0;
         z-index: 1002;
       }
+      .dropdown-list.open { display: block; }
       .dropdown-list li {
         padding: 15px;
         display: flex;
@@ -229,6 +234,37 @@
         padding: 5px 5px;
         font-size: 11px;
         line-height: 1.35;
+      }
+    }
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
+      #mobile-legend {
+        padding: max(5px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 5px max(8px, env(safe-area-inset-left));
+        background: rgba(0, 0, 0, 0.52);
+      }
+      .dropdown { width: 100%; }
+      .dropdown-header {
+        min-height: 38px;
+        padding: 7px 12px;
+        font-size: 14px;
+      }
+      .dropdown-list.open {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      .dropdown-list li {
+        flex: 0 0 min(210px, 52vw);
+        min-height: 46px;
+        padding: 9px 12px;
+        scroll-snap-align: start;
+        white-space: nowrap;
       }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -542,8 +578,8 @@
   <!-- Menu a tendina per la legenda (solo mobile) -->
   <div id="mobile-legend" style="display:none;">
     <div class="dropdown">
-      <div class="dropdown-header" onclick="toggleDropdown()">Seleziona un Argomento</div>
-      <ul class="dropdown-list">
+      <button class="dropdown-header" type="button" aria-expanded="false" aria-controls="mobile-topic-list" onclick="toggleDropdown()">Seleziona un Argomento</button>
+      <ul class="dropdown-list" id="mobile-topic-list" aria-hidden="true">
         <li data-url="/face1">
           <span class="mini-cube" style="background: #ff0000;"></span>
           <span class="dropdown-text" style="color: #ffffff;">AMBIENTI 3D</span>
@@ -632,13 +668,18 @@
   <script>
     function toggleDropdown() {
       const list = document.querySelector('.dropdown-list');
-      list.style.display = list.style.display === 'block' ? 'none' : 'block';
+      const header = document.querySelector('.dropdown-header');
+      const open = !list.classList.contains('open');
+      list.classList.toggle('open', open);
+      list.setAttribute('aria-hidden', String(!open));
+      if (header) header.setAttribute('aria-expanded', String(open));
     }
     document.addEventListener("DOMContentLoaded", function() {
       const items = document.querySelectorAll('.dropdown-list li');
       items.forEach(item => {
         item.addEventListener('click', function() {
           const url = this.getAttribute('data-url');
+          document.querySelector('.dropdown-list')?.classList.remove('open');
           window.location.href = url;
         });
       });

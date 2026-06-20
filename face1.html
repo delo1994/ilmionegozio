@@ -15,6 +15,12 @@
       margin: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      touch-action: none;
     }
     /* Istruzioni per screen reader, visibili solo agli assistive tech */
     .sr-only {
@@ -36,6 +42,7 @@
       padding: 10px;
       border-radius: 5px;
       z-index: 100;
+      pointer-events: none;
     }
     /* Il messaggio dinamico viene annunciato ai lettori di schermo */
     #message {
@@ -270,12 +277,19 @@
       color: #004080;
       text-decoration: underline;
       font-weight: bold;
+      pointer-events: auto;
+      touch-action: manipulation;
     }
     canvas {
       display: block;
       width: 100vw !important;
       height: 100vh !important;
       height: 100dvh !important;
+    }
+    body > canvas {
+      position: fixed;
+      inset: 0;
+      touch-action: none;
     }
     footer {
       position: fixed;
@@ -287,16 +301,42 @@
       padding: 10px 0;
       font-size: 0.9rem;
       z-index: 100;
+      pointer-events: none;
     }
+    footer a { pointer-events: auto; }
     /* Riduci dimensioni per mobile senza modificare gli oggetti 3D */
-    @media (max-width: 600px) {
+    @media (max-width: 700px), (hover: none) and (pointer: coarse) {
       #info {
-        font-size: 0.8rem;
-        padding: 5px;
+        top: max(7px, env(safe-area-inset-top));
+        left: max(7px, env(safe-area-inset-left));
+        width: min(330px, calc(100vw - 88px));
+        padding: 7px 8px;
+        font-size: 0.74rem;
+        background: rgba(255,255,255,0.76);
+      }
+      #info h1 {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        line-height: 1.1;
+      }
+      #message {
+        display: -webkit-box;
+        margin: 0;
+        overflow: hidden;
+        line-height: 1.25;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+      #back-link {
+        min-height: 30px;
+        margin-top: 3px;
+        display: inline-flex;
+        align-items: center;
       }
       footer {
-        padding: 5px 0;
-        font-size: 0.8rem;
+        padding: 4px 68px 4px 6px;
+        font-size: 0.68rem;
+        line-height: 1.22;
       }
       .face1-arcade { padding: 0; }
       .face1-arcade-shell { width: 100%; max-height: 100dvh; height: 100dvh; border: 0; border-radius: 0; }
@@ -308,6 +348,28 @@
       .face1-arcade-footer p { font-size: 0.82rem; }
       .face1-arcade-restart { width: 100%; min-height: 42px; }
       .face1-story-bubble { width: min(310px, calc(100vw - 24px)); padding: 12px 14px 11px; font-size: 0.72rem; line-height: 1.3; }
+    }
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+      #info {
+        top: max(5px, env(safe-area-inset-top));
+        left: max(5px, env(safe-area-inset-left));
+        width: min(300px, 39vw);
+        padding: 5px 7px;
+      }
+      #info h1 { margin: 0; font-size: 0.78rem; white-space: nowrap; }
+      #message { display: none; }
+      #back-link { min-height: 26px; margin-top: 2px; font-size: 0.68rem; }
+      footer {
+        min-height: 30px;
+        padding: 3px 72px 3px 6px;
+        font-size: 0.58rem;
+        line-height: 1.15;
+      }
+      .face1-story-bubble {
+        width: min(330px, calc(100vw - 180px));
+        padding: 9px 12px 8px;
+        font-size: 0.66rem;
+      }
     }
   </style>
   <!-- Includi fflate per FBXLoader se necessario -->
@@ -376,6 +438,7 @@
     // === Variabili Globali ===
     let spacedrive = null;    // Modello spacedrive (Overdrive)
     let charizard = null;     // Modello Charizard
+    let charizardLoadInFlight = false;
     let facehugger = null;    // Modello Facehugger interattivo
     let character = null;     // Personaggio controllabile (modello 3D)
     let octaClickCount = 0;   // Contatore click sul dodecaedro
@@ -475,7 +538,7 @@
 
     // === Scena, Camera e Renderer ===
     const scene = new THREE.Scene();
-    const isMobileViewport = window.matchMedia("(max-width: 600px)").matches;
+    const isMobileViewport = window.matchMedia("(max-width: 700px), (hover: none) and (pointer: coarse)").matches;
     const fallbackTextureLoader = new THREE.TextureLoader();
     fallbackTextureLoader.load('/static/backgroundFace1.webp', function(texture) {
       scene.background = texture;
@@ -516,7 +579,7 @@
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
     // Se siamo su mobile, sposta la camera indietro per rendere gli oggetti più contenuti
-    if (window.innerWidth <= 600) {
+    if (isMobileViewport) {
       camera.position.set(0, 5, 30);
     } else {
       camera.position.set(0, 5, 20);
@@ -612,20 +675,49 @@
       console.error('Errore nel caricamento del modello GLB spacedrive:', error);
     });
 
-    // === Funzione per Caricare Charizard (clic sul terreno) ===
-    function loadCharizard() {
-      if (charizard) return;
+    // === Charizard: ingresso ravvicinato automatico e volo storico su richiesta ===
+    function loadCharizard(options = {}) {
+      if (charizard || charizardLoadInFlight) return;
+      const introFlight = options.intro !== false;
+      charizardLoadInFlight = true;
       gltfLoader.load('/static/charizard_flying_animation.glb', function(gltf) {
+        charizardLoadInFlight = false;
         charizard = gltf.scene;
-        // Lascialo come nella versione desktop
-        charizard.scale.set(2, 2, 2);
-        charizard.position.set(-50, 5, 0);
         charizard.traverse(child => {
           if(child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
           }
         });
+        charizard.updateMatrixWorld(true);
+        if (introFlight) {
+          const modelBox = new THREE.Box3().setFromObject(charizard);
+          const modelSize = modelBox.getSize(new THREE.Vector3());
+          const targetHeight = isMobileViewport ? 10.5 : 8.4;
+          const introScale = targetHeight / Math.max(modelSize.y, 0.01);
+          const flightZ = isMobileViewport ? 10 : 7;
+          const distance = Math.max(1, camera.position.z - flightZ);
+          const visibleHeight = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * distance;
+          const visibleWidth = visibleHeight * camera.aspect;
+          const edge = visibleWidth * 0.62 + targetHeight * 0.34;
+          charizard.scale.setScalar(introScale);
+          charizard.position.set(-edge, camera.position.y, flightZ);
+          charizard.userData.introFlight = true;
+          charizard.userData.flightStartX = -edge;
+          charizard.userData.flightEndX = edge;
+          charizard.userData.flightBaseY = camera.position.y;
+          charizard.userData.flightBaseZ = flightZ;
+          charizard.userData.flightProgress = 0;
+          charizard.userData.flightDuration = isMobileViewport ? 5.8 : 5.2;
+          charizard.userData.baseScale = introScale;
+          document.documentElement.dataset.charizardIntro = "flying";
+          document.getElementById('message').textContent = "Charizard attraversa il portale: toccalo per cambiare colore!";
+        } else {
+          charizard.scale.set(2, 2, 2);
+          charizard.position.set(-50, 5, 0);
+          charizard.userData.introFlight = false;
+          charizard.userData.baseScale = 2;
+        }
         scene.add(charizard);
         if (gltf.animations && gltf.animations.length > 0) {
           const charizardMixer = new THREE.AnimationMixer(charizard);
@@ -634,6 +726,8 @@
           charizard.userData.mixer = charizardMixer;
         }
       }, undefined, function(error) {
+        charizardLoadInFlight = false;
+        document.documentElement.dataset.charizardIntro = "error";
         console.error('Errore nel caricamento del modello GLB Charizard:', error);
       });
     }
@@ -792,16 +886,37 @@
 
     function changeCharizardColor() {
       if (!charizard) return;
+      const activeCharizard = charizard;
       showStoryBubble("animation", charizard);
       charizardColorStep += 1;
       const color = new THREE.Color().setHSL((charizardColorStep * 0.17) % 1, 0.92, 0.58);
       tintModel(charizard, color);
-      charizard.scale.setScalar(2.14);
+      const baseScale = charizard.userData.baseScale || 2;
+      charizard.scale.setScalar(baseScale * 1.08);
       setTimeout(() => {
-        if (charizard) charizard.scale.set(2, 2, 2);
+        if (charizard === activeCharizard) charizard.scale.setScalar(baseScale);
       }, 180);
       document.getElementById('message').textContent = "Charizard ha cambiato colore mentre vola!";
     }
+
+    window.Face1Charizard = Object.freeze({
+      startIntro: function() { loadCharizard({ intro: true }); },
+      state: function() {
+        if (!charizard) return { loaded: false, loading: charizardLoadInFlight, colorStep: charizardColorStep };
+        const screenPosition = charizard.getWorldPosition(new THREE.Vector3()).project(camera);
+        return {
+          loaded: true,
+          loading: false,
+          intro: Boolean(charizard.userData.introFlight),
+          progress: charizard.userData.flightProgress || 0,
+          colorStep: charizardColorStep,
+          scale: charizard.scale.x,
+          screenX: (screenPosition.x * 0.5 + 0.5) * window.innerWidth,
+          screenY: (-screenPosition.y * 0.5 + 0.5) * window.innerHeight
+        };
+      }
+    });
+    window.setTimeout(function() { loadCharizard({ intro: true }); }, 260);
 
     function createBurst(position, color, count = 14, speed = 8) {
       for (let i = 0; i < count; i++) {
@@ -1281,6 +1396,27 @@
     // === Interazione: Raycaster e Click Event ===
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    function activateStorySphere() {
+      if (!sphere || sphere.parent !== scene) return false;
+      showStoryBubble("scanning", sphere);
+      scene.remove(sphere);
+      loadFacehugger();
+      document.getElementById('message').textContent = "La sfera è stata sostituita dal Facehugger!";
+      return true;
+    }
+
+    function activateDodecahedron(target = octahedron) {
+      if (!target) return false;
+      showStoryBubble("rhino", target);
+      target.material.color.setHex(Math.random() * 0xffffff);
+      octaClickCount++;
+      console.log("Click sul dodecaedro:", octaClickCount);
+      document.getElementById('message').textContent = "Dodecaedro ha cambiato colore (" + octaClickCount + " click)!";
+      if (octaClickCount >= 10 && !character) createCharacter();
+      if (octaClickCount === 30) startOctaMiniGame();
+      return true;
+    }
+
     document.addEventListener('click', onDocumentClick, false);
     function onDocumentClick(event) {
       if (event.target instanceof Element && event.target.closest('#info, footer, #face1Arcade')) return;
@@ -1303,8 +1439,16 @@
         changeDiamondColor();
         return;
       }
-      if (charizard && ((clickedObject && isDescendantOf(clickedObject, charizard)) || isProjectedObjectNearPointer(charizard, event, 96))) {
+      if (charizard && ((clickedObject && isDescendantOf(clickedObject, charizard)) || isProjectedObjectNearPointer(charizard, event, isMobileViewport ? 170 : 140))) {
         changeCharizardColor();
+        return;
+      }
+      if (isMobileViewport && octahedron && isProjectedObjectNearPointer(octahedron, event, 92)) {
+        activateDodecahedron(octahedron);
+        return;
+      }
+      if (isMobileViewport && sphere && sphere.parent === scene && isProjectedObjectNearPointer(sphere, event, 94)) {
+        activateStorySphere();
         return;
       }
       if (facehugger && ((clickedObject && isDescendantOf(clickedObject, facehugger)) || isProjectedObjectNearPointer(facehugger, event, isMobileViewport ? 150 : 112))) {
@@ -1332,15 +1476,12 @@
         if (clickedObject.name === "ground") {
           clickedObject.material.color.setHex(Math.random() * 0xffffff);
           showStoryBubble("concept", clickedObject);
-          loadCharizard();
+          loadCharizard({ intro: false });
           document.getElementById('message').textContent = "Charizard sta volando!";
         }
         // Se la sfera viene cliccata: sostituiscila con il Facehugger
         else if (clickedObject === sphere || (clickedObject.parent && clickedObject.parent === sphere)) {
-          showStoryBubble("scanning", sphere);
-          scene.remove(sphere);
-          loadFacehugger();
-          document.getElementById('message').textContent = "La sfera è stata sostituita dal Facehugger!";
+          activateStorySphere();
         }
         // Se il clic appartiene al modello spacedrive (overdrive)
         else {
@@ -1358,17 +1499,7 @@
               octaTarget = octaTarget.parent;
             }
             if (octaTarget.name === "dodecahedron") {
-              showStoryBubble("rhino", octaTarget);
-              octaTarget.material.color.setHex(Math.random() * 0xffffff);
-              octaClickCount++;
-              console.log("Click sul dodecaedro:", octaClickCount);
-              document.getElementById('message').textContent = "Dodecaedro ha cambiato colore (" + octaClickCount + " click)!";
-              if (octaClickCount >= 10 && !character) {
-                createCharacter();
-              }
-              if (octaClickCount === 30) {
-                startOctaMiniGame();
-              }
+              activateDodecahedron(octaTarget);
             } else {
               showStoryBubble("delivery", clickedObject);
               if (clickedObject.material && clickedObject.material.color) {
@@ -1379,7 +1510,7 @@
           }
         }
       } else {
-        loadCharizard();
+        loadCharizard({ intro: false });
         document.getElementById('message').textContent = "Charizard sta volando!";
       }
     }
@@ -1422,12 +1553,24 @@
         }
       }
       // Aggiorna l'animazione di Charizard se presente
-      if (charizard && charizard.userData.mixer) {
-        charizard.userData.mixer.update(delta);
-        charizard.position.x += delta * 20;
-        if (charizard.position.x > 50) {
+      if (charizard) {
+        if (charizard.userData.mixer) charizard.userData.mixer.update(delta);
+        if (charizard.userData.introFlight) {
+          charizard.userData.flightProgress += delta / charizard.userData.flightDuration;
+          const progress = Math.min(1, charizard.userData.flightProgress);
+          charizard.position.x = THREE.MathUtils.lerp(charizard.userData.flightStartX, charizard.userData.flightEndX, progress);
+          charizard.position.y = charizard.userData.flightBaseY + Math.sin(progress * Math.PI * 2) * 0.55;
+          charizard.position.z = charizard.userData.flightBaseZ + Math.sin(progress * Math.PI) * 1.15;
+        } else {
+          charizard.position.x += delta * 20;
+        }
+        const charizardFinished = charizard.userData.introFlight
+          ? charizard.userData.flightProgress >= 1
+          : charizard.position.x > 50;
+        if (charizardFinished) {
           scene.remove(charizard);
           charizard = null;
+          document.documentElement.dataset.charizardIntro = "complete";
           document.getElementById('message').textContent = "Charizard è scomparso!";
         }
       }

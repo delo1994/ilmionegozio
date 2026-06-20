@@ -63,6 +63,8 @@ assert.match(index, /const animationDuration = 1000/, "L'animazione storica del 
 assert.match(index, /elapsed >= animationDuration && !transitionEffectStarted[\s\S]*startFaceTransition/, "Gli effetti devono partire soltanto al termine dell'animazione originale");
 assert.match(index, /function prefetchFace[\s\S]*rel = "prefetch"/, "La destinazione deve essere precaricata durante l'animazione del cubo");
 assert.match(index, /window\.IndexFaceTransitions/, "Le sei transizioni devono esporre uno stato diagnostico");
+assert.match(index, /class="dropdown-header"[^>]*aria-controls="mobile-topic-list"/, "Il menu mobile deve usare un controllo accessibile");
+assert.match(index, /\.dropdown-list\.open[\s\S]*touch-action:\s*pan-x/, "Il menu landscape deve scorrere orizzontalmente con il dito");
 for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-seamless.gif", "static/meteoriti-spazio-continuous.gif", "static/meteoriti-spazio-static.png"]) {
   assert.ok(fs.statSync(path.join(root, asset)).size > 0, `${asset} deve esistere e non essere vuoto`);
 }
@@ -93,6 +95,8 @@ for (const skill of ["Fotografia professionale", "Videomaking e regia", "Riprese
 }
 assert.match(face2, /class="studio-drone"/, "Face2 deve includere il drone decorativo");
 assert.match(face2, /legacy-green-particles-disabled/, "Il vecchio sfondo a particelle deve restare disattivato");
+assert.match(face2, /orientation:\s*landscape[\s\S]*max-height:\s*34px/, "Face2 deve mantenere un footer compatto in landscape");
+assert.match(face2, /right:\s*max\(76px/, "Il ritorno Face2 deve lasciare spazio a WhatsApp");
 
 const face5 = read("face5.html");
 for (const title of ["Studio Creativo Premium", "Agenzia AI &amp; Marketing", "Portfolio Professionale Tech"]) {
@@ -160,6 +164,11 @@ assert.match(face1, /id="face1Arcade"/, "Face1 deve includere l'arcade 3D");
 assert.match(face1, /facehuggerClickCount\s*>=\s*5/, "Il Facehugger deve aprire il gioco dopo cinque tocchi");
 assert.match(face1, /diamondClickCount\s*>=\s*5/, "Il diamante deve aprire il gioco dopo cinque tocchi");
 assert.match(face1, /startFace1Arcade\("coffee"/, "Il caffe deve avviare il gioco tematico");
+assert.match(face1, /window\.Face1Charizard/, "Face1 deve esporre lo stato del volo iniziale di Charizard");
+assert.match(face1, /loadCharizard\(\{ intro: true \}\)/, "Charizard deve attraversare automaticamente la scena all'ingresso");
+assert.match(face1, /targetHeight = isMobileViewport \? 10\.5 : 8\.4/, "Charizard deve apparire ingrandito anche su mobile");
+assert.match(face1, /isProjectedObjectNearPointer\(octahedron, event, 92\)/, "Il dodecaedro deve avere un'area touch mobile tollerante");
+assert.match(face1, /isProjectedObjectNearPointer\(sphere, event, 94\)/, "La sfera deve avere un'area touch mobile tollerante");
 
 const face1Games = read("static/face1-games.js");
 for (const title of ["Portale VR", "Prisma Quantico", "Barista Orbitale"]) {
@@ -171,8 +180,14 @@ const face6 = read("face6.html");
 assert.match(face6, /<video id="experienceVideo" autoplay muted loop preload="auto"/, "Face6 deve richiedere autoplay immediato");
 assert.match(face6, /function startExperienceVideo[\s\S]*experienceVideo\.play\(\)/, "Face6 deve avere un avvio video immediato");
 assert.match(face6, /prepareVideo\(experienceVideo[\s\S]*startExperienceVideo\(\)/, "Face6 deve avviare il video dopo la preparazione senza attendere un click");
+assert.match(face6, /orientation:\s*landscape[\s\S]*\.overlay p \{[^}]*font-size:\s*0\.75rem/, "Face6 deve compattare il testo in landscape");
+assert.match(face6, /max-height:\s*46px/, "Face6 deve evitare sovrapposizioni con il footer mobile");
 
-for (const face of ["face1", "face2", "face5"]) {
+const face4 = read("face4.html");
+assert.match(face4, /orientation:\s*landscape[\s\S]*max-height:\s*31px/, "Face4 deve usare un footer ridotto in landscape");
+assert.match(face4, /\*, \*::before, \*::after \{ box-sizing: border-box; \}/, "Face4 non deve allargare il footer oltre il viewport");
+
+for (const face of ["face1", "face2", "face4", "face5"]) {
   assert.equal(read(`${face}.html`), read(`${face}/index.html`), `${face}.html e ${face}/index.html devono restare sincronizzati`);
 }
 assert.equal(round1, read("face4Round1/index.html"), "Face4Round1 e la route devono restare sincronizzati");

@@ -27,11 +27,14 @@
       font-family: Arial, sans-serif;
       color: #fff;
       overflow: hidden;
+      width: 100%;
+      min-height: 100dvh;
     }
     .video-container {
       position: relative;
       width: 100%;
       height: 100vh;
+      height: 100dvh;
     }
     video {
       width: 100%;
@@ -99,6 +102,60 @@
       text-decoration: underline;
     }
 
+    @media (max-width: 700px), (hover: none) and (pointer: coarse) {
+      .overlay {
+        justify-content: center;
+        overflow-y: auto;
+        padding: 76px 16px 82px;
+        overscroll-behavior: contain;
+      }
+      .overlay h1 {
+        margin: 0 0 12px;
+        font-size: clamp(1.65rem, 8vw, 2.25rem);
+        line-height: 1.05;
+      }
+      .overlay p {
+        max-width: 620px;
+        margin: 0;
+        font-size: clamp(0.88rem, 3.7vw, 1.02rem);
+        line-height: 1.4;
+      }
+      .back-link {
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        min-height: 38px;
+        padding: 8px 11px;
+        font-size: 0.78rem;
+      }
+      .footer {
+        max-height: 46px;
+        overflow: hidden;
+        padding: 5px 70px 5px 7px;
+        background: rgba(0,0,0,0.72);
+        font-size: 0.64rem;
+        line-height: 1.22;
+      }
+    }
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+      .overlay {
+        align-items: flex-start;
+        justify-content: center;
+        padding: 50px 150px 38px 18px;
+        text-align: left;
+      }
+      .overlay h1 { margin-bottom: 7px; font-size: 1.55rem; }
+      .overlay p { max-width: 650px; font-size: 0.75rem; line-height: 1.28; }
+      .back-link { top: 7px; right: 8px; min-height: 32px; padding: 6px 9px; font-size: 0.68rem; }
+      .footer {
+        min-height: 29px;
+        max-height: 34px;
+        overflow: hidden;
+        padding: 3px 72px 3px 6px;
+        font-size: 0.53rem;
+        line-height: 1.08;
+      }
+    }
+
     .video-placeholder {
       width: 200px;
       min-height: 112px;
@@ -114,7 +171,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { max-width: 100%; }
+    html, body { width: 100%; height: 100%; max-width: 100%; overflow: hidden; }
     body > canvas { max-width: 100%; }
   </style>
   <meta property="og:type" content="website">
