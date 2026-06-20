@@ -28,7 +28,8 @@ for (const voice of [1, 2, 4, 5, 6, 7, 8, 9, 10]) {
 }
 assert.match(index, /id="meteor-overlay"/, "La homepage deve includere lo strato meteoriti");
 assert.match(index, /data-meteor-count="38"/, "Lo sciame deve includere molti meteoriti piccoli");
-assert.match(index, /meteoriti-spazio\.gif/, "La homepage deve caricare la GIF trasparente dei meteoriti");
+assert.match(index, /data-meteor-frames="56"/, "La homepage deve dichiarare la sequenza estesa dei meteoriti");
+assert.match(index, /meteoriti-spazio-seamless\.gif/, "La homepage deve caricare la GIF dei meteoriti raccordata");
 assert.match(index, /meteoriti-spazio-static\.png/, "La homepage deve avere il fallback meteoriti a movimento ridotto");
 assert.match(index, /drop-shadow\(0 0 4px/, "L'alone dei meteoriti deve restare piccolo e discreto");
 assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco interno deve essere pieno");
@@ -39,6 +40,9 @@ assert.match(index, /const electricBoltCount = isMobileViewport \? 8 : 18/, "Le 
 assert.match(index, /function refreshElectricBolt/, "Le scariche elettriche devono rigenerare il proprio percorso");
 assert.match(index, /mainCube\.add\(electricDischargeGroup\)/, "Le scariche devono occupare lo spazio interno dell'ipercubo");
 assert.match(index, /new THREE\.PointsMaterial/, "Le scariche devono avere nodi luminosi visibili su mobile");
+assert.match(index, /const cubeSmokeParticleCount = isMobileViewport \? 10 : 22/, "Il fumo deve essere leggero su mobile e piu ricco su desktop");
+assert.match(index, /mainCube\.add\(cubeSmokeGroup\)/, "Il fumo deve restare dentro l'ipercubo");
+assert.match(index, /function updateCubeSmoke/, "Il fumo chiaro e scuro deve fluttuare nello spazio interno");
 assert.match(index, /viewport-fit=cover/, "La homepage deve coprire le aree di sicurezza in orizzontale");
 assert.match(index, /viewport\.width > viewport\.height \? 1\.28 : 1/, "Il cubo deve restare leggibile con il telefono in orizzontale");
 assert.match(index, /\.eyes-container\s*\{[\s\S]*?inset:\s*0;[\s\S]*?pointer-events:\s*none;/, "Gli occhi devono restare distribuiti nel viewport senza creare zone bianche in basso");
@@ -58,9 +62,11 @@ assert.match(index, /const animationDuration = 1000/, "L'animazione storica del 
 assert.match(index, /elapsed >= animationDuration && !transitionEffectStarted[\s\S]*startFaceTransition/, "Gli effetti devono partire soltanto al termine dell'animazione originale");
 assert.match(index, /function prefetchFace[\s\S]*rel = "prefetch"/, "La destinazione deve essere precaricata durante l'animazione del cubo");
 assert.match(index, /window\.IndexFaceTransitions/, "Le sei transizioni devono esporre uno stato diagnostico");
-for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-static.png"]) {
+for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-seamless.gif", "static/meteoriti-spazio-static.png"]) {
   assert.ok(fs.statSync(path.join(root, asset)).size > 0, `${asset} deve esistere e non essere vuoto`);
 }
+const meteorGif = fs.readFileSync(path.join(root, "static/meteoriti-spazio-seamless.gif")).toString("latin1");
+assert.ok((meteorGif.match(/\x21\xF9\x04/g) || []).length >= 56, "La GIF raccordata deve contenere almeno 56 fotogrammi");
 
 const round1 = read("Face4Round1.html");
 assert.match(round1, /JAILBREAK_CHORD_MS\s*=\s*1200/, "DELO deve accettare un accordo rapido per tastiere con rollover limitato");
@@ -140,6 +146,8 @@ assert.match(face1, /new THREE\.DodecahedronGeometry\(2, 0\)/, "Il solido giallo
 assert.match(face1, /octahedron\.name = "dodecahedron"/, "Il dodecaedro deve essere riconosciuto dal raycaster");
 assert.match(face1, /id="face1StoryBubble"/, "Face1 deve includere le nuvolette narrative");
 assert.match(face1, /window\.Face1Story/, "Face1 deve esporre lo stato della missione staff");
+assert.match(face1, /font:\s*700 0\.8rem\/1\.34 Arial/, "Il testo delle vignette Face1 deve restare compatto e leggibile");
+assert.match(face1, /font-size:\s*0\.72rem;\s*line-height:\s*1\.3/, "Le vignette Face1 devono adattarsi anche agli schermi mobili");
 for (const skill of ["Rhinoceros", "NURBS", "Blender", "Unity", "Unreal Engine"]) {
   assert.match(face1, new RegExp(skill), `La storia Face1 deve includere ${skill}`);
 }
