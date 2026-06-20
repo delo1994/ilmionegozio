@@ -28,8 +28,9 @@ for (const voice of [1, 2, 4, 5, 6, 7, 8, 9, 10]) {
 }
 assert.match(index, /id="meteor-overlay"/, "La homepage deve includere lo strato meteoriti");
 assert.match(index, /data-meteor-count="38"/, "Lo sciame deve includere molti meteoriti piccoli");
-assert.match(index, /data-meteor-frames="56"/, "La homepage deve dichiarare la sequenza estesa dei meteoriti");
-assert.match(index, /meteoriti-spazio-seamless\.gif/, "La homepage deve caricare la GIF dei meteoriti raccordata");
+assert.match(index, /data-meteor-frames="120"/, "La homepage deve dichiarare la sequenza continua dei meteoriti");
+assert.match(index, /data-meteor-mode="continuous-translation"/, "I meteoriti devono usare movimento continuo senza dissolvenza");
+assert.match(index, /meteoriti-spazio-continuous\.gif/, "La homepage deve caricare la GIF continua dei meteoriti");
 assert.match(index, /meteoriti-spazio-static\.png/, "La homepage deve avere il fallback meteoriti a movimento ridotto");
 assert.match(index, /drop-shadow\(0 0 4px/, "L'alone dei meteoriti deve restare piccolo e discreto");
 assert.match(index, /innerMaterial[\s\S]*wireframe:\s*false/, "Il cubo bianco interno deve essere pieno");
@@ -62,11 +63,11 @@ assert.match(index, /const animationDuration = 1000/, "L'animazione storica del 
 assert.match(index, /elapsed >= animationDuration && !transitionEffectStarted[\s\S]*startFaceTransition/, "Gli effetti devono partire soltanto al termine dell'animazione originale");
 assert.match(index, /function prefetchFace[\s\S]*rel = "prefetch"/, "La destinazione deve essere precaricata durante l'animazione del cubo");
 assert.match(index, /window\.IndexFaceTransitions/, "Le sei transizioni devono esporre uno stato diagnostico");
-for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-seamless.gif", "static/meteoriti-spazio-static.png"]) {
+for (const asset of ["static/meteoriti-spazio.gif", "static/meteoriti-spazio-seamless.gif", "static/meteoriti-spazio-continuous.gif", "static/meteoriti-spazio-static.png"]) {
   assert.ok(fs.statSync(path.join(root, asset)).size > 0, `${asset} deve esistere e non essere vuoto`);
 }
-const meteorGif = fs.readFileSync(path.join(root, "static/meteoriti-spazio-seamless.gif")).toString("latin1");
-assert.ok((meteorGif.match(/\x21\xF9\x04/g) || []).length >= 56, "La GIF raccordata deve contenere almeno 56 fotogrammi");
+const meteorGif = fs.readFileSync(path.join(root, "static/meteoriti-spazio-continuous.gif")).toString("latin1");
+assert.ok((meteorGif.match(/\x21\xF9\x04/g) || []).length >= 120, "La GIF continua deve contenere almeno 120 fotogrammi");
 
 const round1 = read("Face4Round1.html");
 assert.match(round1, /JAILBREAK_CHORD_MS\s*=\s*1200/, "DELO deve accettare un accordo rapido per tastiere con rollover limitato");
